@@ -41,6 +41,17 @@ const DATA = [
 ];
 
 const Account = (props) => {
+
+    const Navigatee = (id) => {
+        if (id === "3") {
+            props.navigation.navigate("Orders")
+        } else if (id === "2") {
+            props.navigation.navigate("Alerts")
+        } 
+    }
+    
+
+
     return (
         <View style={styles.container}>
             <Header left LeftImage ImageName={iconPath.drawerIcon}
@@ -68,7 +79,7 @@ const Account = (props) => {
                         flexDirection: "row", backgroundColor: "#EEEEEE", paddingHorizontal: wp(4), justifyContent: "space-between",
                         alignItems: "center", paddingVertical: wp(6), borderRadius: 12, marginTop: 12
                     }}
-                    // onPress={() => this.navigate(item)}
+                    onPress={() => Navigatee(item.id)}
                     >
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                             <Image source={item.imgName} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />

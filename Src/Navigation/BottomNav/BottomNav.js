@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { wp } from '../../Helpers/Responsiveness';
 import HomeStack from '../Stack/HomeStack';
+import TradeStack from '../Stack/TradeStack';
 import MarketInfoStack from '../Stack/MarketInfoStack';
 import AccountStack from '../Stack/AccountStack';
 
@@ -102,8 +103,8 @@ export default function BottomNav() {
       />
 
       <Tab.Screen
-        name="Settings"
-        component={Screen4}
+        name="TradeStack"
+        component={TradeStack}
         options={{
           tabBarIcon: ({ focused }) => (
             <View style={{ backgroundColor: Colors.greenColor, borderRadius: 4, alignItems: "center", height:"100%", width:"85%", justifyContent:"center" }}>
