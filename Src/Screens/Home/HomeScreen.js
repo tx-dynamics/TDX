@@ -89,7 +89,6 @@ const HomeScreen = (props) => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
 
-
                     <View style={{ backgroundColor: "#CCCCCC33", padding: wp(4), paddingBottom:wp(2) }}>
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                             <View style={{ flexDirection: "row" }}>

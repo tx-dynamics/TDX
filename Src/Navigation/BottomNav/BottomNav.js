@@ -7,6 +7,7 @@ import HomeStack from '../Stack/HomeStack';
 import TradeStack from '../Stack/TradeStack';
 import MarketInfoStack from '../Stack/MarketInfoStack';
 import AccountStack from '../Stack/AccountStack';
+import AssetsStack from '../Stack/AssetsStack';
 
 import { iconPath } from '../../Constants/icon';
 import { Colors } from '../../Constants/Colors';
@@ -72,7 +73,7 @@ export default function BottomNav() {
         showLabel: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: 55, 
+          height: 55,
           // elevation: 0, shadowOpacity: 0,
           borderTopColor: "transparent",
           justifyContent: "center", alignItems: "center",
@@ -95,7 +96,7 @@ export default function BottomNav() {
       <Tab.Screen name="MarketInfoStack" component={MarketInfoStack}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={{  padding: 3, borderRadius: 8, alignItems: "center", paddingLeft: 4 }}>
+            <View style={{ padding: 3, borderRadius: 8, alignItems: "center", paddingLeft: 4 }}>
               <Image source={iconPath.Bottom2} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
             </View>
           ),
@@ -107,7 +108,7 @@ export default function BottomNav() {
         component={TradeStack}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={{ backgroundColor: Colors.greenColor, borderRadius: 4, alignItems: "center", height:"100%", width:"85%", justifyContent:"center" }}>
+            <View style={{ backgroundColor: Colors.greenColor, borderRadius: 4, alignItems: "center", height: "100%", width: "85%", justifyContent: "center" }}>
               <Image source={iconPath.Bottom3} style={{ width: wp(20), height: wp(20), resizeMode: "contain" }} />
             </View>
           ),
@@ -120,11 +121,11 @@ export default function BottomNav() {
       />
 
       <Tab.Screen
-        name="Profile"
-        component={Screen4}
+        name="AssetsStack"
+        component={AssetsStack}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={{  padding: 4, borderRadius: 8, alignItems: "center" }}>
+            <View style={{ padding: 4, borderRadius: 8, alignItems: "center" }}>
               <Image source={iconPath.Bottom4} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
             </View>
           ),
@@ -140,8 +141,13 @@ export default function BottomNav() {
               <Image source={iconPath.Bottom5} style={{ width: wp(9), height: wp(9), resizeMode: "contain" }} />
             </View>
           ),
-
         }}
+
+        listeners={({ navigation }) => ({
+          tabPress: () => {
+            navigation.navigate('AccountStack', { screen: 'Account' });
+          },
+        })}
       />
 
     </Tab.Navigator>

@@ -44,7 +44,7 @@ const InputField = (props) => {
             {props.secureText &&
                 <TouchableOpacity style={{ paddingRight: wp(1.8), }} onPress={props.onPress}>
                     {props.RightImage ?
-                    <Image source={props.secureTextEntry ? iconPath.passwordHide : iconPath.passwordUnhide} style={{ width: wp(6), height: wp(6) }} resizeMode={"contain"}/>
+                    <Image source={props.newImage ? props.newImage : props.secureTextEntry ? iconPath.passwordHide : iconPath.passwordUnhide} style={{ width: wp(6), height: wp(6) }} resizeMode={"contain"}/>
                     :
                      <Ionicons
                         size={wp(6)}

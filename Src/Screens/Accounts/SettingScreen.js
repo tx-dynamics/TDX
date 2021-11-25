@@ -15,7 +15,7 @@ import ModalDropdown from 'react-native-modal-dropdown';
 
 const SettingScreen = (props) => {
 
-    const [DropDownItem, setDropDownItem] = useState('')
+    const [DropDownItem, setDropDownItem] = useState('USD')
 
     return (
         <View style={styles.container}>
@@ -24,7 +24,7 @@ const SettingScreen = (props) => {
                 leftPress={() => props.navigation.goBack()} />
             <ScrollView>
 
-                <View style={[styles.headingContainer, { flexDirection: "row", justifyContent:"space-between" }]}>
+                <View style={[styles.headingContainer, { flexDirection: "row", justifyContent: "space-between" }]}>
                     <ResponsiveText size="h8" >{"Contact Details"}</ResponsiveText>
                     <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} >{"Edit Profile"}</ResponsiveText>
                 </View>
@@ -42,6 +42,7 @@ const SettingScreen = (props) => {
 
                     <ResponsiveText size="h8" color={"#6F7074"} fontFamily={fonts.Poppins_SemiBold} >{"GH₵"}</ResponsiveText>
                     <ModalDropdown options={['GHS', 'USD']}
+                        defaultValue={DropDownItem}
                         style={styles.dropDown}
                         dropdownStyle={styles.dropDown_dropDownStyle}
                         dropdownTextStyle={styles.dropDown_textStyle}

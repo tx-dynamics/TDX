@@ -28,6 +28,12 @@ const HelpDull = require("../Assets/Images/HelpDull.png");
 const DROPDOWN = require("../Assets/Images/DROPDOWN.png");
 const passwordHide = require("../Assets/Images/passwordHide.png");
 const passwordUnhide = require("../Assets/Images/passwordUnhide.png");
+const greenRadioBtn = require("../Assets/Images/greenRadioBtn.png");
+const darkRadioBtn = require("../Assets/Images/darkRadioBtn.png");
+const Deposit = require("../Assets/Images/Deposit.png");
+const Withdrawal = require("../Assets/Images/Withdrawal.png");
+const uploadWhite = require("../Assets/Images/uploadWhite.png");
+const calender = require("../Assets/Images/calender.png");
 
 export const iconPath = {
   Logo,
@@ -60,4 +66,10 @@ export const iconPath = {
   DROPDOWN,
   passwordHide,
   passwordUnhide,
+  greenRadioBtn,
+  darkRadioBtn,
+  Deposit,
+  Withdrawal,
+  uploadWhite,
+  calender
 };
