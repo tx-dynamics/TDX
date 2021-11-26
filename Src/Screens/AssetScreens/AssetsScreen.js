@@ -125,7 +125,8 @@ const AssetsScreen = (props) => {
 
 
 
-            <View style={{ backgroundColor: "#CCCCCC33", paddingVertical: wp(4), paddingHorizontal: wp(3), paddingBottom: wp(2) }}>
+            <Pressable onPress={() => props.navigation.navigate("AssetsDetailss")}
+                style={{ backgroundColor: "#CCCCCC33", paddingVertical: wp(4), paddingHorizontal: wp(3), paddingBottom: wp(2) }}>
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                     <View style={{ flexDirection: "row" }}>
                         <Image source={iconPath.coin1} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
@@ -222,73 +223,7 @@ const AssetsScreen = (props) => {
 
                 </View>
 
-                {/* <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-                 marginTop: 7 }}>
-
-                    <View style={{}}>
-                        <ResponsiveText size="h7" margin={[0, 0, 0, 5]}>{"Ticker"}</ResponsiveText>
-                        <ResponsiveText size="h6" margin={[0, 0, 0, 5]}>{"GWAYM1"}</ResponsiveText>
-                    </View>
-
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <LineChart
-                            data={Greendata}
-                            width={wp(30)} // from react-native
-                            height={wp(11)}
-                            withHorizontalLabels={false}
-                            flatColor={true}
-                            chartConfig={{
-                                backgroundGradientFromOpacity: 0,
-                                backgroundGradientToOpacity: 0,
-                                color: (opacity = 1) => Colors.greenColor,
-                                propsForDots: { r: "0" },
-                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                            }}
-                            bezier
-                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
-                        />
-
-                        <View style={{ alignItems: "flex-end" }}>
-                            <ResponsiveText size="h6" color={Colors.greenColor}>{"2000"}</ResponsiveText>
-                            <ResponsiveText size="h8" color={Colors.greenColor} margin={[-4, 0, 0, 0]}>{"+10%"}</ResponsiveText>
-                        </View>
-                    </View>
-
-                </View>
-
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
-                    <ResponsiveText size="h6" margin={[0, 0, 0, 5]}>{"GWAYM1"}</ResponsiveText>
-
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <LineChart
-                            data={Reddata}
-                            width={wp(30)} // from react-native
-                            height={wp(11)}
-                            withHorizontalLabels={false}
-                            flatColor={true}
-                            chartConfig={{
-                                backgroundGradientFromOpacity: 0,
-                                backgroundGradientToOpacity: 0,
-                                color: (opacity = 1) => "#DB1222",
-                                propsForDots: { r: "0" },
-                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                            }}
-                            bezier
-                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -20 }] }}
-                        />
-
-                        <View style={{ alignItems: "flex-end" }}>
-                            <ResponsiveText size="h6" color={"#DB1222"}>{"1875"}</ResponsiveText>
-                            <ResponsiveText size="h8" color={"#DB1222"} margin={[-4, 0, 0, 0]}>{"-3.8%"}</ResponsiveText>
-                        </View>
-                    </View>
-
-                </View>
-
-                <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "90%", alignSelf: "center", marginTop: 18 }}/>
-            */}
-
-            </View>
+            </Pressable>
 
 
 

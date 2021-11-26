@@ -10,6 +10,7 @@ import ChangePassword from '../../Screens/Accounts/ChangePassword'
 import NotificationSettings from '../../Screens/Accounts/NotificationSettings'
 import Orders from '../../Screens/Accounts/Orders'
 import Alerts from '../../Screens/Accounts/Alerts'
+import RequestACall from '../../Screens/Accounts/RequestACall'
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ function AccountStack(props) {
                 <Stack.Screen name="NotificationSettings" component={NotificationSettings} />
                 <Stack.Screen name="Orders" component={Orders} />
                 <Stack.Screen name="Alerts" component={Alerts} />
+                <Stack.Screen name="RequestACall" component={RequestACall} />
             </Stack.Navigator>
         </>
     );

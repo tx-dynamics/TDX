@@ -69,12 +69,11 @@ class Content extends Component {
     if (item.id === '1') {
       // this.props.navigation.navigate("HomeStack")
       // this.props.navigation.navigate("HomeStack")
-      this.props.navigation.navigate('DrawerStack', { screen: 'TicketMenu' });
+      this.props.navigation.navigate('AccountStack', { screen: 'SettingScreen' });
     }
     else if (item.id === "2") {
       // this.props.navigation.navigate("BinStack")
-      // this.props.navigation.navigate('BinStack', { screen: 'AddBin' });
-
+      this.props.navigation.navigate('AccountStack', { screen: 'RequestACall' });
     }
     else if (item.id === "3") {
       // this.props.navigation.navigate('DrawerStack', { screen: 'Store' });
@@ -156,7 +155,7 @@ class Content extends Component {
                 flexDirection: "row", backgroundColor: "#EEEEEE", paddingHorizontal: wp(4), justifyContent: "space-between",
                 alignItems: "center", paddingVertical: wp(3.5), borderRadius: 12
               }}
-              // onPress={() => this.navigate(item)}
+              onPress={() => this.navigate(item)}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Image source={item.imgName} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />

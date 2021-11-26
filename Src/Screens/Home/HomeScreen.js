@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList } from 'react-native'
+import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
@@ -50,11 +50,11 @@ const Reddata = {
 }
 
 const DATA = [
-    { id: "1", coinName:"Maize", },
-    { id: "2", coinName:"Soya Bean", },
-    { id: "3", coinName:"Rice", },
-    { id: "4", coinName:"Sesame", },
-    { id: "5", coinName:"Sorghum", },
+    { id: "1", coinName: "Maize", },
+    { id: "2", coinName: "Soya Bean", },
+    { id: "3", coinName: "Rice", },
+    { id: "4", coinName: "Sesame", },
+    { id: "5", coinName: "Sorghum", },
 ]
 
 const HomeScreen = (props) => {
@@ -62,7 +62,8 @@ const HomeScreen = (props) => {
         <View style={styles.container}>
             <Header left LeftImage ImageName={iconPath.drawerIcon}
                 midImage right RightIconType={"Ionicons"} RightIconName={"search"}
-                leftPress={() => props.navigation.openDrawer()} />
+                leftPress={() => props.navigation.openDrawer()}
+                RightPress={() => props.navigation.navigate("SearchScreen")} />
             <View style={{ paddingHorizontal: wp(4), marginTop: 15 }}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Image source={iconPath.marketIcon} style={{ width: wp(6), height: wp(6), resizeMode: "contain" }} />
@@ -89,7 +90,8 @@ const HomeScreen = (props) => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
 
-                    <View style={{ backgroundColor: "#CCCCCC33", padding: wp(4), paddingBottom:wp(2) }}>
+                    <Pressable onPress={() => props.navigation.navigate("AssetsDetails")}
+                        style={{ backgroundColor: "#CCCCCC33", padding: wp(4), paddingBottom: wp(2) }}>
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                             <View style={{ flexDirection: "row" }}>
                                 <Image source={iconPath.coin1} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
@@ -156,14 +158,10 @@ const HomeScreen = (props) => {
 
                         </View>
 
-                        <View style={{backgroundColor:"#D8D8D8", height:1.5, width:"90%", alignSelf:"center", marginTop:18}}>
+                        <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "90%", alignSelf: "center", marginTop: 18 }}>
                         </View>
-                    </View>
-
-
+                    </Pressable>
                 )} />
-
-
 
         </View>
     )
@@ -172,8 +170,5 @@ export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: Colors.white,
-        // justifyContent: "center",
-        // alignItems: "center"
     }
 })

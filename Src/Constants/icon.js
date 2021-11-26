@@ -34,6 +34,8 @@ const Deposit = require("../Assets/Images/Deposit.png");
 const Withdrawal = require("../Assets/Images/Withdrawal.png");
 const uploadWhite = require("../Assets/Images/uploadWhite.png");
 const calender = require("../Assets/Images/calender.png");
+const threeVerticalDot = require("../Assets/Images/threeVerticalDot.png");
+const timeIcon = require("../Assets/Images/timeIcon.png");
 
 export const iconPath = {
   Logo,
@@ -71,5 +73,7 @@ export const iconPath = {
   Deposit,
   Withdrawal,
   uploadWhite,
-  calender
+  calender,
+  threeVerticalDot,
+  timeIcon
 };

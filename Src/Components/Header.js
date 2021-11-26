@@ -21,14 +21,15 @@ const Header = (props) => {
             }
             {props.midImage &&
                 <View style={{ position: "absolute", width: "100%", alignItems: "center" }}>
-                    <Image source={iconPath.Logo} style={{ width: props.imageWidth ? props.imageWidth : wp(15), height: props.imageHeight ? props.imageHeight :  wp(15), resizeMode: "contain" }} />
+                    <Image source={iconPath.Logo} style={{ width: props.imageWidth ? props.imageWidth : wp(15), height: props.imageHeight ? props.imageHeight : wp(15), resizeMode: "contain" }} />
                 </View>}
             {props.midtitle &&
                 <View style={{ position: "absolute", width: "100%", alignItems: "center" }}>
                     <ResponsiveText size="header" fontFamily={fonts.Poppins_SemiBold}>{props.title}</ResponsiveText>
                 </View>}
             {props.right &&
-                <Pressable style={{ paddingRight: wp(4) }}>
+                <Pressable onPress={props.RightPress}
+                    style={{ paddingRight: wp(4) }}>
                     <Fonticon type={props.RightIconType} name={props.RightIconName} size={wp(7)} color={Colors.black} />
                 </Pressable>
             }
