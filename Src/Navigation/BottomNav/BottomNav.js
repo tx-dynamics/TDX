@@ -85,7 +85,7 @@ export default function BottomNav() {
         options={{
           tabBarIcon: ({ focused }) => (
             <View style={{ padding: 3, borderRadius: 8, alignItems: "center" }}>
-              <Image source={iconPath.Bottom1} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
+              <Image source={iconPath.Bottom1} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
             </View>
           ),
         }}
@@ -97,7 +97,7 @@ export default function BottomNav() {
         options={{
           tabBarIcon: ({ focused }) => (
             <View style={{ padding: 3, borderRadius: 8, alignItems: "center", paddingLeft: 4 }}>
-              <Image source={iconPath.Bottom2} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
+              <Image source={iconPath.Bottom2} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
             </View>
           ),
         }}
@@ -126,7 +126,7 @@ export default function BottomNav() {
         options={{
           tabBarIcon: ({ focused }) => (
             <View style={{ padding: 4, borderRadius: 8, alignItems: "center" }}>
-              <Image source={iconPath.Bottom4} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
+              <Image source={iconPath.Bottom4} style={{ width: wp(6), height: wp(6), resizeMode: "contain" }} />
             </View>
           ),
 
@@ -138,7 +138,7 @@ export default function BottomNav() {
         options={{
           tabBarIcon: ({ focused }) => (
             <View style={{ padding: 4, borderRadius: 8, alignItems: "center" }}>
-              <Image source={iconPath.Bottom5} style={{ width: wp(9), height: wp(9), resizeMode: "contain" }} />
+              <Image source={iconPath.Bottom5} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
             </View>
           ),
         }}

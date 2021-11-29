@@ -14,6 +14,7 @@ const Button = (props) => {
                     marginTop: props.marginTop ? props.marginTop : 0,
                     backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.greenColor,
                     height: props.height ? props.height : 50,
+                    borderRadius : props.borderRadius ? props.borderRadius : 10
                 }]}>
                 {props.icon &&
                     // <Zocial name={props.iconName} size={20} color="#fff" style={{marginRight:10}} />

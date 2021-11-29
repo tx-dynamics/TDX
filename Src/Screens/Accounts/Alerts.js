@@ -83,11 +83,9 @@ const Alerts = (props) => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
 
-
                     <View style={{ padding: wp(4), paddingBottom: wp(2) }}>
-                     
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
-                            <ResponsiveText size="h6" margin={[0, 0, 0, 5]}>{item.coinName}</ResponsiveText>
+                            <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item.coinName}</ResponsiveText>
 
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <LineChart
@@ -108,8 +106,8 @@ const Alerts = (props) => {
                                 />
 
                                 <View style={{ alignItems: "flex-end" }}>
-                                    <ResponsiveText size="h6" color={item.type === "green" ? Colors.greenColor : "#455154"}>{item.value}</ResponsiveText>
-                                    <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#455154"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
+                                    <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#455154"}>{item.value}</ResponsiveText>
+                                    <ResponsiveText size="h10" color={item.type === "green" ? Colors.greenColor : "#455154"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
                                 </View>
                             </View>
 

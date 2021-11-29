@@ -16,6 +16,7 @@ import ModalDropdown from 'react-native-modal-dropdown';
 const SettingScreen = (props) => {
 
     const [DropDownItem, setDropDownItem] = useState('USD')
+    const [assetsDropdownShow, setAssetsDropdownShow] = useState(false)
 
     return (
         <View style={styles.container}>
@@ -45,10 +46,12 @@ const SettingScreen = (props) => {
                         defaultValue={DropDownItem}
                         style={styles.dropDown}
                         dropdownStyle={styles.dropDown_dropDownStyle}
+                        onDropdownWillShow={() => setAssetsDropdownShow(true)}
+                        onDropdownWillHide={() => setAssetsDropdownShow(false)}
                         dropdownTextStyle={styles.dropDown_textStyle}
-                        textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(69), fontFamily: fonts.Poppins }}
+                        textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(69), fontFamily: fonts.Poppins, }}
                         onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
-                        renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
+                        renderRightComponent={() => (<Fonticon type={"AntDesign"} name={assetsDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                     />
 
                 </View>
@@ -60,7 +63,7 @@ const SettingScreen = (props) => {
 
                 <Pressable onPress={() => props.navigation.navigate("NotificationSettings")}
                     style={styles.containerStyle}>
-                    <Image source={iconPath.notificationDull} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
+                    <Image source={iconPath.notificationDull} style={{ width: wp(5.5), height: wp(5.5), resizeMode: "contain" }} />
                     <ResponsiveText size="h8" color={"#6F7074"} margin={[0, 0, 0, 8]}>{"Notification Settings"}</ResponsiveText>
                 </Pressable>
 
@@ -70,14 +73,14 @@ const SettingScreen = (props) => {
                 </View>
                 <Pressable onPress={() => props.navigation.navigate("ChangePassword")}
                     style={styles.containerStyle}>
-                    <Image source={iconPath.changePassword} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
+                    <Image source={iconPath.changePassword} style={{ width: wp(6), height: wp(6), resizeMode: "contain" }} />
                     <ResponsiveText size="h8" color={"#6F7074"} margin={[0, 0, 0, 8]}>{"Change Password"}</ResponsiveText>
                 </Pressable>
                 <View style={styles.headingContainer}>
                     <ResponsiveText size="h8" >{"General Settings"}</ResponsiveText>
                 </View>
                 <View style={styles.containerStyle}>
-                    <Image source={iconPath.HelpDull} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
+                    <Image source={iconPath.HelpDull} style={{ width: wp(6), height: wp(6), resizeMode: "contain" }} />
                     <ResponsiveText size="h8" color={"#6F7074"} margin={[0, 0, 0, 8]}>{"Help"}</ResponsiveText>
                 </View>
 
@@ -107,13 +110,14 @@ const styles = StyleSheet.create({
     dropDown_dropDownStyle: {
         width: wp(90),
         borderWidth: 0,
-        marginLeft: wp(-12)
-
+        marginLeft: wp(-12),
+        height:wp(26)
     },
     dropDown_textStyle: {
         fontSize: 15,
         color: "#6F7074",
-        fontFamily: fonts.Poppins
+        fontFamily: fonts.Poppins,
+        paddingLeft:wp(4)
     },
     dropDown: {
         height: 50,
@@ -122,7 +126,7 @@ const styles = StyleSheet.create({
         // backgroundColor: Colors.TextInputBackgroundColor
     },
     dropDownIcon: {
-        width: wp(4.5),
+        width: wp(3.8),
         height: "100%",
         alignSelf: "flex-end",
         resizeMode: "contain",

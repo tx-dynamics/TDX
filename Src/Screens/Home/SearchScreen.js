@@ -25,12 +25,12 @@ const SearchScreen = (props) => {
             <Header left LeftImage ImageName={iconPath.backArrow}
                 midtitle title={"Choose Commodity"}
                 leftPress={() => props.navigation.goBack()} />
-            <View style={{ paddingHorizontal: wp(4), }}>
+            <View style={{ paddingHorizontal: wp(6), }}>
 
-                <View style={{ backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", borderRadius: 35, height: 55, alignItems: "center", paddingHorizontal: wp(3), marginTop: wp(4) }}>
+                <View style={{ backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", borderRadius: 35, height: 55, alignItems: "center", paddingHorizontal: wp(3), marginTop: wp(2) }}>
                     <Fonticon type={"Ionicons"} name={"search"} size={wp(7)} color={"#BBBBBB"} style={{ paddingTop: wp(0) }} />
                     <InputField
-                        placeholder={"search"}
+                        placeholder={"Search"}
                         placeholderTextColor={"#BBBBBB"}
                         backgroundColor={"transparent"}
                         height={60} />

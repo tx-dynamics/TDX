@@ -29,7 +29,7 @@ const FullType = [
     { id: "3", value: "Fill OR Kill" },
 ]
 
-const TradeScreen = (props) => {
+const TradeScreenn = (props) => {
 
     const [DropDownItem, setDropDownItem] = useState('')
     const [selectedBtn, setSelectedBtn] = useState("Buy")
@@ -48,7 +48,6 @@ const TradeScreen = (props) => {
                     <Button
                         onPress={() => setSelectedBtn("Buy")}
                         Text={'Buy'}
-                        TextColor={selectedBtn === "Buy" ? "#fff" : "rgba(255, 255, 255, 0.5)"}
                         backgroundColor={selectedBtn === "Buy" ? "#019146" : "#6FBF92"}
                     />
                 </View>
@@ -56,13 +55,12 @@ const TradeScreen = (props) => {
                     <Button
                         onPress={() => setSelectedBtn("Sell")}
                         Text={'Sell'}
-                        TextColor={selectedBtn === "Sell" ? "#fff" : "rgba(255, 255, 255, 0.5)"}
                         backgroundColor={selectedBtn === "Sell" ? "#DB1222" : "#E6727F"}
                     />
                 </View>
             </View>
 
-            <ScrollView style={{ paddingHorizontal: wp(6), marginTop: 14 }}>
+            <ScrollView style={{ paddingHorizontal: wp(4), marginTop: 14 }}>
 
                 <TradeHeading title={selectedBtn === "Buy" ? "Buy Order For :" : "Sell Order For :"} />
                 <InputField
@@ -93,9 +91,9 @@ const TradeScreen = (props) => {
                                     defaultValue={'Any'}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
                                     dropdownTextStyle={styles.dropDown_textStyle}
-                                    textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
+                                    textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
                                     onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
-                                    renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} style={styles.dropDownIcon}  />)}
+                                    renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
                                 />
 
                             </View>
@@ -107,9 +105,9 @@ const TradeScreen = (props) => {
                                     defaultValue={''}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
                                     dropdownTextStyle={styles.dropDown_textStyle}
-                                    textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
+                                    textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
                                     onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
-                                    renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} style={styles.dropDownIcon}  />)}
+                                    renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
                                 />
 
                             </View>
@@ -203,8 +201,7 @@ const TradeScreen = (props) => {
                             onPress={() => setSelectedBtn("Buy")}
                             Text={'Clear'}
                             fontFamily={fonts.Poppins_Medium}
-                            fontSize={16}
-                            height={44}
+                            fontSize={18}
                             TextColor={"#6D6D6D"}
                             backgroundColor={"transparent"}
                         />
@@ -213,8 +210,7 @@ const TradeScreen = (props) => {
                         <Button
                             Text={'Submit'}
                             fontFamily={fonts.Poppins_Medium}
-                            fontSize={16}
-                            height={44}
+                            fontSize={18}
                             backgroundColor={"#455154"}
                         />
                     </View>
@@ -226,7 +222,7 @@ const TradeScreen = (props) => {
         </View>
     )
 }
-export default TradeScreen;
+export default TradeScreenn;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -255,7 +251,7 @@ const styles = StyleSheet.create({
     },
     dropDown_textStyle: {
         fontSize: 15,
-        color: "#000",
+        color: "#6F7074",
         fontFamily: fonts.Poppins
     },
     dropDown: {
@@ -266,11 +262,11 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     dropDownIcon: {
-        // width: wp(4.5),
-        // height: "100%",
+        width: wp(4.5),
+        height: "100%",
         alignSelf: "flex-end",
         resizeMode: "contain",
         marginRight: 10,
-        // marginTop: wp(-8)
+        marginTop: wp(-8)
     }
 })

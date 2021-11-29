@@ -20,6 +20,9 @@ const Withdraw = (props) => {
     const [DropDownItem, setDropDownItem] = useState('Cash')
     const [DropDownItemm, setDropDownItemm] = useState('Bank Account')
     const [DropDownItemmm, setDropDownItemmm] = useState('GWASYB1')
+    const [assetsDropdownShow, setAssetsDropdownShow] = useState(false)
+    const [TickerDropdownShow, setTickerDropdownShow] = useState(false)
+    const [withdrawDropdownShow, setwithdrawDropdownShow] = useState(false)
 
     return (
         <View style={styles.container}>
@@ -31,12 +34,14 @@ const Withdraw = (props) => {
                 <ResponsiveText size="h8" color={"#616161"} margin={[0, 0, 5, 0]}>{"Choose Asset :"}</ResponsiveText>
                 <ModalDropdown options={['Cash', 'Commodity']}
                     defaultValue={DropDownItem}
-                    style={styles.dropDown}
+                    style={[styles.dropDown, { backgroundColor: assetsDropdownShow ? "#fff" : Colors.TextInputBackgroundColor }]}
                     dropdownStyle={styles.dropDown_dropDownStyle}
                     dropdownTextStyle={styles.dropDown_textStyle}
-                    textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
+                    onDropdownWillShow={() => setAssetsDropdownShow(true)}
+                    onDropdownWillHide={() => setAssetsDropdownShow(false)}
+                    textStyle={{ color: assetsDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins, borderRadius: 11 }}
                     onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
-                    renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
+                    renderRightComponent={() => (<Fonticon type={"AntDesign"} name={assetsDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                 />
                 {DropDownItem === 'Cash' ?
                     <>
@@ -61,12 +66,14 @@ const Withdraw = (props) => {
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Withdrawl to :"}</ResponsiveText>
                         <ModalDropdown options={['Bank Account', 'Option 2', 'Option 3']}
                             defaultValue={DropDownItemm}
-                            style={styles.dropDown}
+                            style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor }]}
                             dropdownStyle={styles.dropDown_dropDownStyle}
                             dropdownTextStyle={styles.dropDown_textStyle}
-                            textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
+                            onDropdownWillShow={() => setwithdrawDropdownShow(true)}
+                            onDropdownWillHide={() => setwithdrawDropdownShow(false)}
+                            textStyle={{ color: withdrawDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
                             onSelect={(idx, DropDownItem) => setDropDownItemm(DropDownItem)}
-                            renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
+                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={withdrawDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                         />
                     </>
 
@@ -75,12 +82,14 @@ const Withdraw = (props) => {
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose Ticker :"}</ResponsiveText>
                         <ModalDropdown options={['GWASYB1', 'Option 2', 'Option 3']}
                             defaultValue={DropDownItemmm}
-                            style={styles.dropDown}
+                            style={[styles.dropDown, { backgroundColor: TickerDropdownShow ? "#fff" : Colors.TextInputBackgroundColor }]}
                             dropdownStyle={styles.dropDown_dropDownStyle}
                             dropdownTextStyle={styles.dropDown_textStyle}
-                            textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
+                            onDropdownWillShow={() => setTickerDropdownShow(true)}
+                            onDropdownWillHide={() => setTickerDropdownShow(false)}
+                            textStyle={{ color: TickerDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
                             onSelect={(idx, DropDownItem) => setDropDownItemmm(DropDownItem)}
-                            renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
+                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={TickerDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                         />
 
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Enter Quantity :"}</ResponsiveText>
@@ -88,7 +97,7 @@ const Withdraw = (props) => {
                             height={60} />
 
 
-                        <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose date of withdrawl"}</ResponsiveText>
+                        <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose Date of Withdrawl"}</ResponsiveText>
                         <InputField
                             height={60}
                             secureText
@@ -102,12 +111,13 @@ const Withdraw = (props) => {
 
 
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: wp(2), marginVertical: 20, flex: 1, alignItems: "flex-end" }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: wp(60), marginVertical: 20, }}>
                     <View style={{ width: "45%", }}>
                         <Button
-                            Text={'Clear'}
+                            Text={'Cancel'}
                             fontFamily={fonts.Poppins_Medium}
-                            fontSize={18}
+                            fontSize={16}
+                            height={44}
                             TextColor={"#FFFFFF"}
                             backgroundColor={"#00000066"}
                         />
@@ -116,7 +126,8 @@ const Withdraw = (props) => {
                         <Button
                             Text={'Submit'}
                             fontFamily={fonts.Poppins_Medium}
-                            fontSize={18}
+                            fontSize={16}
+                            height={44}
                             backgroundColor={"#455154"}
                         />
                     </View>
@@ -143,12 +154,14 @@ const styles = StyleSheet.create({
     dropDown_dropDownStyle: {
         width: wp(89),
         borderWidth: 0,
-        marginLeft: wp(1)
+        marginLeft: wp(1),
+        borderRadius: 11,
+        paddingTop: 8
     },
     dropDown_textStyle: {
         fontSize: 15,
         color: "#000",
-        fontFamily: fonts.Poppins
+        fontFamily: fonts.Poppins,
     },
     dropDown: {
         height: 60,

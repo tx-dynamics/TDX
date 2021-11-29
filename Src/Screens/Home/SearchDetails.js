@@ -85,7 +85,7 @@ const SearchDetails = (props) => {
             <View style={{ flex: 1, backgroundColor: Colors.TextInputBackgroundColor, marginTop:wp(6) }}>
 
                 <View style={{width:"100%", alignItems:"flex-end", marginTop:wp(3), paddingRight:wp(4)}}>
-                    <ResponsiveText size="h8" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 0]}>{"price/MT"}</ResponsiveText>
+                    <ResponsiveText size="h8" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 0]}>{"Price/MT"}</ResponsiveText>
                 </View>
 
                 <FlatList
@@ -120,7 +120,7 @@ const SearchDetails = (props) => {
 
                                     <View style={{ alignItems: "flex-end" }}>
                                         <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#455154"}>{item.value}</ResponsiveText>
-                                        <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#455154"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
+                                        <ResponsiveText size="h10" color={item.type === "green" ? Colors.greenColor : "#455154"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
                                     </View>
                                 </View>
 

@@ -1,5 +1,5 @@
 {
-  "name": "TimeSheet",
+  "name": "TDX",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -24,6 +24,7 @@
     "react-native-confirmation-code-field": "^7.1.0",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-modal-dropdown": "^1.0.2",
+    "react-native-popup-menu": "^0.15.12",
     "react-native-reanimated": "^2.2.4",
     "react-native-responsive-linechart": "^5.7.1",
     "react-native-safe-area-context": "^3.3.2",

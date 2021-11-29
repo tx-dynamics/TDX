@@ -32,16 +32,24 @@ const ChangePassword = (props) => {
                         // placeholder={"Password"}
                         onPress={() => setHide(!hide)}
                         RightImage
+                        marginTopp={.1}
+                        marginRight={8}
+                        rightImageWidth={wp(5)}
+                        rightImageHeight={wp(5)}
                     // value={password}
                     // onChangeText={(password) => setPassword(password)}
                     />
-                    <ResponsiveText size="h8" margin={[wp(4), 0, -3, 0]}>{"New Password"}</ResponsiveText>
+                    <ResponsiveText size="h8" margin={[wp(4), 0, -3, 0]}>{"Enter New Password"}</ResponsiveText>
                     <InputField
                         secureText
                         secureTextEntry={hide1}
                         // placeholder={"Password"}
                         onPress={() => setHide1(!hide1)}
                         RightImage
+                        marginTopp={.1}
+                        marginRight={8}
+                        rightImageWidth={wp(5)}
+                        rightImageHeight={wp(5)}
                     // value={password}
                     // onChangeText={(password) => setPassword(password)}
                     />
@@ -51,13 +59,17 @@ const ChangePassword = (props) => {
                         secureTextEntry={hide2}
                         // placeholder={"Password"}
                         RightImage
+                        marginTopp={.1}
                         onPress={() => setHide2(!hide2)}
+                        marginRight={8}
+                        rightImageWidth={wp(5)}
+                        rightImageHeight={wp(5)}
                     // value={password}
                     // onChangeText={(password) => setPassword(password)}
                     />
                     <Button
                         Text={'Done'}
-                        marginTop={wp(16)}
+                        marginTop={wp(21)}
                         marginHorizontal={wp(20)}
                     />
                 </View>

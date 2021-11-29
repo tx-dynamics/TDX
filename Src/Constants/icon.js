@@ -36,6 +36,9 @@ const uploadWhite = require("../Assets/Images/uploadWhite.png");
 const calender = require("../Assets/Images/calender.png");
 const threeVerticalDot = require("../Assets/Images/threeVerticalDot.png");
 const timeIcon = require("../Assets/Images/timeIcon.png");
+const loadingAnem = require("../Assets/Images/loadingAnem.png");
+const DROPUP = require("../Assets/Images/DROPUP.png");
+const threeHorizontalDots = require("../Assets/Images/threeHorizontalDots.png");
 
 export const iconPath = {
   Logo,
@@ -75,5 +78,8 @@ export const iconPath = {
   uploadWhite,
   calender,
   threeVerticalDot,
-  timeIcon
+  timeIcon,
+  loadingAnem,
+  DROPUP,
+  threeHorizontalDots
 };

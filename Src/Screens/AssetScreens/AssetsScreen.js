@@ -191,18 +191,18 @@ const AssetsScreen = (props) => {
                         <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{"GH₵/MT"}</ResponsiveText>
 
                         <View style={{ alignItems: "flex-end" }}>
-                            <ResponsiveText size="h6" color={Colors.greenColor}>{"2000"}</ResponsiveText>
-                            <ResponsiveText size="h8" color={Colors.greenColor} margin={[-4, 0, 0, 0]}>{"+10%"}</ResponsiveText>
+                            <ResponsiveText size="h8" color={Colors.greenColor}>{"2000"}</ResponsiveText>
+                            <ResponsiveText size="h10" color={Colors.greenColor} margin={[-4, 0, 0, 0]}>{"+10%"}</ResponsiveText>
                         </View>
 
                         <View style={{ alignItems: "flex-end", marginTop: wp(2) }}>
-                            <ResponsiveText size="h6" color={"#DB1222"}>{"1875"}</ResponsiveText>
-                            <ResponsiveText size="h8" color={"#DB1222"} margin={[-4, 0, 0, 0]}>{"-3.8%"}</ResponsiveText>
+                            <ResponsiveText size="h8" color={"#DB1222"}>{"1875"}</ResponsiveText>
+                            <ResponsiveText size="h10" color={"#DB1222"} margin={[-4, 0, 0, 0]}>{"-3.8%"}</ResponsiveText>
                         </View>
                     </View>
                 </View>
 
-                <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "90%", alignSelf: "center", marginVertical: 18 }} />
+                <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "60%", alignSelf: "center", marginVertical: 18 }} />
                 <View style={{ flexDirection: "row", }}>
 
                     <View style={{ flex: .19, alignItems: "flex-start" }}>

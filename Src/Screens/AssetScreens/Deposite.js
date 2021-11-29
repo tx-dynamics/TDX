@@ -18,6 +18,7 @@ import ModalDropdown from 'react-native-modal-dropdown';
 const Deposite = (props) => {
 
     const [DropDownItem, setDropDownItem] = useState('Bank Deposit')
+    const [assetsDropdownShow, setAssetsDropdownShow] = useState(false)
 
     return (
         <View style={styles.container}>
@@ -25,16 +26,18 @@ const Deposite = (props) => {
                 midtitle title={"Deposit"}
                 leftPress={() => props.navigation.goBack()} />
 
-            <View style={{ paddingHorizontal: wp(4), marginTop: wp(5), flex: 1 }}>
+            <View style={{ paddingHorizontal: wp(6), marginTop: wp(5), flex: 1 }}>
                 <ResponsiveText size="h8" color={"#616161"} margin={[0, 0, 5, 0]}>{"Choose Deposit type :"}</ResponsiveText>
                 <ModalDropdown options={['Bank Deposit', 'MTN Mobile money', 'Wire Transfer']}
                     defaultValue={DropDownItem}
                     style={styles.dropDown}
                     dropdownStyle={styles.dropDown_dropDownStyle}
+                    onDropdownWillShow={() => setAssetsDropdownShow(true)}
+                    onDropdownWillHide={() => setAssetsDropdownShow(false)}
                     dropdownTextStyle={styles.dropDown_textStyle}
                     textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
                     onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
-                    renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
+                    renderRightComponent={() => (<Fonticon type={"AntDesign"} name={assetsDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                 />
 
                 <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Enter Amount Deposited :"}</ResponsiveText>
@@ -59,7 +62,7 @@ const Deposite = (props) => {
                     <>
                         <ResponsiveText size="h7" margin={[wp(12), 0, 0, 0]} color={"#000"} >{"Upload Pictures of Deposit Slip/Confirmation Document"}</ResponsiveText>
                         <Pressable style={{
-                            backgroundColor: "#455154", alignItems: "center", height: 60,
+                            backgroundColor: "#455154", alignItems: "center", height: 58,
                             justifyContent: "center", borderRadius: 11, marginTop: wp(2), flexDirection: "row"
                         }}>
                             <ResponsiveText size="h7" margin={[0, 6, 0, 0]} color={"#fff"} >{"Upload"}</ResponsiveText>
@@ -76,21 +79,23 @@ const Deposite = (props) => {
 
 
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: wp(2), marginVertical: 20, flex: 1, alignItems: "flex-end" }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: wp(50), marginVertical: 20, }}>
                     <View style={{ width: "45%", }}>
                         <Button
-                            Text={'Clear'}
+                            Text={'Cancel'}
                             fontFamily={fonts.Poppins_Medium}
-                            fontSize={18}
+                            fontSize={16}
                             TextColor={"#FFFFFF"}
+                            height={44}
                             backgroundColor={"#00000066"}
                         />
                     </View>
-                    <View style={{ width: "45%" }}>
+                    <View style={{ width: "45%", }}>
                         <Button
                             Text={'Submit'}
                             fontFamily={fonts.Poppins_Medium}
-                            fontSize={18}
+                            fontSize={16}
+                            height={44}
                             backgroundColor={"#455154"}
                         />
                     </View>
@@ -120,12 +125,14 @@ const styles = StyleSheet.create({
     dropDown_dropDownStyle: {
         width: wp(89),
         borderWidth: 0,
-        marginLeft: wp(1)
+        marginLeft: wp(1),
+        borderRadius: 11,
+        paddingTop: 8
 
     },
     dropDown_textStyle: {
         fontSize: 15,
-        color: "#6F7074",
+        color: "#000",
         fontFamily: fonts.Poppins
     },
     dropDown: {

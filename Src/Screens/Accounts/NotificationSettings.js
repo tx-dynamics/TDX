@@ -31,8 +31,7 @@ const NotificationSettings = (props) => {
                 midtitle title={"Notification Settings"}
                 leftPress={() => props.navigation.goBack()} />
 
-
-            <View style={[styles.containerStyle, {marginTop:wp(10)}]}>
+            <View style={[styles.containerStyle, {marginTop:wp(6)}]}>
                 <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{"Deposits & Withdrawals"}</ResponsiveText>
                 <Switch
                     trackColor={{ false: "#95959B", true: Colors.greenColor }}
@@ -63,7 +62,7 @@ const NotificationSettings = (props) => {
                 />
             </View>
             <View style={styles.containerStyle}>
-                <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{"app notififcations"}</ResponsiveText>
+                <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{"App Notififcations"}</ResponsiveText>
                 <Switch
                     trackColor={{ false: "#95959B", true: Colors.greenColor }}
                     thumbColor={isEnabled3 ? "#fff" : "#fff"}
@@ -91,8 +90,8 @@ const styles = StyleSheet.create({
         // alignItems: "center"
     },
     containerStyle: {
-        backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", justifyContent: "space-between",
-        padding: wp(4), marginHorizontal: wp(4), borderRadius: 5, alignItems: "center", marginTop:wp(4)
+        backgroundColor: "#F4F4F4", flexDirection: "row", justifyContent: "space-between",
+        padding: wp(4), marginHorizontal: wp(6), borderRadius: 5, alignItems: "center", marginTop:wp(4)
     },
 
 

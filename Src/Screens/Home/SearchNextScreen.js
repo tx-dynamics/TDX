@@ -22,7 +22,8 @@ const DATA = [
 
 const SearchNextScreen = (props) => {
 
-    const [DropDownItem, setDropDownItem] = useState('Bank Deposit')
+    const [DropDownItem, setDropDownItem] = useState('White Maize')
+    const [DropDownItemm, setDropDownItemm] = useState('Warehouse W9')
 
     return (
         <View style={styles.container}>
@@ -48,23 +49,23 @@ const SearchNextScreen = (props) => {
                     renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
                 />
 
-                <ResponsiveText size="h7" fontFamily={fonts.Poppins_SemiBold} margin={[wp(8), 0, 5, 0]}>{"Choose Type"}</ResponsiveText>
+                <ResponsiveText size="h7" fontFamily={fonts.Poppins_SemiBold} margin={[wp(8), 0, 5, 0]}>{"Choose Warehouse Location"}</ResponsiveText>
                 <ModalDropdown options={['Warehouse W9', 'Warehouse W9', 'Warehouse W9']}
-                    defaultValue={DropDownItem}
+                    defaultValue={DropDownItemm}
                     style={styles.dropDown}
                     dropdownStyle={styles.dropDown_dropDownStyle}
                     dropdownTextStyle={styles.dropDown_textStyle}
                     textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
-                    onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
+                    onSelect={(idx, DropDownItem) => setDropDownItemm(DropDownItem)}
                     renderRightComponent={() => (<Image source={iconPath.DROPDOWN} style={styles.dropDownIcon} />)}
                 />
 
-                <View style={{ width: "40%", alignSelf: "center", marginTop: wp(30) }}>
+                <View style={{ width: "37%", alignSelf: "center", marginTop: wp(30) }}>
                     <Button
                         onPress={() => props.navigation.navigate("SearchDetails")}
                         Text={'Search'}
                         fontFamily={fonts.Poppins_Medium}
-                        fontSize={18}
+                        fontSize={16}
                         backgroundColor={"#455154"}
                         height={55}
                     />

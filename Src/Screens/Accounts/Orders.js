@@ -41,6 +41,7 @@ const Orders = (props) => {
                         onPress={() => setSelectedBtn("Open")}
                         Text={'Open'}
                         height={52}
+                        TextColor={selectedBtn === "Open" ? "#fff" : "rgba(255, 255, 255, 0.5)"}
                         backgroundColor={selectedBtn === "Open" ? "#979797" : "#BABABA"}
                     />
                 </View>
@@ -49,6 +50,7 @@ const Orders = (props) => {
                         onPress={() => setSelectedBtn("History")}
                         Text={'History'}
                         height={52}
+                        TextColor={selectedBtn === "Open" ? "rgba(255, 255, 255, 0.5)" : "#fff"}
                         backgroundColor={selectedBtn === "Open" ? "#BABABA" : "#979797"}
                     />
                 </View>
@@ -101,7 +103,7 @@ const Orders = (props) => {
                                 <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium}  margin={[0, 0, 0, 0]} textAlign={"center"}>{item.qty}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center", }}>
-                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={item.status === "Completed" ? "#019146" : item.status === "Pending" ? "#DB1222" : "#F4BB32"  } textAlign={"center"}>{item.status}</ResponsiveText>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={item.status === "Completed" ? "#019146" : item.status === "Pending" ? "#DB1222" : "#F4BB32"  } textAlign={"center"}>{item.status}</ResponsiveText>
                             </View>
                         </View>
                         <View style={{ backgroundColor: "#ECECEC", height: 2, width: wp(100), marginVertical:wp(2) }} />

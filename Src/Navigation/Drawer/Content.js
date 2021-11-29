@@ -34,7 +34,7 @@ const DATA = [
   },
   {
     id: '2',
-    title: 'Request a call',
+    title: 'Request A Call',
     iconType: "MaterialCommunityIcons",
     iconName: "mailbox-open-up",
     imgName: iconPath.Drawer2
@@ -50,7 +50,7 @@ const DATA = [
   },
   {
     id: '4',
-    title: 'terms & Services',
+    title: 'Terms & Services',
     iconType: "MaterialCommunityIcons",
     iconName: "view-dashboard-variant",
     imgName: iconPath.Drawer4
@@ -136,8 +136,9 @@ class Content extends Component {
     return (
       <View style={{ flex: 1, backgroundColor: Colors.white, paddingHorizontal: wp(4) }}>
         <View style={{ flexDirection: "row", alignItems: "center", paddingTop: wp(5) }}>
-          <Fonticon type={"Ionicons"} name={"arrow-back"} size={wp(7)} color={Colors.black} style={{ paddingTop: wp(0) }}
-            onPress={() => this.props.navigation.closeDrawer()} />
+          <Pressable onPress={() => this.props.navigation.closeDrawer()}>
+            <Image source={iconPath.backArrow} style={{ width: wp(6.5), height: wp(6.5), resizeMode: "contain" }} />
+          </Pressable>
           <Image source={iconPath.Logo} style={{ width: wp(42), height: wp(16), resizeMode: "contain", marginLeft: wp(9) }} />
         </View>
 
@@ -150,16 +151,16 @@ class Content extends Component {
           style={{ marginTop: wp(12) }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
-            <View style={{ marginTop: 10 }}>
+            <View style={{ marginTop: 10, marginHorizontal:wp(1) }}>
               <Pressable style={{
                 flexDirection: "row", backgroundColor: "#EEEEEE", paddingHorizontal: wp(4), justifyContent: "space-between",
-                alignItems: "center", paddingVertical: wp(3.5), borderRadius: 12
+                alignItems: "center", paddingVertical: wp(3.5), borderRadius: 9
               }}
-              onPress={() => this.navigate(item)}
+                onPress={() => this.navigate(item)}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image source={item.imgName} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
-                  <ResponsiveText size="h7" margin={[0, 0, 0, 12]}>{item.title}</ResponsiveText>
+                  <Image source={item.imgName} style={{ width: index ===1 ? wp(6.2) : wp(5.5), height: index ===1 ? wp(6.2) : wp(5.5), resizeMode: "contain" }} />
+                  <ResponsiveText size="h8" margin={[0, 0, 0, 4]}>{item.title}</ResponsiveText>
                 </View>
               </Pressable>
             </View>

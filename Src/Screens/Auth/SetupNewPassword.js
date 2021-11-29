@@ -18,12 +18,13 @@ const SetupNewPassword = (props) => {
             <ScrollView >
                 <Image source={iconPath.Logo} style={{ width: wp(30), height: wp(30), resizeMode: "contain", alignSelf: "center", marginTop: wp(0) }}></Image>
 
-                <View style={{ paddingHorizontal: wp(4), flex: 1 }}>
+                <View style={{ paddingHorizontal: wp(6), flex: 1 }}>
                     <ResponsiveText size="h8" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_Medium}>{"Setup a new password to continue"}</ResponsiveText>
 
                     <ResponsiveText size="h8" margin={[wp(8), 0, -3, 0]}>{"New Password"}</ResponsiveText>
                     <InputField
                         secureText
+                        marginTopp={.1}
                         secureTextEntry={hide}
                         // placeholder={"Password"}
                         onPress={() => setHide(!hide)}
@@ -33,6 +34,7 @@ const SetupNewPassword = (props) => {
                     <ResponsiveText size="h8" margin={[wp(4), 0, -3, 0]}>{"Confirm Password"}</ResponsiveText>
                     <InputField
                         secureText
+                        marginTopp={.1}
                         secureTextEntry={hide}
                         // placeholder={"Password"}
                         onPress={() => setHide(!hide)}

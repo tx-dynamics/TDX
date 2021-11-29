@@ -55,7 +55,7 @@ const RequestACall = (props) => {
     return (
         <View style={styles.container}>
             <Header left LeftImage ImageName={iconPath.drawerIcon}
-                midtitle title={"Request a call"}
+                midtitle title={"Request A Call"}
                 leftPress={() => props.navigation.openDrawer()} />
 
             <View style={{ paddingHorizontal: wp(4), marginTop: wp(6), flex: 1 }}>
@@ -124,11 +124,11 @@ const RequestACall = (props) => {
                 <View style={{ flex: 1, justifyContent: "flex-end" }}>
 
 
-                    <View style={{ width: "45%", alignSelf: "center" }}>
+                    <View style={{ width: "38%", alignSelf: "center" }}>
                         <Button
                             Text={'Request'}
                             fontFamily={fonts.Poppins_Medium}
-                            fontSize={18}
+                            fontSize={16}
                             backgroundColor={"#455154"}
                             height={55}
                         />

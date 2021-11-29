@@ -24,7 +24,8 @@ const DayDATA = [
     { id: "3", title: "1 M" },
     { id: "4", title: "3 M" },
     { id: "5", title: "6 M" },
-    { id: "6", title: "1  Y" },
+    { id: "6", title: "1 Y" },
+    { id: "7", title: "All" },
 ]
 
 import {
@@ -76,7 +77,7 @@ const AssetsDetailss = (props) => {
                             <ResponsiveText size="h6" margin={[-6, 0, 0, 0]}>{"Maize"}</ResponsiveText>
                         </View>
                     </View>
-                    <Image source={iconPath.threeVerticalDot} style={{ width: wp(8), height: wp(8), resizeMode: "contain", marginRight: -5 }} />
+                    <Image source={iconPath.threeVerticalDot} style={{ width: wp(7), height: wp(7), resizeMode: "contain", marginRight: -5 }} />
                 </View>
 
 
@@ -111,15 +112,13 @@ const AssetsDetailss = (props) => {
                     </View>
 
                     <View style={{ paddingHorizontal: wp(4) }}>
-                        <ScrollView horizontal>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {DayDATA.map((item, index) =>
                                 <Pressable style={{  marginLeft: index ===0 ? 0 : wp(4), backgroundColor: "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
                                     <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{item.title}</ResponsiveText>
                                 </Pressable>
                             )}
-
                         </ScrollView>
-
                     </View>
                 </View>
 
@@ -186,11 +185,7 @@ const AssetsDetailss = (props) => {
                         backgroundColor: "#455154", paddingHorizontal: wp(5), paddingVertical: wp(2), alignSelf: "center",
                         borderRadius: 11, alignItems: "center"
                     }}>
-
                         <ResponsiveText size="h7" textAlign={"center"} color={"#F3BA2F"} >{"View Soya Bean \n Contract"}</ResponsiveText>
-
-
-
                     </Pressable>
 
                 </View>
@@ -209,16 +204,16 @@ const AssetsDetailss = (props) => {
                 )}
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(4), marginBottom: wp(10) }}>
-                    <View style={{ width: "47%", }}>
+                    <View style={{ width: "49%", }}>
                         <Button
-                            onPress={() => setSelectedBtn("Buy")}
+                            onPress={() => props.navigation.navigate('TradeScreenn')}
                             Text={'Buy'}
                             backgroundColor={"#019146"}
                         />
                     </View>
-                    <View style={{ width: "47%" }}>
+                    <View style={{ width: "49%" }}>
                         <Button
-                            onPress={() => setSelectedBtn("Sell")}
+                            onPress={() => props.navigation.navigate('TradeScreenn')}
                             Text={'Sell'}
                             backgroundColor={"#DB1222"}
                         />

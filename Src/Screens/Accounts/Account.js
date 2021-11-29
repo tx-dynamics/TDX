@@ -58,20 +58,20 @@ const Account = (props) => {
                 midtitle title={"Account"}
                 leftPress={() => props.navigation.openDrawer()} />
 
-            <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: 13 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: 13, alignItems:"center" }}>
                 <View>
                     <ResponsiveText size="h4" fontFamily={fonts.Poppins_SemiBold} >{"John Doe"}</ResponsiveText>
-                    <ResponsiveText size="h7" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText>
+                    <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText>
                 </View>
                 <Pressable onPress={() => props.navigation.navigate("SettingScreen")}>
-                    <Image source={iconPath.Drawer1} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
+                    <Image source={iconPath.Drawer1} style={{ width: wp(6.5), height: wp(6.5), resizeMode: "contain" }} />
                 </Pressable>
             </View>
 
             <FlatList
                 data={DATA}
                 keyExtractor={(item, index) => index.toString()}
-                style={{ marginTop: wp(5) }}
+                style={{ marginTop: wp(9) }}
                 contentContainerStyle={{ paddingHorizontal: wp(5) }}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
@@ -82,15 +82,15 @@ const Account = (props) => {
                     onPress={() => Navigatee(item.id)}
                     >
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Image source={item.imgName} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
-                            <ResponsiveText size="h7" margin={[0, 0, 0, 5]}>{item.title}</ResponsiveText>
+                            <Image source={item.imgName} style={{ width: wp(5.6), height: wp(5.6), resizeMode: "contain" }} />
+                            <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item.title}</ResponsiveText>
                         </View>
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                             {item.unread &&
-                                <View style={{ backgroundColor: "#DB1222", justifyContent: "center", paddingHorizontal: 8, borderRadius: 25, paddingVertical: 7 }}>
-                                    <ResponsiveText size="h9" color={"#fff"} margin={[-5, 0, -5, 0]}>{item.unreadCount}</ResponsiveText>
+                                <View style={{ backgroundColor: "#DB1222", justifyContent: "center", paddingHorizontal: 6, borderRadius: 25, paddingVertical: 5 }}>
+                                    <ResponsiveText size="h10" color={"#fff"} margin={[-5, 0, -5, 0]}>{item.unreadCount}</ResponsiveText>
                                 </View>}
-                            <Fonticon type={"MaterialIcons"} name={"navigate-next"} size={wp(8)} color={Colors.black} />
+                            <Fonticon type={"MaterialIcons"} name={"navigate-next"} size={wp(7)} color={Colors.black} />
                         </View>
 
                     </Pressable>

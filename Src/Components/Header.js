@@ -14,7 +14,7 @@ const Header = (props) => {
             {props.left &&
                 <Pressable style={{ paddingLeft: wp(4) }} onPress={props.leftPress}>
                     {props.LeftImage ?
-                        <Image source={props.ImageName} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
+                        <Image source={props.ImageName} style={{ width: wp(6.5), height: wp(6.5), resizeMode: "contain" }} />
                         :
                         <Fonticon type={props.LeftIconType} name={props.LeftIconName} size={wp(7)} color={Colors.black} />}
                 </Pressable>
