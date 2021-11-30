@@ -99,7 +99,7 @@ const HomeScreen = (props) => {
                     <ResponsiveText size="h6" margin={[0, 0, 0, 10]} fontFamily={fonts.Poppins_SemiBold}>{"Markets"}</ResponsiveText>
                 </View>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: wp(5) }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: wp(3) }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <View style={{ backgroundColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, height: wp(7), justifyContent: "center" }}>
                             <ResponsiveText size="h8" color={Colors.white} >{filterApply === "commodity" ? "Commodity" : "All"}</ResponsiveText>
@@ -117,7 +117,7 @@ const HomeScreen = (props) => {
             <FlatList
                 data={DATA}
                 keyExtractor={(item, index) => index.toString()}
-                style={{ marginTop: wp(5) }}
+                style={{ marginTop: wp(3.5) }}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
 
@@ -153,7 +153,7 @@ const HomeScreen = (props) => {
 
                                 <View style={{ alignItems: "flex-end" }}>
                                     <ResponsiveText size="h8" color={Colors.greenColor}>{"2000"}</ResponsiveText>
-                                    <ResponsiveText size="h8" color={Colors.greenColor} margin={[-4, 0, 0, 0]}>{"+10%"}</ResponsiveText>
+                                    <ResponsiveText size="h10" color={Colors.greenColor} margin={[-4, 0, 0, 0]}>{"+10%"}</ResponsiveText>
                                 </View>
                             </View>
 

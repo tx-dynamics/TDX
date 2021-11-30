@@ -34,7 +34,7 @@ const Withdraw = (props) => {
                 <ResponsiveText size="h8" color={"#616161"} margin={[0, 0, 5, 0]}>{"Choose Asset :"}</ResponsiveText>
                 <ModalDropdown options={['Cash', 'Commodity']}
                     defaultValue={DropDownItem}
-                    style={[styles.dropDown, { backgroundColor: assetsDropdownShow ? "#fff" : Colors.TextInputBackgroundColor }]}
+                    style={[styles.dropDown, { backgroundColor: assetsDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: assetsDropdownShow ? 1 : 0 }]}
                     dropdownStyle={styles.dropDown_dropDownStyle}
                     dropdownTextStyle={styles.dropDown_textStyle}
                     onDropdownWillShow={() => setAssetsDropdownShow(true)}
@@ -66,8 +66,8 @@ const Withdraw = (props) => {
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Withdrawl to :"}</ResponsiveText>
                         <ModalDropdown options={['Bank Account', 'Option 2', 'Option 3']}
                             defaultValue={DropDownItemm}
-                            style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor }]}
-                            dropdownStyle={styles.dropDown_dropDownStyle}
+                            style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: withdrawDropdownShow ? 1 : 0 }]}
+                            dropdownStyle={[styles.dropDown_dropDownStyle, { height: wp(40) }]}
                             dropdownTextStyle={styles.dropDown_textStyle}
                             onDropdownWillShow={() => setwithdrawDropdownShow(true)}
                             onDropdownWillHide={() => setwithdrawDropdownShow(false)}
@@ -82,8 +82,8 @@ const Withdraw = (props) => {
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose Ticker :"}</ResponsiveText>
                         <ModalDropdown options={['GWASYB1', 'Option 2', 'Option 3']}
                             defaultValue={DropDownItemmm}
-                            style={[styles.dropDown, { backgroundColor: TickerDropdownShow ? "#fff" : Colors.TextInputBackgroundColor }]}
-                            dropdownStyle={styles.dropDown_dropDownStyle}
+                            style={[styles.dropDown, { backgroundColor: TickerDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: TickerDropdownShow ? 1 : 0 }]}
+                            dropdownStyle={[styles.dropDown_dropDownStyle, { height: wp(42) }]}
                             dropdownTextStyle={styles.dropDown_textStyle}
                             onDropdownWillShow={() => setTickerDropdownShow(true)}
                             onDropdownWillHide={() => setTickerDropdownShow(false)}
@@ -152,11 +152,15 @@ const styles = StyleSheet.create({
     headingContainer: { paddingHorizontal: wp(4), backgroundColor: Colors.TextInputBackgroundColor, paddingVertical: 4, justifyContent: "center" },
 
     dropDown_dropDownStyle: {
-        width: wp(89),
+        width: wp(92),
         borderWidth: 0,
-        marginLeft: wp(1),
+        marginLeft: wp(0),
         borderRadius: 11,
-        paddingTop: 8
+        // paddingTop: 8,
+        borderTopWidth: .1,
+        elevation: .5,
+        height: wp(30),
+
     },
     dropDown_textStyle: {
         fontSize: 15,
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         borderRadius: 4,
         backgroundColor: Colors.TextInputBackgroundColor,
-        borderRadius: 11
+        borderRadius: 11,
     },
     dropDownIcon: {
         width: wp(4.5),

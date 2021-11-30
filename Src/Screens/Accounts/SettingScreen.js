@@ -39,17 +39,20 @@ const SettingScreen = (props) => {
                     <ResponsiveText size="h8" >{"Currency"}</ResponsiveText>
                 </View>
 
-                <View style={{ backgroundColor: "#F4F4F4", margin: wp(4), borderRadius: 5, flexDirection: "row", paddingHorizontal: wp(4), alignItems: "center" }}>
+                <View style={{
+                    margin: wp(4), borderRadius: 5, flexDirection: "row", paddingHorizontal: wp(4), alignItems: "center",
+                    backgroundColor: assetsDropdownShow ? "#fff" : "#F4F4F4", elevation: assetsDropdownShow ? 1 : 0
+                }}>
 
-                    <ResponsiveText size="h8" color={"#6F7074"} fontFamily={fonts.Poppins_SemiBold} >{"GH₵"}</ResponsiveText>
+                    <ResponsiveText size="h8" color={assetsDropdownShow ? "#fff" : "#6F7074"} fontFamily={fonts.Poppins_SemiBold} >{"GH₵"}</ResponsiveText>
                     <ModalDropdown options={['GHS', 'USD']}
                         defaultValue={DropDownItem}
-                        style={styles.dropDown}
+                        style={[styles.dropDown, {}]}
                         dropdownStyle={styles.dropDown_dropDownStyle}
                         onDropdownWillShow={() => setAssetsDropdownShow(true)}
                         onDropdownWillHide={() => setAssetsDropdownShow(false)}
                         dropdownTextStyle={styles.dropDown_textStyle}
-                        textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(69), fontFamily: fonts.Poppins, }}
+                        textStyle={{ color: assetsDropdownShow ? "#fff" : "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(69), fontFamily: fonts.Poppins, }}
                         onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
                         renderRightComponent={() => (<Fonticon type={"AntDesign"} name={assetsDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                     />
@@ -108,16 +111,23 @@ const styles = StyleSheet.create({
     headingContainer: { paddingHorizontal: wp(4), backgroundColor: Colors.TextInputBackgroundColor, paddingVertical: 4, justifyContent: "center" },
 
     dropDown_dropDownStyle: {
-        width: wp(90),
+        width: wp(92),
         borderWidth: 0,
         marginLeft: wp(-12),
-        height:wp(26)
+        height: wp(26),
+
+        // marginLeft: wp(0),
+        borderRadius: 11,
+        // paddingTop: 8,
+        borderTopWidth: .1,
+        elevation: .5,
+        height: wp(30),
     },
     dropDown_textStyle: {
         fontSize: 15,
         color: "#6F7074",
         fontFamily: fonts.Poppins,
-        paddingLeft:wp(4)
+        paddingLeft: wp(4)
     },
     dropDown: {
         height: 50,

@@ -119,8 +119,8 @@ const SearchDetails = (props) => {
                                     />
 
                                     <View style={{ alignItems: "flex-end" }}>
-                                        <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#455154"}>{item.value}</ResponsiveText>
-                                        <ResponsiveText size="h10" color={item.type === "green" ? Colors.greenColor : "#455154"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
+                                        <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#DB1222"}>{item.value}</ResponsiveText>
+                                        <ResponsiveText size="h10" color={item.type === "green" ? Colors.greenColor : "#DB1222"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
                                     </View>
                                 </View>
 

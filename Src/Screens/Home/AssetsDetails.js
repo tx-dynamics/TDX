@@ -236,15 +236,17 @@ const AssetsDetails = (props) => {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(4), marginBottom: wp(10) }}>
                     <View style={{ width: "49%", }}>
                         <Button
-                            onPress={() => setSelectedBtn("Buy")}
-                            Text={'Buy'}
+                            onPress={() => props.navigation.navigate('TradeScreenn')}
+                            Text={'BUY'}
+                            height={45}
                             backgroundColor={"#019146"}
                         />
                     </View>
                     <View style={{ width: "49%" }}>
                         <Button
-                            onPress={() => setSelectedBtn("Sell")}
-                            Text={'Sell'}
+                            onPress={() => props.navigation.navigate('TradeScreenn')}
+                            Text={'SELL'}
+                            height={45}
                             backgroundColor={"#DB1222"}
                         />
                     </View>
@@ -261,15 +263,15 @@ const AssetsDetails = (props) => {
                 <Pressable
                     onPress={() => setFilterModal(false)}
                     style={styles.modalBackground}>
-                    <View style={styles.activityIndicatorWrapper}>
+                    <View style={[styles.activityIndicatorWrapper, { padding: 0 }]}>
                         <Pressable onPress={() => setFilterModal(false)}
-                            style={{ flexDirection: "row", paddingHorizontal: wp(3) }}>
+                            style={{ flexDirection: "row", paddingHorizontal: wp(3), marginLeft: 5 }}>
                             <Image source={iconPath.passwordUnhide} style={{ width: wp(5), height: wp(5), resizeMode: "contain" }} />
                             <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(2)]}>{"Add to watch list"}</ResponsiveText>
                         </Pressable>
                         <View style={{ height: .5, backgroundColor: "#000", marginVertical: wp(3) }} />
                         <Pressable onPress={() => openAlertModal()}
-                            style={{ flexDirection: "row", paddingHorizontal: wp(3) }}>
+                            style={{ flexDirection: "row", paddingHorizontal: wp(3), marginLeft: 5 }}>
                             <Image source={iconPath.alerts} style={{ width: wp(4), height: wp(4), resizeMode: "contain" }} />
                             <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(2.5)]}>{"Set an alert"}</ResponsiveText>
                         </Pressable>
@@ -361,7 +363,7 @@ const styles = StyleSheet.create({
         // height: wp(40),
         width: "100%",
         borderRadius: 10,
-        marginTop: wp(23),
+        marginTop: wp(19),
         padding: 5,
         paddingVertical: wp(5)
     }

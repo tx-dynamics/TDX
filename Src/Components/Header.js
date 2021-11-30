@@ -30,7 +30,7 @@ const Header = (props) => {
             {props.right &&
                 <Pressable onPress={props.RightPress}
                     style={{ paddingRight: wp(4) }}>
-                    <Fonticon type={props.RightIconType} name={props.RightIconName} size={wp(7)} color={Colors.black} />
+                    <Fonticon type={props.RightIconType} name={props.RightIconName} size={wp(6.7)} color={Colors.black} />
                 </Pressable>
             }
         </View>

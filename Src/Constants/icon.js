@@ -39,6 +39,7 @@ const timeIcon = require("../Assets/Images/timeIcon.png");
 const loadingAnem = require("../Assets/Images/loadingAnem.png");
 const DROPUP = require("../Assets/Images/DROPUP.png");
 const threeHorizontalDots = require("../Assets/Images/threeHorizontalDots.png");
+const loadingAni = require("../Assets/Images/loadingAni.gif");
 
 export const iconPath = {
   Logo,
@@ -81,5 +82,6 @@ export const iconPath = {
   timeIcon,
   loadingAnem,
   DROPUP,
-  threeHorizontalDots
+  threeHorizontalDots,
+  loadingAni
 };

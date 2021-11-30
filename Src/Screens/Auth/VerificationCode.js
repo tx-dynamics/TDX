@@ -28,13 +28,6 @@ export default function VerificationCode(props) {
 
     return (
         <View style={styles.container}>
-            {/* <View style={{ height: 50, alignItems: "center", flexDirection: "row", justifyContent: "space-between" }}>
-                <Fonticon type={"Ionicons"} name={"arrow-back"} size={wp(7)} color={Colors.black} style={{ paddingLeft: wp(0) }} />
-                <View style={{ position: "absolute", width: "100%", alignItems: "center" }}>
-                    <Image source={iconPath.Logo} style={{ width: wp(10), height: wp(10), resizeMode: "contain" }} />
-                </View>
-                <View style={{ paddingRight: wp(4) }} />
-            </View> */}
             <Header left LeftImage ImageName={iconPath.backArrow}
                 midImage imageWidth={wp(13)} imageHeight={wp(13)}
                 leftPress={() => props.navigation.goBack()} />
@@ -91,19 +84,21 @@ const styles = StyleSheet.create({
     cell: {
         width: 43,
         height: 55,
-        lineHeight: 66,
         fontSize: 20,
         borderWidth: 1,
         borderColor: Colors.greenColor,
         textAlign: 'center',
         borderRadius: 10,
         color: Colors.greenColor,
-        fontFamily: fonts.Poppins_Medium
+        fontFamily: fonts.Poppins_Medium,
+        alignItems:"center",
+        justifyContent:"center",
+        textAlignVertical:"center",
+        paddingTop:5
     },
     focusCell: {
         borderColor: Colors.greenColor,
-        color: Colors.greenColor
-
+        color: Colors.greenColor,
     },
 
 })

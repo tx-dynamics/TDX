@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, StatusBar, Modal, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
@@ -10,6 +10,7 @@ import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
+import InputField from '../../Components/InputField';
 
 import ModalDropdown from 'react-native-modal-dropdown';
 
@@ -26,6 +27,16 @@ const DayDATA = [
     { id: "5", title: "6 M" },
     { id: "6", title: "1 Y" },
     { id: "7", title: "All" },
+]
+const DayDATA1 = [
+    { id: "1", title: "1/10" },
+    { id: "2", title: "2/10" },
+    { id: "3", title: "3/10" },
+    { id: "4", title: "4/10" },
+    { id: "5", title: "5/10" },
+    { id: "6", title: "6/10" },
+    { id: "7", title: "7/10" },
+    { id: "8", title: "8/10" },
 ]
 
 import {
@@ -59,6 +70,13 @@ const Greendata = {
 const AssetsDetailss = (props) => {
 
     const [DropDownItem, setDropDownItem] = useState('USD')
+    const [filterModal, setFilterModal] = useState(false)
+    const [alertModal, setAlertModal] = useState(false)
+
+    const openAlertModal = () => {
+        setFilterModal(false)
+        setAlertModal(true)
+    }
 
     return (
         <View style={styles.container}>
@@ -77,7 +95,9 @@ const AssetsDetailss = (props) => {
                             <ResponsiveText size="h6" margin={[-6, 0, 0, 0]}>{"Maize"}</ResponsiveText>
                         </View>
                     </View>
-                    <Image source={iconPath.threeVerticalDot} style={{ width: wp(7), height: wp(7), resizeMode: "contain", marginRight: -5 }} />
+                    <Pressable onPress={() => setFilterModal(true)}>
+                        <Image source={iconPath.threeVerticalDot} style={{ width: wp(7), height: wp(7), resizeMode: "contain", marginRight: -5 }} />
+                    </Pressable>
                 </View>
 
 
@@ -111,20 +131,31 @@ const AssetsDetailss = (props) => {
                         />
                     </View>
 
+                    <View style={{ paddingHorizontal: wp(4), marginTop: wp(-4), marginBottom: wp(6) }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            {DayDATA1.map((item, index) =>
+                                <Pressable style={{ marginLeft: index === 0 ? 0 : wp(2), width: 41, }}>
+                                    <ResponsiveText size="h9" margin={[0, 0, 0, 0]}>{item.title}</ResponsiveText>
+                                </Pressable>
+                            )}
+                        </ScrollView>
+                    </View>
+
                     <View style={{ paddingHorizontal: wp(4) }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {DayDATA.map((item, index) =>
-                                <Pressable style={{  marginLeft: index ===0 ? 0 : wp(4), backgroundColor: "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
+                                <Pressable style={{ marginLeft: index === 0 ? 0 : wp(4), backgroundColor: "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
                                     <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{item.title}</ResponsiveText>
                                 </Pressable>
                             )}
                         </ScrollView>
                     </View>
+
                 </View>
 
                 <View style={{
                     backgroundColor: Colors.TextInputBackgroundColor, paddingHorizontal: wp(4), justifyContent: "space-between",
-                    marginVertical: wp(4), paddingVertical: wp(4), flexDirection: "row", alignItems: "center"
+                    marginVertical: wp(6), paddingVertical: wp(4), flexDirection: "row", alignItems: "center"
                 }}>
                     <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"Your stock"}</ResponsiveText>
 
@@ -187,7 +218,6 @@ const AssetsDetailss = (props) => {
                     }}>
                         <ResponsiveText size="h7" textAlign={"center"} color={"#F3BA2F"} >{"View Soya Bean \n Contract"}</ResponsiveText>
                     </Pressable>
-
                 </View>
 
 
@@ -207,21 +237,80 @@ const AssetsDetailss = (props) => {
                     <View style={{ width: "49%", }}>
                         <Button
                             onPress={() => props.navigation.navigate('TradeScreenn')}
-                            Text={'Buy'}
+                            Text={'BUY'}
+                            height={45}
                             backgroundColor={"#019146"}
                         />
                     </View>
                     <View style={{ width: "49%" }}>
                         <Button
                             onPress={() => props.navigation.navigate('TradeScreenn')}
-                            Text={'Sell'}
+                            Text={'SELL'}
+                            height={45}
                             backgroundColor={"#DB1222"}
                         />
                     </View>
                 </View>
 
-
             </ScrollView>
+
+            <Modal
+                transparent={true}
+                animationType={'none'}
+                // visible={true}
+                visible={filterModal}
+                onRequestClose={() => { setFilterModal(false) }}>
+                <Pressable
+                    onPress={() => setFilterModal(false)}
+                    style={styles.modalBackground}>
+                    <View style={[styles.activityIndicatorWrapper, { padding: 0 }]}>
+                        <Pressable onPress={() => setFilterModal(false)}
+                            style={{ flexDirection: "row", paddingHorizontal: wp(3), marginLeft: 5 }}>
+                            <Image source={iconPath.passwordUnhide} style={{ width: wp(5), height: wp(5), resizeMode: "contain" }} />
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(2)]}>{"Add to watch list"}</ResponsiveText>
+                        </Pressable>
+                        <View style={{ height: .5, backgroundColor: "#000", marginVertical: wp(3) }} />
+                        <Pressable onPress={() => openAlertModal()}
+                            style={{ flexDirection: "row", paddingHorizontal: wp(3), marginLeft: 5 }}>
+                            <Image source={iconPath.alerts} style={{ width: wp(4), height: wp(4), resizeMode: "contain" }} />
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(2.5)]}>{"Set an alert"}</ResponsiveText>
+                        </Pressable>
+                    </View>
+                </Pressable>
+            </Modal>
+
+            <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={alertModal}
+                onRequestClose={() => { setAlertModal(false) }}>
+                <Pressable
+                    onPress={() => setAlertModal(false)}
+                    style={styles.modalBackground}>
+                    <View style={styles.activityIndicatorWrapper}>
+                        <Pressable style={{ flexDirection: "row", paddingHorizontal: wp(3) }}>
+                            <Image source={iconPath.alerts} style={{ width: wp(4), height: wp(4), resizeMode: "contain" }} />
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(2.5)]}>{"Set an alert"}</ResponsiveText>
+                        </Pressable>
+
+                        <View style={{ paddingHorizontal: wp(2), paddingTop: wp(3), paddingBottom: wp(10), }}>
+                            <View style={{ borderWidth: .8, borderColor: "#DADADA", borderRadius: 11 }}>
+                                <InputField
+                                    placeholder={"Set an alert price"}
+                                    placeholderTextColor={"#CACACA"}
+                                    backgroundColor={"#fff"}
+                                />
+                            </View>
+                        </View>
+                        <Pressable onPress={() => setAlertModal(false)}
+                            style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
+                            <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
+                        </Pressable>
+                    </View>
+                </Pressable>
+            </Modal>
+
+
         </View>
     )
 }
@@ -263,6 +352,20 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
         marginRight: 10,
         marginTop: wp(-8)
+    },
+    modalBackground: {
+        flex: 1,
+        backgroundColor: '#CCCCCC90',
+        paddingHorizontal: wp(4)
+    },
+    activityIndicatorWrapper: {
+        backgroundColor: "white",
+        // height: wp(40),
+        width: "100%",
+        borderRadius: 10,
+        marginTop: wp(19),
+        padding: 5,
+        paddingVertical: wp(5)
     }
 
 })

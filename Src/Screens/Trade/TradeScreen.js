@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     dropDownIcon: {
         // width: wp(4.5),
         // height: "100%",
-        alignSelf: "flex-end",
+        // alignSelf: "flex-end",
         resizeMode: "contain",
         marginRight: 10,
         // marginTop: wp(-8)
