@@ -40,6 +40,11 @@ const loadingAnem = require("../Assets/Images/loadingAnem.png");
 const DROPUP = require("../Assets/Images/DROPUP.png");
 const threeHorizontalDots = require("../Assets/Images/threeHorizontalDots.png");
 const loadingAni = require("../Assets/Images/loadingAni.gif");
+const Bottom1Dark = require("../Assets/Images/Bottom1Dark.png");
+const Bottom2Dark = require("../Assets/Images/Bottom2Dark.png");
+const Bottom4Dark = require("../Assets/Images/Bottom4Dark.png");
+const Bottom5Dark = require("../Assets/Images/Bottom5Dark.png");
+const WithdrawSuccess = require("../Assets/Images/WithdrawSuccess.png");
 
 export const iconPath = {
   Logo,
@@ -83,5 +88,10 @@ export const iconPath = {
   loadingAnem,
   DROPUP,
   threeHorizontalDots,
-  loadingAni
+  loadingAni,
+  Bottom1Dark,
+  Bottom2Dark,
+  Bottom4Dark,
+  Bottom5Dark,
+  WithdrawSuccess
 };

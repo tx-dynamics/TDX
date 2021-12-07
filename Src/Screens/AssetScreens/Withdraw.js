@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, Modal, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
@@ -13,6 +13,7 @@ import InputField from '../../Components/InputField';
 import Button from '../../Components/Button';
 
 import ModalDropdown from 'react-native-modal-dropdown';
+import { Calendar, CalendarList, Agenda, LocaleConfig } from 'react-native-calendars';
 
 
 const Withdraw = (props) => {
@@ -23,6 +24,29 @@ const Withdraw = (props) => {
     const [assetsDropdownShow, setAssetsDropdownShow] = useState(false)
     const [TickerDropdownShow, setTickerDropdownShow] = useState(false)
     const [withdrawDropdownShow, setwithdrawDropdownShow] = useState(false)
+
+    const [DateModal, setDateModal] = useState(false)
+    const [selectedDate, setSelectedDate] = useState('')
+    const [minDate, setMinDate] = useState('')
+    const [callDate, setCallDate] = useState('')
+
+
+    useEffect(() => {
+        var tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        setMinDate(tomorrow.toISOString().split('T')[0])
+        setCallDate(tomorrow.toISOString().split('T')[0])
+        setSelectedDate({ [tomorrow.toISOString().split('T')[0]]: { selected: true, selectedColor: "#000" } })
+
+        // alert(new Date().toISOString().split('T')[0])
+    }, [])
+
+    const dateSelect = (day) => {
+        setSelectedDate({ [day.dateString]: { selected: true, selectedColor: "#000" } })
+        setDateModal(false)
+        setCallDate(day.dateString)
+    }
+
 
     return (
         <View style={styles.container}>
@@ -96,19 +120,20 @@ const Withdraw = (props) => {
                         <InputField
                             height={60} />
 
-
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose Date of Withdrawl"}</ResponsiveText>
-                        <InputField
-                            height={60}
-                            secureText
-                            RightImage
-                            newImage={iconPath.calender} />
-
+                        <Pressable onPress={() => setDateModal(true)}>
+                            <InputField
+                                height={60}
+                                onPress={() => setDateModal(true)}
+                                value={callDate}
+                                secureText
+                                RightImage
+                                newImage={iconPath.calender}
+                                editable={false} />
+                        </Pressable>
 
                     </>
                 }
-
-
 
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: wp(60), marginVertical: 20, }}>
@@ -132,8 +157,41 @@ const Withdraw = (props) => {
                         />
                     </View>
                 </View>
-
             </View>
+
+
+
+
+            <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={DateModal}
+                onRequestClose={() => { console.log('close modal') }}>
+                <Pressable
+                    onPress={() => setDateModal(false)}
+                    style={styles.modalBackground}>
+                    <View style={styles.activityIndicatorWrapper}>
+
+                        <Calendar
+                            onDayPress={(day) => dateSelect(day)}
+                            current={new Date().toISOString().split('T')[0]}
+                            // current={minDate}
+                            markedDates={selectedDate}
+                            minDate={minDate}
+                            hideExtraDays={true}
+                            style={{ width: wp(90) }}
+                            theme={styles.calenderTheme}
+                            enableSwipeMonths={true}
+                            pastScrollRange={1}
+                        />
+
+                    </View>
+                </Pressable>
+            </Modal>
+
+
+
+
         </View>
     )
 }
@@ -181,6 +239,39 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
         marginRight: 10,
         marginTop: wp(-8)
+    },
+    modalBackground: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        backgroundColor: '#00000040',
+        paddingHorizontal: wp(4)
+    },
+    activityIndicatorWrapper: {
+        backgroundColor: "white",
+        height: wp(120),
+        width: "100%",
+        borderRadius: 10,
+        // display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        // paddingVertical:wp(6)
+    },
+    calenderTheme: {
+        backgroundColor: 'transparent',
+        calendarBackground: 'transparent',
+        textSectionTitleColor: "gray",
+        // selectedDayBackgroundColor: 'green',
+        selectedDayTextColor: '#fff',
+        todayTextColor: '#00adf5',
+        dayTextColor: 'white',
+        textDisabledColor: '#858585',
+        textDayStyle: {
+            color: "#000",
+            fontSize: 14,
+            fontFamily: fonts.Poppins,
+        },
     }
 
 })

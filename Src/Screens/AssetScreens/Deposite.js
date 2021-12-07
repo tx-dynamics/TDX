@@ -60,7 +60,7 @@ const Deposite = (props) => {
 
                 {DropDownItem === "Bank Deposit" ?
                     <>
-                        <ResponsiveText size="h8" margin={[wp(12), 0, 0, 0]} color={"#000"} >{"Upload Pictures of Deposit Slip/Confirmation Document"}</ResponsiveText>
+                        <ResponsiveText size="h8" margin={[wp(12), 0, 0, 0]} color={"#000"} >{"Upload Picture of Deposit Slip/Confirmation Document"}</ResponsiveText>
                         <Pressable style={{
                             backgroundColor: "#455154", alignItems: "center", height: 58,
                             justifyContent: "center", borderRadius: 11, marginTop: wp(2), flexDirection: "row"

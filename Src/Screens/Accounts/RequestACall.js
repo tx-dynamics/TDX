@@ -14,14 +14,17 @@ import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 import Button from '../../Components/Button';
 import { Calendar, CalendarList, Agenda, LocaleConfig } from 'react-native-calendars';
-
+import DatePicker from 'react-native-date-picker'
 
 const RequestACall = (props) => {
 
     const [DateModal, setDateModal] = useState(false)
+    const [timeModal, setTimeModal] = useState(false)
     const [selectedDate, setSelectedDate] = useState('')
     const [minDate, setMinDate] = useState('')
     const [callDate, setCallDate] = useState('')
+    const [time, setTime] = useState(new Date())
+    // state = { date: new Date() }
 
     useEffect(() => {
         var tomorrow = new Date();
@@ -43,14 +46,17 @@ const RequestACall = (props) => {
         );
     };
 
-    const dateSelect = (day) => {
+    const dateSelect = async (day) => {
+        // alert(JSON.stringify(day))
         setSelectedDate({ [day.dateString]: { selected: true, selectedColor: "#000" } })
         setDateModal(false)
-        setCallDate(day.dateString)
+        await setCallDate(day.dateString)
     }
     const setCallDatee = () => {
         // setCallDate()
     }
+
+    const checkDay = (value) => value.split(" ")[1] === 'Saturday' || value.split(" ")[1] === 'Sunday'
 
     return (
         <View style={styles.container}>
@@ -74,7 +80,8 @@ const RequestACall = (props) => {
                 <ResponsiveText size="h8" margin={[wp(6), 0, 0, 0]} >{"I am available from:"}</ResponsiveText>
 
                 <View style={{ flexDirection: "row", marginTop: wp(4), alignItems: "center", justifyContent: "space-between" }}>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Pressable onPress={() => setTimeModal(true)}
+                        style={{ flexDirection: "row", alignItems: "center" }}>
 
                         <View style={{ backgroundColor: "#EEEEEE", width: wp(12), height: wp(11), borderRadius: 4, justifyContent: "center", alignItems: "center" }}>
                             <ResponsiveText size="h8" >{"10"}</ResponsiveText>
@@ -93,6 +100,25 @@ const RequestACall = (props) => {
                     </Pressable>
 
                     <Image source={iconPath.timeIcon} style={{ width: wp(6), height: wp(6), resizeMode: "contain" }} />
+
+                    <DatePicker
+                        modal
+                        open={timeModal}
+                        date={time}
+                        onDateChange={date => setTime(date)}
+                        mode={'time'}
+                        textColor={"#fff"}
+                        style={{color:"#fff"}}
+                        onConfirm={(date) => {
+                            setTimeModal(false)
+                            setTime(date)
+                            alert(time)
+                        }}
+                        onCancel={() => {
+                            setTimeModal(false)
+                        }}
+                    />
+
 
                 </View>
 
@@ -144,6 +170,10 @@ const RequestACall = (props) => {
 
             </View>
 
+
+
+
+
             <Modal
                 transparent={true}
                 animationType={'none'}
@@ -152,7 +182,7 @@ const RequestACall = (props) => {
                 <Pressable
                     onPress={() => setDateModal(false)}
                     style={styles.modalBackground}>
-                    <View style={styles.activityIndicatorWrapper}>
+                    <Pressable style={styles.activityIndicatorWrapper}>
 
                         <Calendar
                             onDayPress={(day) => dateSelect(day)}
@@ -160,6 +190,25 @@ const RequestACall = (props) => {
                             // current={minDate}
                             markedDates={selectedDate}
                             minDate={minDate}
+                            dayComponent={({ accessibilityLabel, date, state }) => {
+                                return (
+                                    (checkDay(accessibilityLabel) || state) ?
+                                        <Pressable>
+                                            <Text style={{ color: "#858585", fontSize: 14, fontFamily: fonts.Poppins, padding: wp(2) }}>{date.day}</Text>
+                                        </Pressable>
+                                        :
+                                        <Pressable onPress={() => dateSelect(date)}>
+                                            <Text style={{
+                                                color: date.dateString === callDate ? "#fff" : "#000",
+                                                backgroundColor: date.dateString === callDate ? "#000" : "#fff",
+                                                borderRadius: 50,
+                                                paddingHorizontal: 12,
+                                                paddingVertical: 5,
+                                                fontSize: 14, fontFamily: fonts.Poppins, padding: wp(2),
+                                            }}>{date.day}</Text>
+                                        </Pressable>
+                                );
+                            }}
                             hideExtraDays={true}
                             style={{ width: wp(90) }}
                             theme={{
@@ -189,18 +238,7 @@ const RequestACall = (props) => {
                             // disableArrowLeft={true}
                             pastScrollRange={1}
                         />
-
-
-                        {/* <View style={{ flexDirection: "row", justifyContent: "flex-end", width: "100%" }}>
-                            <Pressable onPress={() => setDateModal(false)}>
-                                <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} color={Colors.greenColor} margin={[0, 0, 0, 0]} >{"Cancel"}</ResponsiveText>
-                            </Pressable>
-                            <Pressable onPress={() => setCallDatee()}>
-                                <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} color={Colors.greenColor} margin={[0, wp(8), 0, wp(14)]} >{"OK"}</ResponsiveText>
-                            </Pressable>
-                        </View> */}
-
-                    </View>
+                    </Pressable>
                 </Pressable>
             </Modal>
 

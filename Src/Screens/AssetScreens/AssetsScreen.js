@@ -76,7 +76,7 @@ const AssetsScreen = (props) => {
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} color={"#FDBD20"}>{"Cash Balance"}</ResponsiveText>
                         <ResponsiveText size="h9" margin={[0, 0, 0, 8]} color={"#000"}>{"(GH₵)"}</ResponsiveText>
                     </View>
-                    <Fonticon type={"MaterialIcons"} name={"info"} size={wp(6)} color={"#000"} />
+                    {/* <Fonticon type={"MaterialIcons"} name={"info"} size={wp(6)} color={"#000"} /> */}
                 </View>
 
                 <ResponsiveText size="h6" fontFamily={fonts.Poppins_Bold} color={"#000"}>{"20,000"}</ResponsiveText>
