@@ -30,18 +30,16 @@ function MainNav(props) {
                 <Splash />
                 :
                 <NavigationContainer
-                theme={AppTheme}
+                    theme={AppTheme}
                 >
                     <Stack.Navigator screenOptions={{ headerShown: false }}>
-                        <Stack.Screen name="AuthStack" component={AuthStack} />
-                        <Stack.Screen name="Drawer" component={Drawer} />
-                        {/* {isLogin ?
+                        {isLogin ?
                             <>
                                 <Stack.Screen name="Drawer" component={Drawer} />
                             </>
                             :
                             <Stack.Screen name="AuthStack" component={AuthStack} />
-                        } */}
+                        }
                     </Stack.Navigator>
                 </NavigationContainer>
             }

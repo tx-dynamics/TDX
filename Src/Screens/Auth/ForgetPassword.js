@@ -15,7 +15,7 @@ import { _axiosPostAPI } from '../../Apis/Apis';
 import { SetSession } from '../../Redux/Actions/Actions'
 import { connect } from 'react-redux';
 
-const Login = (props) => {
+const ForgetPassword = (props) => {
     const [hide, setHide] = useState(true)
     const [EmailAdd, setEmailAdd] = useState('')
     const [password, setPassword] = useState('')
@@ -23,29 +23,24 @@ const Login = (props) => {
     const [apiErrorMsg, setApiErrorMsg] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const LoginUser = async () => {
+    const forgotpassword = async () => {
         setApiError(false)
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if (reg.test(EmailAdd) === false) {
             setApiError(true)
             setApiErrorMsg("Please Enter Valid Email")
         }
-        else if (password === '') {
-            setApiError(true)
-            setApiErrorMsg("Please Enter Password")
-        }
         else {
             setLoading(true)
             let data = {}
             data["email"] = EmailAdd;
-            data["password"] = password;
             // data["email"] = "faisal@gmail.com";
-            // data["password"] = "12345678";
-            await _axiosPostAPI("login", data)
+            await _axiosPostAPI("forgot_password", data)
                 .then(async (response) => {
                     setLoading(false)
                     if (response.action === "success") {
-                        ResponseHandle(response.data)
+                        alert(JSON.stringify(response.otp))
+                        props.navigation.navigate("VerificationCode")
                     } else {
                         setApiError(true)
                         setApiErrorMsg(response.error)
@@ -58,15 +53,6 @@ const Login = (props) => {
         }
     }
 
-    const ResponseHandle = (res) => {
-        let data = {}
-        data["isLogin"] = true;
-        data["userToken"] = res.token;
-        data["userId"] = res.id;
-        data["userInfo"] = res;
-        props.SessionMaintain(data)
-    }
-
     return (
         <View style={styles.container}>
             <ScrollView >
@@ -75,9 +61,15 @@ const Login = (props) => {
 
 
                 <View style={{ paddingHorizontal: wp(6), flex: 1 }}>
-                    <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} textAlign={"center"} margin={[wp(6), 0, 0, 0]}>{"Welcome!"}</ResponsiveText>
-                    <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} textAlign={"center"} margin={[0, 0, wp(6), 0]}>{"Enter credentials to login"}</ResponsiveText>
-
+                    <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} textAlign={"center"} margin={[0, 0, wp(6), 0]}>{"Forgot Password!"}</ResponsiveText>
+                    <ResponsiveText size="h8" margin={[wp(4), 0, -2, 0]}>{"Email"}</ResponsiveText>
+                    <InputField
+                        keyboardType="email-address"
+                        marginTopp={.1}
+                        // placeholder={"Email"}
+                        value={EmailAdd}
+                        onChangeText={(EmailAdd) => setEmailAdd(EmailAdd)}
+                    />
                     {apiError ?
                         <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>
                             {apiErrorMsg}
@@ -86,34 +78,11 @@ const Login = (props) => {
                         <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}> {""}</Text>
                     }
 
-                    <ResponsiveText size="h8" margin={[0, 0, -2, 0]}>{"Email"}</ResponsiveText>
-                    <InputField
-                        keyboardType="email-address"
-                        marginTopp={.1}
-                        // placeholder={"Email"}
-                        value={EmailAdd}
-                        onChangeText={(EmailAdd) => setEmailAdd(EmailAdd)}
-                    />
-                    <ResponsiveText size="h8" margin={[wp(4), 0, -3, 0]}>{"Password"}</ResponsiveText>
-                    <InputField
-                        secureText
-                        marginTopp={.1}
-                        secureTextEntry={hide}
-                        // placeholder={"Password"}
-                        onPress={() => setHide(!hide)}
-                        value={password}
-                        onChangeText={(password) => setPassword(password)}
-                    />
-
-                    <Pressable onPress={() => props.navigation.navigate("ForgetPassword")}>
-                        <ResponsiveText size="h8" margin={[wp(2), 0, 0, 0]} position={"flex-end"}>{"Forgot Password?"}</ResponsiveText>
-                    </Pressable>
-
                     <Button
-                        onPress={() => LoginUser()}
+                        onPress={() => forgotpassword()}
                         // onPress={() => props.navigation.navigate("VerificationCode")}
-                        Text={'Sign In'}
-                        marginTop={wp(16)}
+                        Text={'Submit'}
+                        marginTop={wp(10)}
                         marginHorizontal={wp(20)}
                     />
                 </View>
@@ -131,7 +100,7 @@ const mapDispatchToProps = (dispatch) => {
         SessionMaintain: (data) => dispatch(SetSession(data)),
     };
 };
-export default connect(null, mapDispatchToProps)(Login);
+export default connect(null, mapDispatchToProps)(ForgetPassword);
 
 const styles = StyleSheet.create({
     container: {

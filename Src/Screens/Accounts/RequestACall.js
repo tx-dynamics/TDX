@@ -24,10 +24,16 @@ const RequestACall = (props) => {
     const [minDate, setMinDate] = useState('')
     const [callDate, setCallDate] = useState('')
     const [time, setTime] = useState(new Date())
+    const [minTime, setMinTime] = useState('')
     // state = { date: new Date() }
 
     useEffect(() => {
         var tomorrow = new Date();
+
+        var time = tomorrow.getHours() + ":" + parseInt(tomorrow.getMinutes() + 1);
+        setMinTime(time)
+        // alert(JSON.stringify(time))
+
         tomorrow.setDate(tomorrow.getDate() + 1);
         setMinDate(tomorrow.toISOString().split('T')[0])
         setCallDate(tomorrow.toISOString().split('T')[0])
@@ -107,8 +113,11 @@ const RequestACall = (props) => {
                         date={time}
                         onDateChange={date => setTime(date)}
                         mode={'time'}
+                        format="HH:mm"
+                        minDate={minTime}
+                        maxDate="19:30"
                         textColor={"#fff"}
-                        style={{color:"#fff"}}
+                        style={{ color: "#fff" }}
                         onConfirm={(date) => {
                             setTimeModal(false)
                             setTime(date)
@@ -173,8 +182,7 @@ const RequestACall = (props) => {
 
 
 
-
-            <Modal
+            {/* <Modal
                 transparent={true}
                 animationType={'none'}
                 visible={DateModal}
@@ -240,7 +248,7 @@ const RequestACall = (props) => {
                         />
                     </Pressable>
                 </Pressable>
-            </Modal>
+            </Modal> */}
 
         </View>
     )

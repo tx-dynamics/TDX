@@ -9,6 +9,9 @@ import { Colors } from '../../Constants/Colors';
 import { iconPath } from '../../Constants/icon';
 import Button from '../../Components/Button';
 import Header from '../../Components/Header';
+import Loader from '../../Components/Loader';
+import { _axiosPostAPI } from '../../Apis/Apis';
+
 
 // import {
 //     CodeField,
@@ -24,6 +27,38 @@ export default function VerificationCode(props) {
 
     const [value, setValue] = useState('');
     const [otpValue, setOtpValue] = useState('');
+
+    const [apiError, setApiError] = useState(false)
+    const [apiErrorMsg, setApiErrorMsg] = useState('')
+    const [loading, setLoading] = useState(false)
+
+
+    const forgotpassword = async () => {
+        setApiError(false)
+        if (otpValue.length < 4) {
+            setApiError(true)
+            setApiErrorMsg("Please Enter OTP Code")
+        }
+        else {
+            setLoading(true)
+            let data = {}
+            data["code"] = otpValue;
+            await _axiosPostAPI("check_set_password_otp", data)
+                .then(async (response) => {
+                    setLoading(false)
+                    if (response.action === "success") {
+                        props.navigation.navigate("SetupNewPassword", {Otpcode: otpValue})
+                    } else {
+                        setApiError(true)
+                        setApiErrorMsg(response.error)
+                    }
+                })
+                .catch((err) => {
+                    setLoading(false)
+                    console.log(err)
+                })
+        }
+    }
 
 
     return (
@@ -58,13 +93,21 @@ export default function VerificationCode(props) {
                     />
 
                 </View>
+                {apiError ?
+                    <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>
+                        {apiErrorMsg}
+                    </Text>
+                    :
+                    <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}> {""}</Text>
+                }
 
 
                 <ResponsiveText size="h7" margin={[wp(22), 0, 0, 0]} fontFamily={fonts.Poppins_Medium} textAlign={"center"}>{"Resend Code?"}</ResponsiveText>
 
                 <View style={{ width: wp(48), alignSelf: "center" }}>
                     <Button
-                        onPress={() => props.navigation.navigate("SetupNewPassword")}
+                        onPress={() => forgotpassword()}
+                        // onPress={() => props.navigation.navigate("SetupNewPassword")}
                         Text={'Submit'}
                         marginTop={wp(3)}
                         borderRadius={5}
@@ -72,6 +115,7 @@ export default function VerificationCode(props) {
                     />
                 </View>
             </View>
+            <Loader loading={loading} />
 
         </View>
     )
@@ -91,10 +135,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         color: Colors.greenColor,
         fontFamily: fonts.Poppins_Medium,
-        alignItems:"center",
-        justifyContent:"center",
-        textAlignVertical:"center",
-        paddingTop:5
+        alignItems: "center",
+        justifyContent: "center",
+        textAlignVertical: "center",
+        paddingTop: 5
     },
     focusCell: {
         borderColor: Colors.greenColor,

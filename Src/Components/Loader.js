@@ -21,7 +21,7 @@ const Loader = props => {
       onRequestClose={() => {console.log('close modal')}}>
       <View style={styles.modalBackground}>
         <View style={styles.activityIndicatorWrapper}>
-          <ActivityIndicator size='large' color={Colors.yellowColor}
+          <ActivityIndicator size='large' color={Colors.greenColor}
             animating={loading} />
         </View>
       </View>
@@ -38,14 +38,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#00000040'
   },
   activityIndicatorWrapper: {
-    backgroundColor: Colors.BackgroundColor,
+    backgroundColor: Colors.white,
     height: 100,
     width: 100,
     borderRadius: 10,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-around',
-    borderColor:Colors.yellowColor,
+    borderColor:Colors.greenColor,
     borderWidth:1
   }
 });

@@ -19,7 +19,7 @@ import { Colors } from "../../Constants/Colors";
 import Fonticon from '../../Constants/FontIcon';
 import { wp } from '../../Helpers/Responsiveness';
 import { connect } from 'react-redux'
-// import { SetSession, ChangeProfileRoute } from '../../Redux/Actions/Actions'
+import { SetSession, } from '../../Redux/Actions/Actions'
 import { iconPath } from '../../Constants/icon';
 import { fonts } from '../../Constants/Fonts';
 import ResponsiveText from '../../Components/RnText';
@@ -56,6 +56,14 @@ const DATA = [
     imgName: iconPath.Drawer4
 
   },
+  {
+    id: '5',
+    title: 'Logout',
+    iconType: "MaterialCommunityIcons",
+    iconName: "view-dashboard-variant",
+    imgName: iconPath.Drawer4
+
+  },
 ];
 
 class Content extends Component {
@@ -79,15 +87,10 @@ class Content extends Component {
       // this.props.navigation.navigate('DrawerStack', { screen: 'Store' });
     }
     else if (item.id === "4") {
-      // this.props.navigation.navigate("RequestBin")
-      // DrawerStack
-      // this.props.navigation.closeDrawer()
-      // this.props.navigation.navigate('DrawerStack', { screen: 'RequestBin' });
+      
     }
     else if (item.id === "5") {
-      // this.props.navigation.navigate('DrawerStack', { screen: 'Cart' });
-      // this.props.navigation.closeDrawer()
-      // this.props.navigation.navigate('DrawerStack', { screen: 'Addperson' });
+      this.LogoutFun()
     }
     else if (item.id === "6") {
       // this.props.navigation.closeDrawer()
@@ -113,23 +116,13 @@ class Content extends Component {
 
   LogoutFun = async () => {
 
-    // alert(this.props.LoginType)
-    // let data = {}
-    // data["userId"] = "";
-    // data["isLogin"] = false;
-    // this.props.SessionMaintain(data)
-    // this.props.ChangeRoute(data)
+    let data = {}
+    data["isLogin"] = false;
+    data["userToken"] = "";
+    data["userId"] = "";
+    data["userInfo"] = "";
+    this.props.SessionMaintain(data)
 
-    // if (this.props.LoginType === "Google") {
-    //   try { LoginManager.logOut() } catch (error) { console.warn(error) }
-    //   try {
-    //     await GoogleSignin.revokeAccess();
-    //     await GoogleSignin.signOut();
-    //   } catch (error) { console.warn(error) }
-
-    // } else if (this.props.LoginType === "Facebook") {
-    //   try { LoginManager.logOut() } catch (error) { console.warn(error) }
-    // }
   }
 
   render() {
@@ -179,7 +172,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     SessionMaintain: (userData) => dispatch(SetSession(userData)),
-    ChangeRoute: (userData) => dispatch(ChangeProfileRoute(userData)),
   }
 }
 
