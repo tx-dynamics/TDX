@@ -29,7 +29,6 @@
     "react-native-paper-datetimepicker": "^0.0.2",
     "react-native-popup-menu": "^0.15.12",
     "react-native-reanimated": "^2.2.4",
-    "react-native-responsive-linechart": "^5.7.1",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.9.0",
     "react-native-svg": "^12.1.1",
@@ -37,8 +36,9 @@
     "react-redux": "^7.2.6",
     "redux": "^4.1.2",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.4.0",
-    "styled-components": "^5.3.3"
+    "redux-thunk": "^2.4.1",
+    "styled-components": "^5.3.3",
+    "victory-native": "^36.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

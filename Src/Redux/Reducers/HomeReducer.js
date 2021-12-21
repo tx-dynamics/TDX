@@ -1,27 +1,22 @@
-import { ADD_HABBIT, START_DATE } from '../Constants'
+import { MARKET_DATA,
+    MARKET_DATA_LOADING, } from '../Constants'
 const initialState = {
-    habbitName: '',
-    setTarget: '',
-    ChallengestartDate:'',
-    ChallengeEndDate:'',
-    ChallengeId:''
+    Market_Loading: false,
+    marketData: [],
 };
 
 const HomeReducer = (state = initialState, action) => {
     const { type, payload } = action;
     switch (type) {
-        case ADD_HABBIT:
+        case MARKET_DATA:
             return {
                 ...state,
-                habbitName: payload.habbitName,
-                setTarget: payload.setTarget,
+                marketData: payload,
             }
-        case START_DATE:
+        case MARKET_DATA_LOADING:
             return {
                 ...state,
-                ChallengestartDate: payload.ChallengestartDate,
-                ChallengeEndDate: payload.ChallengeEndDate,
-                ChallengeId: payload.ChallengeId,
+                Market_Loading: payload,
             }
         default:
             return state;

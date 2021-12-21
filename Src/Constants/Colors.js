@@ -3,6 +3,7 @@ export const Colors = {
   splashBackgroundColor:"#515256",
   yellowColor: '#FEB326',
   greenColor: '#019146',
+  redColor: "#DB1222",
   white: '#ffffff',
   black: '#000000',
   darkGreen:"#2A373E",
