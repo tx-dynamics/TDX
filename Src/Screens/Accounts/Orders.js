@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -10,6 +10,8 @@ import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const DATA = [
     { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Pending" },
@@ -24,11 +26,63 @@ const DATA1 = [
     { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Completed" },
 ]
 
+import { useSelector, useDispatch } from 'react-redux';
+import { _getOrders, _getOrdersHistory } from '../../Redux/Actions/Actions';
+
 
 const Orders = (props) => {
 
+    const dispatch = useDispatch();
+
     const [DropDownItem, setDropDownItem] = useState('')
     const [selectedBtn, setSelectedBtn] = useState("Open")
+
+    const Order_List = useSelector(state => state.HomeReducer.Order_List);
+    const Order_List_History = useSelector(state => state.HomeReducer.Order_List_History);
+    const userToken = useSelector(state => state.AuthReducer.userToken);
+
+    useEffect(() => {
+
+        // getTickerData("open")
+        // getTickerDataHistory("history")
+    }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            getTickerData("open")
+        getTickerDataHistory("history")
+        }, [])
+    );
+
+    const getTickerData = async (type) => {
+        let data = {}
+        data["token"] = userToken;
+        data["type"] = type.toLowerCase();
+        data["page"] = 1;
+        data["limit"] = 50;
+        await dispatch(_getOrders('get_orders', data))
+
+        // alert(JSON.stringify(Order_List))
+    }
+
+    const getTickerDataHistory = async (type) => {
+        let data = {}
+        data["token"] = userToken;
+        data["type"] = type.toLowerCase();
+        data["page"] = 1;
+        data["limit"] = 50;
+        await dispatch(_getOrdersHistory('get_orders', data))
+
+        // alert(JSON.stringify(Order_List))
+    }
+    const setTickerData = async (type) => {
+        getTickerData(type)
+        setSelectedBtn(type)
+    }
+    const setTickerDataHistory = async (type) => {
+        getTickerDataHistory(type)
+        setSelectedBtn(type)
+    }
 
     return (
         <View style={styles.container}>
@@ -38,7 +92,7 @@ const Orders = (props) => {
             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(2) }}>
                 <View style={{ width: "47%", }}>
                     <Button
-                        onPress={() => setSelectedBtn("Open")}
+                        onPress={() => setTickerData("Open")}
                         Text={'Open'}
                         height={52}
                         TextColor={selectedBtn === "Open" ? "#fff" : "rgba(255, 255, 255, 0.5)"}
@@ -47,7 +101,7 @@ const Orders = (props) => {
                 </View>
                 <View style={{ width: "47%" }}>
                     <Button
-                        onPress={() => setSelectedBtn("History")}
+                        onPress={() => setTickerDataHistory("History")}
                         Text={'History'}
                         height={52}
                         TextColor={selectedBtn === "Open" ? "rgba(255, 255, 255, 0.5)" : "#fff"}
@@ -79,7 +133,8 @@ const Orders = (props) => {
             </View>
 
             <FlatList
-                data={selectedBtn === "Open" ? DATA : DATA1}
+                data={selectedBtn === "Open" ? Order_List : Order_List_History}
+                extraData={Order_List}
                 keyExtractor={(item, index) => index.toString()}
                 style={{ marginTop: wp(2) }}
                 contentContainerStyle={{}}
@@ -88,25 +143,29 @@ const Orders = (props) => {
                     <>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, height: 50, paddingHorizontal: wp(2) }}>
                             <View style={{ flex: 1, justifyContent: "center" }}>
-                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium}  margin={[0, 0, 0, 0]} textAlign={"center"}>{item.date}</ResponsiveText>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.date?.split('T')[0]}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center" }}>
-                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium}  margin={[0, 0, 0, 0]} textAlign={"center"}>{item.ticker}</ResponsiveText>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.ticker}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center" }}>
-                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium}  margin={[0, 0, 0, 0]} textAlign={"center"}>{item.type}</ResponsiveText>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.type}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center" }}>
-                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium}  margin={[0, 0, 0, 0]} textAlign={"center"}>{item.price}</ResponsiveText>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.price}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center" }}>
-                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium}  margin={[0, 0, 0, 0]} textAlign={"center"}>{item.qty}</ResponsiveText>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.qty}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center", }}>
-                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={item.status === "Completed" ? "#019146" : item.status === "Pending" ? "#DB1222" : "#F4BB32"  } textAlign={"center"}>{item.status}</ResponsiveText>
+                                {selectedBtn === "Open" ?
+                                    <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={item?.status === 0 ? "#DB1222" : "#F4BB32"} textAlign={"center"}>{item?.status === 0 ? "Pending" : "Partial"}</ResponsiveText>
+                                    :
+                                    <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={"#019146"} textAlign={"center"}>{"Completed"}</ResponsiveText>
+                                }
                             </View>
                         </View>
-                        <View style={{ backgroundColor: "#ECECEC", height: 2, width: wp(100), marginVertical:wp(2) }} />
+                        <View style={{ backgroundColor: "#ECECEC", height: 2, width: wp(100), marginVertical: wp(2) }} />
                     </>
 
 

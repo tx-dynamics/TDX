@@ -9,6 +9,8 @@ import VerificationCode from '../../Screens/Auth/VerificationCode'
 // import ForgotPassword from '../../Screens/Auth/ForgotPassword'
 import SetupNewPassword from '../../Screens/Auth/SetupNewPassword'
 import ForgetPassword from '../../Screens/Auth/ForgetPassword'
+import SetupResetPassword from '../../Screens/Auth/SetupResetPassword'
+import VerificationCodeFirst from '../../Screens/Auth/VerificationCodeFirst'
 
 
 const Stack = createNativeStackNavigator();
@@ -21,7 +23,9 @@ function AuthStack(props) {
                     <Stack.Screen name="Login" component={Login} />
                     <Stack.Screen name="VerificationCode" component={VerificationCode} />
                     <Stack.Screen name="SetupNewPassword" component={SetupNewPassword} />
+                    <Stack.Screen name="SetupResetPassword" component={SetupResetPassword} />
                     <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
+                    <Stack.Screen name="VerificationCodeFirst" component={VerificationCodeFirst} />
                     {/* <Stack.Screen name="ForgotPassword" component={ForgotPassword} /> */}
                 </Stack.Navigator>
 

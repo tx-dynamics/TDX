@@ -12,18 +12,11 @@ import Header from '../../Components/Header';
 import Loader from '../../Components/Loader';
 import { _axiosPostAPI } from '../../Apis/Apis';
 
-
-// import {
-//     CodeField,
-//     Cursor,
-//     useBlurOnFulfill,
-//     useClearByFocusCell,
-// } from 'react-native-confirmation-code-field';
 import { CodeField, Cursor } from "react-native-confirmation-code-field";
 
 const CELL_COUNT = 6;
 
-export default function VerificationCode(props) {
+export default function VerificationCodeFirst(props) {
 
     const [value, setValue] = useState('')
     const [otpValue, setOtpValue] = useState('')
@@ -33,7 +26,7 @@ export default function VerificationCode(props) {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        // alert(JSON.stringify(props.route.params.fromScreen))
+        // alert(JSON.stringify(props.route.params.token))
     }, [])
 
 
@@ -51,7 +44,8 @@ export default function VerificationCode(props) {
                 .then(async (response) => {
                     setLoading(false)
                     if (response.action === "success") {
-                            props.navigation.navigate("SetupResetPassword", { Otpcode: otpValue })
+                        props.navigation.navigate("SetupNewPassword", { Otpcode: otpValue,
+                        token: props.route.params.token })
                     } else {
                         setApiError(true)
                         setApiErrorMsg(response.error)

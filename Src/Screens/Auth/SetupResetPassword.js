@@ -13,7 +13,7 @@ import Loader from '../../Components/Loader';
 import { _axiosPostAPI } from '../../Apis/Apis';
 
 
-const SetupNewPassword = (props) => {
+const SetupResetPassword = (props) => {
     const [hide, setHide] = useState(true)
     const [hide1, setHide1] = useState(true)
 
@@ -27,7 +27,6 @@ const SetupNewPassword = (props) => {
 
     useEffect(() => {
         // alert(JSON.stringify(props.route.params.Otpcode))
-        // console.log(JSON.stringify(props.route.params.token))
     }, [])
 
 
@@ -47,11 +46,10 @@ const SetupNewPassword = (props) => {
             } else {
                 setLoading(true)
                 let data = {}
-                data["token"] = props.route.params.token;
+                data["code"] = props.route.params.Otpcode;
                 data["password"] = confirmPassword;
-                await _axiosPostAPI("set_first_time_password", data)
+                await _axiosPostAPI("set_password", data)
                     .then(async (response) => {
-                        // alert(JSON.stringify(response))
                         setLoading(false)
                         if (response.action === "success") {
                             props.navigation.navigate("Login")
@@ -118,7 +116,7 @@ const SetupNewPassword = (props) => {
         </View>
     )
 }
-export default SetupNewPassword;
+export default SetupResetPassword;
 const styles = StyleSheet.create({
     container: {
         flex: 1,

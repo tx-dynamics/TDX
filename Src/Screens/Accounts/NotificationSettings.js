@@ -10,8 +10,6 @@ import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import ModalDropdown from 'react-native-modal-dropdown';
-
 
 const NotificationSettings = (props) => {
 

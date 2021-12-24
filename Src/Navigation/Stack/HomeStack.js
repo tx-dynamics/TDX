@@ -9,6 +9,7 @@ import AssetsDetails from '../../Screens/Home/AssetsDetails'
 import SearchScreen from '../../Screens/Home/SearchScreen'
 import SearchNextScreen from '../../Screens/Home/SearchNextScreen'
 import SearchDetails from '../../Screens/Home/SearchDetails'
+import TradeScreenTicker from '../../Screens/Home/TradeScreenTicker'
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ function HomeStack(props) {
                 <Stack.Screen name="SearchScreen" component={SearchScreen} />
                 <Stack.Screen name="SearchNextScreen" component={SearchNextScreen} />
                 <Stack.Screen name="SearchDetails" component={SearchDetails} />
+                <Stack.Screen name="TradeScreenTicker" component={TradeScreenTicker} />
             </Stack.Navigator>
 
         </>

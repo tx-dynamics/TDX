@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Modal, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -12,13 +12,14 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
 import InputField from '../../Components/InputField';
 
-import ModalDropdown from 'react-native-modal-dropdown';
+import { useSelector, useDispatch } from 'react-redux';
+import { _getTickerData, _getNewsData } from '../../Redux/Actions/Actions';
+
 
 const NewsDATA = [
     { id: "1", Heading: "News Headings", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Non, mauris egestas a..." },
     { id: "2", Heading: "News Headings", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Non, mauris egestas a..." }
 ]
-
 const DayDATA = [
     { id: "1", title: "1 D" },
     { id: "2", title: "1 w" },
@@ -36,7 +37,6 @@ const DayDATA1 = [
     { id: "5", title: "5/10" },
     { id: "6", title: "6/10" },
     { id: "7", title: "7/10" },
-    { id: "8", title: "8/10" },
 ]
 
 import {
@@ -66,12 +66,36 @@ const Greendata = {
     ]
 }
 
-
 const AssetsDetails = (props) => {
+
+    const dispatch = useDispatch();
 
     const [DropDownItem, setDropDownItem] = useState('USD')
     const [filterModal, setFilterModal] = useState(false)
     const [alertModal, setAlertModal] = useState(false)
+
+    const userToken = useSelector(state => state.AuthReducer.userToken);
+    const tickerData = useSelector(state => state.HomeReducer.tickerData);
+    const newsData = useSelector(state => state.HomeReducer.newsData);
+
+    useEffect(() => {
+        // console.log("Token::::: ", userToken)
+        // alert(JSON.stringify(props.route.params.tickerId))
+        // alert(JSON.stringify(props.route.params.marketID))
+        getTickerData()
+    }, [])
+
+    const getTickerData = async () => {
+        let data = {}
+        data["token"] = userToken;
+        data["id"] = props.route.params.tickerId;
+        await dispatch(_getTickerData('get_ticker', data))
+        let data1 = {}
+        data1["token"] = userToken;
+        data1["tickers"] = [props.route.params.tickerId];
+        await dispatch(_getNewsData('get_blogs', data1))
+        // alert(JSON.stringify(tickerData))
+    }
 
     const openAlertModal = () => {
         setFilterModal(false)
@@ -86,13 +110,12 @@ const AssetsDetails = (props) => {
 
             <ScrollView>
 
-
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(3), alignItems: "center" }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <Image source={iconPath.coin1} style={{ width: wp(13), height: wp(13), resizeMode: "contain" }} />
+                        <Image source={{ uri: tickerData?.ticker?.market?.image_url }} style={{ width: wp(13), height: wp(13), resizeMode: "contain" }} />
                         <View style={{ marginLeft: 12 }}>
-                            <ResponsiveText size="h5" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_SemiBold}>{"Maize"}</ResponsiveText>
-                            <ResponsiveText size="h6" margin={[-6, 0, 0, 0]}>{"Maize"}</ResponsiveText>
+                            <ResponsiveText size="h5" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_SemiBold}>{tickerData?.ticker?.market?.title}</ResponsiveText>
+                            <ResponsiveText size="h6" margin={[-6, 0, 0, 0]}>{tickerData?.ticker?.title}</ResponsiveText>
                         </View>
                     </View>
                     <Pressable onPress={() => setFilterModal(true)}>
@@ -100,45 +123,54 @@ const AssetsDetails = (props) => {
                     </Pressable>
                 </View>
 
-
                 <View style={{ backgroundColor: Colors.TextInputBackgroundColor, paddingVertical: wp(4), marginTop: wp(5) }}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4) }}>
-                        <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 5]}>{"GWAYM1"}</ResponsiveText>
+                        <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 5]}>{tickerData?.ticker?.ticker}</ResponsiveText>
                         <View style={{ alignItems: "flex-end" }}>
-                            <ResponsiveText size="h8" color={Colors.greenColor}>{"2000"}</ResponsiveText>
-                            <ResponsiveText size="h9" color={Colors.greenColor} margin={[-4, 0, 0, 0]}>{"+10%"}</ResponsiveText>
+                            <ResponsiveText size="h8" color={tickerData?.ticker?.price >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(tickerData?.ticker?.price).toFixed(1)}</ResponsiveText>
+                            <ResponsiveText size="h9" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{tickerData?.ticker?.trend + " %"}</ResponsiveText>
                         </View>
                     </View>
 
                     <View style={{ width: "100%", alignItems: "center", marginTop: wp(5) }}>
+                        {tickerData?.ticker?.chartData !== undefined &&
+                            <LineChart
+                                data={{
+                                    datasets: [
+                                        {
+                                            data: tickerData?.ticker?.chartData.map((itemm) => {
+                                                return (
+                                                    parseInt(itemm.price)
+                                                )
+                                            })
+                                        }
+                                    ]
+                                }}
+                                width={wp(100)} // from react-native
+                                height={140}
+                                withHorizontalLabels={false}
+                                flatColor={true}
+                                chartConfig={{
+                                    backgroundGradientFromOpacity: 0,
+                                    backgroundGradientToOpacity: 0,
+                                    color: (opacity = 1) => Colors.greenColor,
+                                    propsForDots: { r: "0" },
+                                    propsForBackgroundLines: { stroke: "#CCCCCC33" }
+                                }}
+                                bezier
+                                style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: 28 }] }}
+                            />}
 
-
-                        <LineChart
-                            data={Greendata}
-                            width={wp(100)} // from react-native
-                            height={140}
-                            withHorizontalLabels={false}
-                            flatColor={true}
-                            chartConfig={{
-                                backgroundGradientFromOpacity: 0,
-                                backgroundGradientToOpacity: 0,
-                                color: (opacity = 1) => Colors.greenColor,
-                                propsForDots: { r: "0" },
-                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                            }}
-                            bezier
-                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: 15 }] }}
-                        />
                     </View>
 
-                    <View style={{ paddingHorizontal: wp(4), marginTop: wp(-4), marginBottom: wp(6) }}>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                            {DayDATA1.map((item, index) =>
-                                <Pressable style={{ marginLeft: index === 0 ? 0 : wp(2), width: 41, }}>
-                                    <ResponsiveText size="h9" margin={[0, 0, 0, 0]}>{item.title}</ResponsiveText>
-                                </Pressable>
-                            )}
-                        </ScrollView>
+                    <View style={{ paddingHorizontal: wp(4), marginTop: wp(-4), marginBottom: wp(6), flexDirection: "row", justifyContent: "space-between" }}>
+                        {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}> */}
+                        {tickerData?.ticker?.chartData.map((item, index) =>
+                            <Pressable style={{}}>
+                                <ResponsiveText size="h9" margin={[0, 0, 0, 0]}>{item.date.split('T')[0].split('-')[2] + "/" + item.date.split('-')[1]}</ResponsiveText>
+                            </Pressable>
+                        )}
+                        {/* </ScrollView> */}
                     </View>
 
                     <View style={{ paddingHorizontal: wp(4) }}>
@@ -157,20 +189,21 @@ const AssetsDetails = (props) => {
                     backgroundColor: Colors.TextInputBackgroundColor, paddingHorizontal: wp(4), justifyContent: "space-between",
                     marginVertical: wp(6), paddingVertical: wp(4), flexDirection: "row", alignItems: "center"
                 }}>
-                    <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"Your stock"}</ResponsiveText>
+                    <Pressable onPress={() => alert(JSON.stringify(newsData))}>
+                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"Your stock"}</ResponsiveText>
+                    </Pressable>
 
                     <View style={{ flexDirection: "row" }}>
                         <View style={{ alignItems: "center" }}>
-                            <ResponsiveText size="h9" color={"#BEBEBE"}>{"Quantity (MT)"}</ResponsiveText>
-                            <ResponsiveText size="h9" margin={[5, 0, 0, 0]}>{"10"}</ResponsiveText>
+                            <ResponsiveText size="h9" color={"#BEBEBE"}>{"Quantity (" + tickerData?.ticker?.my_stocks?.qty_symbol + ")"}</ResponsiveText>
+                            <ResponsiveText size="h9" margin={[5, 0, 0, 0]}>{tickerData?.ticker?.my_stocks?.qty}</ResponsiveText>
                         </View>
                         <View style={{ alignItems: "center", marginLeft: wp(9), marginRight: wp(4) }}>
                             <ResponsiveText size="h9" color={"#BEBEBE"}>{"Bags"}</ResponsiveText>
-                            <ResponsiveText size="h9" margin={[5, 0, 0, 0]}>{"200"}</ResponsiveText>
+                            <ResponsiveText size="h9" margin={[5, 0, 0, 0]}>{tickerData?.ticker?.my_stocks?.bags}</ResponsiveText>
                         </View>
                     </View>
                 </View>
-
 
                 <View style={{
                     backgroundColor: Colors.TextInputBackgroundColor, paddingHorizontal: wp(4),
@@ -183,33 +216,33 @@ const AssetsDetails = (props) => {
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: wp(3), alignItems: "center" }}>
                         <View>
                             <ResponsiveText size="h9" color={"#BEBEBE"}>{"Country of origin"}</ResponsiveText>
-                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{"Ghana"}</ResponsiveText>
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.country}</ResponsiveText>
                         </View>
-                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"G"}</ResponsiveText>
+                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.country_symbol}</ResponsiveText>
                     </View>
 
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: wp(1), alignItems: "center" }}>
                         <View>
                             <ResponsiveText size="h9" color={"#BEBEBE"}>{"Warehouse Location"}</ResponsiveText>
-                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{"W9"}</ResponsiveText>
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.warehouse}</ResponsiveText>
                         </View>
-                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"WA"}</ResponsiveText>
+                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.warehouse_symbol}</ResponsiveText>
                     </View>
 
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: wp(1), alignItems: "center" }}>
                         <View>
                             <ResponsiveText size="h9" color={"#BEBEBE"}>{"Commodity Type"}</ResponsiveText>
-                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{"Yellow Soya Bean"}</ResponsiveText>
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.commudity}</ResponsiveText>
                         </View>
-                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"YSB"}</ResponsiveText>
+                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.commudity_symbol}</ResponsiveText>
                     </View>
 
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: wp(1), alignItems: "center" }}>
                         <View>
                             <ResponsiveText size="h9" color={"#BEBEBE"}>{"Grade"}</ResponsiveText>
-                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{"1"}</ResponsiveText>
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.grade}</ResponsiveText>
                         </View>
-                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"1"}</ResponsiveText>
+                        <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.grade_symbol}</ResponsiveText>
                     </View>
 
                     <Pressable style={{
@@ -220,23 +253,22 @@ const AssetsDetails = (props) => {
                     </Pressable>
                 </View>
 
-
                 <ResponsiveText size="h7" margin={[wp(4), 0, 0, wp(4)]} fontFamily={fonts.Poppins_Medium}>{"News"}</ResponsiveText>
 
-                {NewsDATA.map((item) =>
+                {newsData?.blogs?.map((item) =>
                     <View style={{
                         backgroundColor: Colors.TextInputBackgroundColor, marginTop: wp(2), marginHorizontal: wp(4), paddingHorizontal: wp(4),
                         paddingVertical: wp(2), borderRadius: 16
                     }}>
-                        <ResponsiveText size="h7" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_Medium}>{item.Heading}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[-2, 0, 0, 0]} color={"#6B6B6B"}>{item.desc}</ResponsiveText>
+                        <ResponsiveText size="h7" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_Medium}>{item.title}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[-2, 0, 0, 0]} color={"#6B6B6B"}>{item.description}</ResponsiveText>
                     </View>
                 )}
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(4), marginBottom: wp(10) }}>
                     <View style={{ width: "49%", }}>
                         <Button
-                            onPress={() => props.navigation.navigate('TradeScreenn')}
+                            onPress={() => props.navigation.navigate('TradeScreenTicker')}
                             Text={'BUY'}
                             height={45}
                             backgroundColor={"#019146"}
@@ -244,7 +276,7 @@ const AssetsDetails = (props) => {
                     </View>
                     <View style={{ width: "49%" }}>
                         <Button
-                            onPress={() => props.navigation.navigate('TradeScreenn')}
+                            onPress={() => props.navigation.navigate('TradeScreenTicker')}
                             Text={'SELL'}
                             height={45}
                             backgroundColor={"#DB1222"}
@@ -318,9 +350,6 @@ export default AssetsDetails;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: Colors.white,
-        // justifyContent: "center",
-        // alignItems: "center"
     },
     containerStyle: {
         backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", marginVertical: wp(4),

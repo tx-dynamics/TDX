@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, Modal, ScrollView, FlatList, Pressable } from 'react-native'
 
+import { useFocusEffect } from '@react-navigation/native';
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
 import { iconPath } from '../../Constants/icon';
@@ -11,7 +12,7 @@ import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import InputField from '../../Components/InputField';
-
+import { MARKET_DATA_LOADING } from '../../Redux/Constants'
 import { useSelector, useDispatch } from 'react-redux';
 
 import { _getMarketData } from '../../Redux/Actions/Actions';
@@ -24,6 +25,7 @@ import {
     StackedBarChart
 } from "react-native-chart-kit";
 import { _axiosPostAPI } from '../../Apis/Apis';
+import ModalDropdown from 'react-native-modal-dropdown';
 
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
 
@@ -66,7 +68,7 @@ const DATA = [
 ]
 const FilterDate = [
     { id: "1", title: "Grade" },
-    { id: "2", title: "commodity" },
+    { id: "2", title: "Commodity" },
     { id: "3", title: "Warehouse" },
 ]
 
@@ -76,47 +78,80 @@ const HomeScreen = (props) => {
 
     const [filterModal, setFilterModal] = useState(false)
     const [filterApply, setFilterApply] = useState('')
+    const [filter_value, setFilter_value] = useState('')
+    const [CommodityValue, setCommodityValue] = useState('')
+    const [GradeDropDownValue, setGradeDropDownValue] = useState('1')
+    const [WarehouseDropDownValue, setWarehouseDropDownValue] = useState('W9')
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const Market_Loading = useSelector(state => state.HomeReducer.Market_Loading);
     const marketData = useSelector(state => state.HomeReducer.marketData);
 
     useEffect(() => {
+        // dispatch({ type: MARKET_DATA_LOADING, payload: true });
         // console.log("Token::::: ", userToken)
-        getMarketData()
+        // getMarketData()
     }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            getMarketData()
+        }, [])
+    );
 
     const getMarketData = async () => {
         let data = {}
+        let data1 = {}
+        data1["searching"] = false;
+        data1["filtering"] = false;
         data["token"] = userToken;
-        data["filters"] = [];
-        data["limit"] = 20;
+        data["search"] = data1;
+        data["limit"] = 30;
         data["page"] = 1;
         await dispatch(_getMarketData('get_markets', data))
 
-        // alert(JSON.stringify(marketData))
+        // alert(JSON.stringify(marketData.more_available))
     }
-    const getFilteredData = async (filter) => {
+    const getFilteredData = async (filter, filter_Value) => {
         let data = {}
+        let data1 = {}
+
+        data1["searching"] = false;
+        data1["filtering"] = true;
+        data1["filter_type"] = filter;
+        data1["filter_value"] = filter_Value;
         data["token"] = userToken;
-        data["filters"] = [filter];
-        data["limit"] = 20;
+        data["search"] = data1;
+        data["limit"] = 30;
         data["page"] = 1;
         await dispatch(_getMarketData('get_markets', data))
 
-        // alert(JSON.stringify(marketData))
+        // alert(JSON.stringify(data))
     }
     const applyFilter = async (item) => {
         await setFilterApply(item.title)
-        if (item.title !== "commodity") {
-            setFilterModal(false)
-            getFilteredData(item.title)
-        }
+        // if ((item.title !== "Commodity") || (item.title !== "Grade")) {
+        //     setFilterModal(false)
+        //     getFilteredData(item.title)
+        // }
     }
     const applyFilterCom = () => {
-        setFilterApply("commodity")
-        setFilterModal(false)
-        getFilteredData("commodity")
+        if (filterApply === "Grade") {
+            getFilteredData("Grade", GradeDropDownValue)
+            setFilterModal(false)
+            setFilterApply('')
+        } else if (filterApply === "Warehouse") {
+            getFilteredData("Warehouse", WarehouseDropDownValue)
+            setFilterModal(false)
+            setFilterApply('')
+        } else {
+            getFilteredData("Commodity", CommodityValue)
+            setFilterModal(false)
+            setFilterApply('')
+        }
+        // setFilterApply("Commodity")
+        // setFilterModal(false)
+        // getFilteredData("Commodity")
     }
 
 
@@ -137,7 +172,7 @@ const HomeScreen = (props) => {
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: wp(3) }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        {filterApply === "commodity" ?
+                        {filterApply === "Commodity" ?
                             <Pressable style={{ backgroundColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, height: wp(7), justifyContent: "center" }}>
                                 <ResponsiveText size="h8" color={Colors.white} >{"Commodity"}</ResponsiveText>
                             </Pressable>
@@ -170,8 +205,7 @@ const HomeScreen = (props) => {
                 }
                 renderItem={({ item, index }) => (
 
-                    <Pressable onPress={() => props.navigation.navigate("AssetsDetails")}
-                        style={{ backgroundColor: "#CCCCCC33", padding: wp(4), paddingBottom: wp(2) }}>
+                    <Pressable style={{ backgroundColor: "#CCCCCC33", padding: wp(4), paddingBottom: wp(2) }}>
 
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                             <View style={{ flexDirection: "row" }}>
@@ -181,44 +215,47 @@ const HomeScreen = (props) => {
                             <ResponsiveText size="h9" margin={[0, 0, 0, 5]} fontFamily={fonts.Poppins_SemiBold}>{item.pair}</ResponsiveText>
                         </View>
 
-                        {item.tickers.map((cardData) =>
-                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
+                        {item?.tickers?.map((cardData) =>
+                            <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData.id, marketID: item.id })}
+                                style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7, }}>
                                 <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData.title}</ResponsiveText>
 
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                    <LineChart
-                                        data={{
-                                            datasets: [
-                                                {
-                                                    data: cardData.chatData.map((itemm) => {
-                                                        return (
-                                                            parseInt(itemm.price)
-                                                        )
-                                                    })
-                                                }
-                                            ]
-                                        }}
-                                        width={wp(30)} // from react-native
-                                        height={wp(11)}
-                                        withHorizontalLabels={false}
-                                        flatColor={true}
-                                        chartConfig={{
-                                            backgroundGradientFromOpacity: 0,
-                                            backgroundGradientToOpacity: 0,
-                                            color: (opacity = 1) => cardData.trend > 0 ? Colors.greenColor : Colors.redColor,
-                                            propsForDots: { r: "0" },
-                                            propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                                        }}
-                                        bezier
-                                        style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
-                                    />
+                                    {cardData?.chatData[0]?.price !== undefined &&
+                                        <LineChart
+                                            data={{
+                                                datasets: [
+                                                    {
+                                                        data: cardData?.chatData?.map((itemm) => {
+                                                            return (
+                                                                parseInt(itemm.price)
+                                                            )
+                                                        })
+                                                    }
+                                                ]
+                                            }}
+                                            width={wp(30)} // from react-native
+                                            height={wp(11)}
+                                            withHorizontalLabels={false}
+                                            flatColor={true}
+                                            chartConfig={{
+                                                backgroundGradientFromOpacity: 0,
+                                                backgroundGradientToOpacity: 0,
+                                                color: (opacity = 1) => cardData.trend >= 0 ? Colors.greenColor : Colors.redColor,
+                                                propsForDots: { r: "0" },
+                                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
+                                            }}
+                                            bezier
+                                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
+                                        />
+                                    }
 
                                     <View style={{ alignItems: "flex-end" }}>
-                                        <ResponsiveText size="h8" color={cardData.trend > 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(cardData.price).toFixed(1)}</ResponsiveText>
-                                        <ResponsiveText size="h10" color={cardData.trend > 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"+ " + cardData.trend + " %"}</ResponsiveText>
+                                        <ResponsiveText size="h8" color={cardData.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(cardData.price).toFixed(1)}</ResponsiveText>
+                                        <ResponsiveText size="h10" color={cardData.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + cardData.trend + " %"}</ResponsiveText>
                                     </View>
                                 </View>
-                            </View>
+                            </Pressable>
                         )}
 
                         {/* {item.dot &&
@@ -263,28 +300,28 @@ const HomeScreen = (props) => {
                 <Pressable
                     onPress={() => setFilterModal(false)}
                     style={styles.modalBackground}>
-                    <View style={styles.activityIndicatorWrapper}>
+                    <Pressable style={[styles.activityIndicatorWrapper]}>
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(1)]}>{"Filters:"}</ResponsiveText>
-                        <View style={{ marginTop: wp(5), paddingBottom: wp(6) }}>
+                        <View style={{ marginTop: wp(5), paddingBottom: wp(6), }}>
                             <ScrollView horizontal>
                                 {FilterDate.map((item, index) =>
                                     <Pressable onPress={() => applyFilter(item)}
                                         style={{
-                                            backgroundColor: filterApply === "commodity" ? index === 1 ? "#fff" : "#CCCCCC" : "#CCCCCC", marginLeft: index === 0 ? wp(2) : wp(4), paddingVertical: wp(2), paddingHorizontal: wp(4), borderRadius: 7,
-                                            borderColor: Colors.greenColor, borderWidth: filterApply === "commodity" ? index === 1 ? 1 : 0 : 0
+                                            backgroundColor: filterApply === "Commodity" ? index === 1 ? "#fff" : "#CCCCCC" : "#CCCCCC", marginLeft: index === 0 ? wp(2) : wp(4), paddingVertical: wp(2), paddingHorizontal: wp(4), borderRadius: 7,
+                                            borderColor: Colors.greenColor, borderWidth: filterApply === "Commodity" ? index === 1 ? 1 : 0 : 0
                                         }}>
                                         <ResponsiveText size="h9" padding={[0, 0, 0, 0]}>{item.title}</ResponsiveText>
                                     </Pressable>
                                 )}
                             </ScrollView>
-                            {filterApply === "commodity" &&
+                            {filterApply === "Commodity" &&
                                 <>
                                     <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
                                         <InputField
                                             placeholder={" + add commoditiy"}
                                             placeholderTextColor={"#D0D0D0"}
-                                        // value={password}
-                                        // onChangeText={(password) => setPassword(password)}
+                                            value={CommodityValue}
+                                            onChangeText={(text) => setCommodityValue(text)}
                                         />
                                     </View>
                                     <Pressable onPress={() => applyFilterCom()}
@@ -293,8 +330,50 @@ const HomeScreen = (props) => {
                                     </Pressable>
                                 </>
                             }
+                            {filterApply === "Grade" &&
+                                <>
+                                    <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
+                                        <ModalDropdown options={['1', '2']}
+                                            defaultValue={GradeDropDownValue}
+                                            style={[styles.dropDown, {}]}
+                                            dropdownStyle={styles.dropDown_dropDownStyle}
+                                            dropdownTextStyle={styles.dropDown_textStyle}
+                                            textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(75), fontFamily: fonts.Poppins, }}
+                                            onSelect={(idx, DropDownItem) => setGradeDropDownValue(DropDownItem)}
+                                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} />)}
+                                        />
+
+                                    </View>
+                                    <Pressable
+                                        onPress={() => applyFilterCom()}
+                                        style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
+                                        <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
+                                    </Pressable>
+                                </>
+                            }
+                            {filterApply === "Warehouse" &&
+                                <>
+                                    <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
+                                        <ModalDropdown options={['W9', 'W10']}
+                                            defaultValue={WarehouseDropDownValue}
+                                            style={[styles.dropDown, {}]}
+                                            dropdownStyle={styles.dropDown_dropDownStyle}
+                                            dropdownTextStyle={styles.dropDown_textStyle}
+                                            textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(75), fontFamily: fonts.Poppins, }}
+                                            onSelect={(idx, DropDownItem) => setWarehouseDropDownValue(DropDownItem)}
+                                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} />)}
+                                        />
+
+                                    </View>
+                                    <Pressable
+                                        onPress={() => applyFilterCom()}
+                                        style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
+                                        <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
+                                    </Pressable>
+                                </>
+                            }
                         </View>
-                    </View>
+                    </Pressable>
                 </Pressable>
             </Modal>
             <Loader loading={Market_Loading} />
@@ -323,5 +402,31 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: wp(30),
         padding: 5
-    }
+    },
+    dropDown_dropDownStyle: {
+        width: wp(85.2),
+        borderWidth: 1,
+        height: wp(26),
+
+        // marginLeft: wp(0),
+        borderRadius: 11,
+        // paddingTop: 8,
+        borderTopWidth: .1,
+        elevation: .5,
+        // height: wp(30),
+    },
+    dropDown_textStyle: {
+        fontSize: 15,
+        color: "#6F7074",
+        fontFamily: fonts.Poppins,
+        paddingLeft: wp(4),
+        // backgroundColor: Colors.TextInputBackgroundColor
+
+    },
+    dropDown: {
+        height: 50,
+        justifyContent: "center",
+        borderRadius: 10,
+        backgroundColor: Colors.TextInputBackgroundColor
+    },
 })

@@ -39,13 +39,16 @@ const Login = (props) => {
             let data = {}
             data["email"] = EmailAdd;
             data["password"] = password;
-            // data["email"] = "faisal@gmail.com";
-            // data["password"] = "12345678";
             await _axiosPostAPI("login", data)
                 .then(async (response) => {
                     setLoading(false)
                     if (response.action === "success") {
-                        ResponseHandle(response.data)
+                        // ResponseHandle(response.data)
+                        if (response.data.is_password_set) {
+                            ResponseHandle(response.data)
+                        } else {
+                            SendOtp(response.data.token)
+                        }
                     } else {
                         setApiError(true)
                         setApiErrorMsg(response.error)
@@ -56,6 +59,30 @@ const Login = (props) => {
                     console.log(err)
                 })
         }
+    }
+
+    const SendOtp = async (tokenn) => {
+        setLoading(true)
+        let data = {}
+        data["email"] = EmailAdd;
+        await _axiosPostAPI("forgot_password", data)
+            .then(async (response) => {
+                setLoading(false)
+                if (response.action === "success") {
+                    // alert(JSON.stringify(response.otp))
+                    props.navigation.navigate("VerificationCodeFirst", {token: tokenn })
+                    setPassword('')
+                    setEmailAdd('')
+                } else {
+                    setApiError(true)
+                    setApiErrorMsg(response.error)
+                }
+            })
+            .catch((err) => {
+                setLoading(false)
+                console.log(err)
+            })
+
     }
 
     const ResponseHandle = (res) => {
