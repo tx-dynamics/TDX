@@ -182,7 +182,7 @@ const RequestACall = (props) => {
 
 
 
-            {/* <Modal
+            <Modal
                 transparent={true}
                 animationType={'none'}
                 visible={DateModal}
@@ -248,7 +248,7 @@ const RequestACall = (props) => {
                         />
                     </Pressable>
                 </Pressable>
-            </Modal> */}
+            </Modal>
 
         </View>
     )

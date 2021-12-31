@@ -50,23 +50,7 @@ function Screen4() {
 export default function BottomNav() {
   return (
     <Tab.Navigator
-      // tabBarOptions={{
-      //   // showIcon: true,
-      //   // showLabel: false,
-      //   // keyboardHidesTabBar: true,
-      //   // height:50,
-      //   // // style: { display: 'none'  }
-      //   // // style: { display: 'flex'  }
-      //   // labelStyle: {
-      //   //   color: '#2972ff'
-      //   //  },
-      //   //  style: {
-      //   //   height: 300
-      //   // },
-      //   // tabStyle: {
-      //   // },
-
-      // }}
+     
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,

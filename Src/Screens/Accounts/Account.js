@@ -64,6 +64,7 @@ const Account = (props) => {
                     <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText>
                 </View>
                 <Pressable onPress={() => props.navigation.navigate("SettingScreen")}>
+                {/* <Pressable onPress={() => alert("jhhhjj")}> */}
                     <Image source={iconPath.Drawer1} style={{ width: wp(6.3), height: wp(6.3), resizeMode: "contain" }} />
                 </Pressable>
             </View>

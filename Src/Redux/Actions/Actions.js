@@ -23,6 +23,31 @@ export const SetSession = (data) => {
     }
 }
 
+export const _checkLogin = (url, params) => {
+    try {
+        return async dispatch => {
+            await _axiosPostAPI(url, params)
+                .then(async (response) => {
+                    // alert(JSON.stringify(response))
+                    if (response.action === "success") {
+                    } else {
+                        let data = {}
+                        data["isLogin"] = false;
+                        data["userToken"] = "";
+                        data["userId"] = "";
+                        data["userInfo"] = "";
+                        dispatch({ type: SESSION, payload: data });
+                    }
+                })
+                .catch((err) => {
+                    console.log(JSON.stringify(err))
+                })
+        };
+    } catch (error) {
+        console.log(JSON.stringify(error))
+    }
+}
+
 export const _getSingleMarketData = (url, params) => {
     try {
         return async dispatch => {

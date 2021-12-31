@@ -80,6 +80,7 @@ const HomeScreen = (props) => {
     const [filterApply, setFilterApply] = useState('')
     const [filter_value, setFilter_value] = useState('')
     const [CommodityValue, setCommodityValue] = useState('')
+    const [CommodityValueError, setCommodityValueError] = useState(false)
     const [GradeDropDownValue, setGradeDropDownValue] = useState('1')
     const [WarehouseDropDownValue, setWarehouseDropDownValue] = useState('W9')
 
@@ -112,6 +113,7 @@ const HomeScreen = (props) => {
 
         // alert(JSON.stringify(marketData.more_available))
     }
+
     const getFilteredData = async (filter, filter_Value) => {
         let data = {}
         let data1 = {}
@@ -122,33 +124,48 @@ const HomeScreen = (props) => {
         data1["filter_value"] = filter_Value;
         data["token"] = userToken;
         data["search"] = data1;
+        data["filters"] = [];
+        data["limit"] = 30;
+        data["page"] = 1;
+        await dispatch(_getMarketData('get_markets', data))
+        setCommodityValue('')
+    }
+
+    const getFilteredDataFilter = async (filter) => {
+        let data = {}
+        let data1 = {}
+        data1["searching"] = false;
+        data1["filtering"] = false;
+        data["token"] = userToken;
+        data["search"] = data1;
+        data["filters"] = [filter];
         data["limit"] = 30;
         data["page"] = 1;
         await dispatch(_getMarketData('get_markets', data))
 
         // alert(JSON.stringify(data))
     }
+
     const applyFilter = async (item) => {
         await setFilterApply(item.title)
-        // if ((item.title !== "Commodity") || (item.title !== "Grade")) {
-        //     setFilterModal(false)
-        //     getFilteredData(item.title)
-        // }
+        if (item.title !== "Commodity") {
+            setFilterModal(false)
+            getFilteredDataFilter(item.title)
+        }
     }
+
     const applyFilterCom = () => {
-        if (filterApply === "Grade") {
-            getFilteredData("Grade", GradeDropDownValue)
-            setFilterModal(false)
-            setFilterApply('')
-        } else if (filterApply === "Warehouse") {
-            getFilteredData("Warehouse", WarehouseDropDownValue)
-            setFilterModal(false)
-            setFilterApply('')
+        setCommodityValueError(false)
+        if (CommodityValue === '') {
+            setCommodityValueError(true)
         } else {
+
             getFilteredData("Commodity", CommodityValue)
             setFilterModal(false)
             setFilterApply('')
+
         }
+
         // setFilterApply("Commodity")
         // setFilterModal(false)
         // getFilteredData("Commodity")
@@ -218,7 +235,7 @@ const HomeScreen = (props) => {
                         {item?.tickers?.map((cardData) =>
                             <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData.id, marketID: item.id })}
                                 style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7, }}>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData.title}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData.ticker}</ResponsiveText>
 
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                                     {cardData?.chatData[0]?.price !== undefined &&
@@ -323,6 +340,13 @@ const HomeScreen = (props) => {
                                             value={CommodityValue}
                                             onChangeText={(text) => setCommodityValue(text)}
                                         />
+                                        {CommodityValueError ?
+                                            <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 0, fontFamily: fonts.Poppins }}>
+                                                {"Please Enter Commodity Name"}
+                                            </Text>
+                                            :
+                                            <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 0, fontFamily: fonts.Poppins }}> {""}</Text>
+                                        }
                                     </View>
                                     <Pressable onPress={() => applyFilterCom()}
                                         style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
@@ -330,48 +354,7 @@ const HomeScreen = (props) => {
                                     </Pressable>
                                 </>
                             }
-                            {filterApply === "Grade" &&
-                                <>
-                                    <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
-                                        <ModalDropdown options={['1', '2']}
-                                            defaultValue={GradeDropDownValue}
-                                            style={[styles.dropDown, {}]}
-                                            dropdownStyle={styles.dropDown_dropDownStyle}
-                                            dropdownTextStyle={styles.dropDown_textStyle}
-                                            textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(75), fontFamily: fonts.Poppins, }}
-                                            onSelect={(idx, DropDownItem) => setGradeDropDownValue(DropDownItem)}
-                                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} />)}
-                                        />
 
-                                    </View>
-                                    <Pressable
-                                        onPress={() => applyFilterCom()}
-                                        style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
-                                        <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
-                                    </Pressable>
-                                </>
-                            }
-                            {filterApply === "Warehouse" &&
-                                <>
-                                    <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
-                                        <ModalDropdown options={['W9', 'W10']}
-                                            defaultValue={WarehouseDropDownValue}
-                                            style={[styles.dropDown, {}]}
-                                            dropdownStyle={styles.dropDown_dropDownStyle}
-                                            dropdownTextStyle={styles.dropDown_textStyle}
-                                            textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(75), fontFamily: fonts.Poppins, }}
-                                            onSelect={(idx, DropDownItem) => setWarehouseDropDownValue(DropDownItem)}
-                                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} />)}
-                                        />
-
-                                    </View>
-                                    <Pressable
-                                        onPress={() => applyFilterCom()}
-                                        style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
-                                        <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
-                                    </Pressable>
-                                </>
-                            }
                         </View>
                     </Pressable>
                 </Pressable>

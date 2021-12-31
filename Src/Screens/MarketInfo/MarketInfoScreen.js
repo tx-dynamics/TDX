@@ -59,11 +59,11 @@ const MarketInfoScreen = (props) => {
                     <Pressable
                         // onPress={() => Linking.openURL('http://' + item.link)}
                         style={styles.itemContainer}>
-                        <Image source={{ uri: item.image_url }} style={{ width: "100%", height: wp(46), marginTop: wp(-1) }} />
-                        <ResponsiveText size="h8" padding={[0, 15, 0, 0]} >{item.description}</ResponsiveText>
-                        {/* <Text style={{ color: Colors.black, fontFamily: fonts.Poppins, textDecorationLine: 'underline', fontSize: 11 }} */}
-                        {/* // onPress={() => Linking.openURL('http://' + item.link)} */}
-                        {/* // >{"by " + item.link}</Text> */}
+                        <Image source={{ uri: item.image_url }} style={{ width: "100%", height: wp(46), marginTop: wp(-1), resizeMode:"contain" }} />
+                        <ResponsiveText size="h8" padding={[0, 15, 0, 0]} >{item.title}</ResponsiveText>
+                        <Text style={{ color: Colors.black, fontFamily: fonts.Poppins, textDecorationLine: 'underline', fontSize: 11 }}
+                         onPress={() => Linking.openURL('http://' + item.link)}
+                         >{"by " + item.link}</Text>
 
                     </Pressable>
                 )} />

@@ -42,7 +42,8 @@ const Orders = (props) => {
     const userToken = useSelector(state => state.AuthReducer.userToken);
 
     useEffect(() => {
-
+        console.log(userToken)
+        // alert(JSON.stringify(Order_List_History))
         // getTickerData("open")
         // getTickerDataHistory("history")
     }, [])
@@ -50,7 +51,7 @@ const Orders = (props) => {
     useFocusEffect(
         React.useCallback(() => {
             getTickerData("open")
-        getTickerDataHistory("history")
+            getTickerDataHistory("history")
         }, [])
     );
 
@@ -72,7 +73,6 @@ const Orders = (props) => {
         data["page"] = 1;
         data["limit"] = 50;
         await dispatch(_getOrdersHistory('get_orders', data))
-
         // alert(JSON.stringify(Order_List))
     }
     const setTickerData = async (type) => {
@@ -158,11 +158,13 @@ const Orders = (props) => {
                                 <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.qty}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center", }}>
-                                {selectedBtn === "Open" ?
+
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} color={ item?.status === 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : item?.status === 3 && "red"  } textAlign={"center"}>{item?.status === 0 ? "Pending" : item?.status === 1 ? "Partial" : item?.status === 2 ? "Completed" : item?.status === 3 && "Rejected" }</ResponsiveText>
+                                {/* {selectedBtn === "Open" ?
                                     <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={item?.status === 0 ? "#DB1222" : "#F4BB32"} textAlign={"center"}>{item?.status === 0 ? "Pending" : "Partial"}</ResponsiveText>
                                     :
                                     <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={"#019146"} textAlign={"center"}>{"Completed"}</ResponsiveText>
-                                }
+                                } */}
                             </View>
                         </View>
                         <View style={{ backgroundColor: "#ECECEC", height: 2, width: wp(100), marginVertical: wp(2) }} />

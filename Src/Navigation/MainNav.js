@@ -20,7 +20,7 @@ function MainNav(props) {
 
     const isLogin = useSelector(state => state.AuthReducer.isLogin);
 
-    useEffect(() => { setTimeout(() => { setTimePassed(true) }, 2000) })
+    useEffect(() => { setTimeout(() => { setTimePassed(true) }, 3000) })
     const [timePassed, setTimePassed] = useState(false);
     return (
         <>

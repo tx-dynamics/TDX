@@ -196,7 +196,11 @@ const AssetsDetails = (props) => {
                     <View style={{ flexDirection: "row" }}>
                         <View style={{ alignItems: "center" }}>
                             <ResponsiveText size="h9" color={"#BEBEBE"}>{"Quantity (" + tickerData?.ticker?.my_stocks?.qty_symbol + ")"}</ResponsiveText>
-                            <ResponsiveText size="h9" margin={[5, 0, 0, 0]}>{tickerData?.ticker?.my_stocks?.qty}</ResponsiveText>
+                            {tickerData?.ticker?.my_stocks?.qty === null ?
+                                <ResponsiveText size="h9" margin={[5, 0, 0, 0]}>{"0"}</ResponsiveText>
+                                :
+                                <ResponsiveText size="h9" margin={[5, 0, 0, 0]}>{tickerData?.ticker?.my_stocks?.qty}</ResponsiveText>
+                            }
                         </View>
                         <View style={{ alignItems: "center", marginLeft: wp(9), marginRight: wp(4) }}>
                             <ResponsiveText size="h9" color={"#BEBEBE"}>{"Bags"}</ResponsiveText>
@@ -265,26 +269,29 @@ const AssetsDetails = (props) => {
                     </View>
                 )}
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(4), marginBottom: wp(10) }}>
-                    <View style={{ width: "49%", }}>
-                        <Button
-                            onPress={() => props.navigation.navigate('TradeScreenTicker')}
-                            Text={'BUY'}
-                            height={45}
-                            backgroundColor={"#019146"}
-                        />
-                    </View>
-                    <View style={{ width: "49%" }}>
-                        <Button
-                            onPress={() => props.navigation.navigate('TradeScreenTicker')}
-                            Text={'SELL'}
-                            height={45}
-                            backgroundColor={"#DB1222"}
-                        />
-                    </View>
-                </View>
+
 
             </ScrollView>
+
+
+            <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(2), marginBottom: wp(3) }}>
+                <View style={{ width: "49%", }}>
+                    <Button
+                        onPress={() => props.navigation.navigate('TradeScreenTicker')}
+                        Text={'BUY'}
+                        height={45}
+                        backgroundColor={"#019146"}
+                    />
+                </View>
+                <View style={{ width: "49%" }}>
+                    <Button
+                        onPress={() => props.navigation.navigate('TradeScreenTicker')}
+                        Text={'SELL'}
+                        height={45}
+                        backgroundColor={"#DB1222"}
+                    />
+                </View>
+            </View>
 
             <Modal
                 transparent={true}
