@@ -21,7 +21,7 @@ const Splash = () => {
         // alert(JSON.stringify(userToken))
         let data = {}
         data["token"] = userToken;
-        await dispatch(_checkLogin('get_markets', data))
+        await dispatch(_checkLogin('check_login', data))
 
     }
 

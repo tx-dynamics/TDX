@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -8,6 +8,10 @@ import { wp } from '../../Helpers/Responsiveness';
 import ResponsiveText from '../../Components/RnText';
 import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
+
+import { useSelector, useDispatch } from 'react-redux';
+
+import { _getAssets, _removeNotification } from '../../Redux/Actions/Actions';
 
 import {
     LineChart,
@@ -51,6 +55,72 @@ const Reddata = {
 
 const AssetsScreen = (props) => {
 
+    const dispatch = useDispatch();
+
+    const [Notificationss, setNotificationss] = useState([])
+    const [cash_balance, setCash_balance] = useState('')
+    const [currency_iso, setCurrency_iso] = useState('')
+    const [totalQuantity, setTotalQuantity] = useState('')
+    const [totalPrice, setTotalPrice] = useState('')
+    const [AlertsState, setAlertsState] = useState([])
+    const [TickersState, setTickersState] = useState([])
+    const [StockMarkets, setStockMarkets] = useState([])
+
+
+    const userToken = useSelector(state => state.AuthReducer.userToken);
+    const AssetsDetails = useSelector(state => state.HomeReducer.AssetsDetails);
+    const Alertss = useSelector(state => state.HomeReducer.Alertss);
+
+
+    useEffect(() => {
+        setAlertsState(Alertss)
+    }, [Alertss])
+
+    useEffect(() => {
+        getUserAssets()
+    }, [])
+
+    useEffect(() => {
+        if ((AssetsDetails !== "" || AssetsDetails !== undefined)) {
+            setCash_balance(AssetsDetails?.cash_balance)
+            setCurrency_iso(AssetsDetails?.currency_iso)
+            setTickerValue()
+            setTotalValues()
+        }
+    }, [AssetsDetails])
+
+    const setTotalValues = async () => {
+        let totalQuantity = []
+        let totalPrice = []
+        AssetsDetails?.stocks?.map((item) => {
+            let PriceCount = 0
+            let QtyCount = 0
+            item?.tickers?.map((itemm) => {
+                PriceCount = PriceCount + parseFloat(itemm?.price)
+                QtyCount = QtyCount + parseFloat(itemm?.my_stocks?.qty)
+            })
+            totalPrice.push(PriceCount)
+            totalQuantity.push(QtyCount)
+        })
+        setTotalQuantity(totalQuantity)
+        setTotalPrice(totalPrice)
+    }
+
+    const setTickerValue = async () => {
+        if (AssetsDetails?.stocks?.length !== undefined) {
+            if (AssetsDetails?.stocks?.length > 0) {
+                setStockMarkets(AssetsDetails?.stocks)
+                // alert(JSON.stringify(checkUI[1]))
+            }
+        }
+    }
+
+    const getUserAssets = async () => {
+        let data = {}
+        data["token"] = userToken;
+        await dispatch(_getAssets('get_assets', data))
+    }
+
     const Navigatee = (id) => {
         if (id === "3") {
             props.navigation.navigate("Orders")
@@ -58,8 +128,6 @@ const AssetsScreen = (props) => {
             props.navigation.navigate("Alerts")
         }
     }
-
-
 
     return (
         <View style={styles.container}>
@@ -74,12 +142,12 @@ const AssetsScreen = (props) => {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} color={"#FDBD20"}>{"Cash Balance"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[0, 0, 0, 8]} color={"#000"}>{"(GH₵)"}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[0, 0, 0, 8]} color={"#000"}>{currency_iso}</ResponsiveText>
                     </View>
                     {/* <Fonticon type={"MaterialIcons"} name={"info"} size={wp(6)} color={"#000"} /> */}
                 </View>
 
-                <ResponsiveText size="h6" fontFamily={fonts.Poppins_Bold} color={"#000"}>{"20,000"}</ResponsiveText>
+                <ResponsiveText size="h6" fontFamily={fonts.Poppins_Bold} color={"#000"}>{cash_balance}</ResponsiveText>
 
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: wp(5) }}>
 
@@ -113,19 +181,122 @@ const AssetsScreen = (props) => {
                 <View style={{ flexDirection: "row" }}>
                     <View style={{ alignItems: "center" }}>
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{"Quantity (MT)"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{"300"}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{"0"}</ResponsiveText>
                     </View>
                     <View style={{ alignItems: "center", marginLeft: wp(5) }}>
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{"GH₵ Value"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{"5000"}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{"0"}</ResponsiveText>
                     </View>
                 </View>
             </View>
+            {/* StockMarkets */}
+
+
+            <FlatList
+                data={StockMarkets}
+                keyExtractor={(item, index) => index.toString()}
+                style={{ marginTop: wp(3.5) }}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                        <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[wp(5), 0, 0, 0]}>{"No Data Found"}</ResponsiveText>
+                    </View>
+                }
+                renderItem={({ item, index }) => (
+
+                    <Pressable
+                        style={{ backgroundColor: "#CCCCCC33", paddingVertical: wp(4), paddingHorizontal: wp(3), paddingBottom: wp(2), marginBottom:20 }}>
+
+
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row" }}>
+                                <Image source={{ uri: item?.market?.image_url }} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
+                                <ResponsiveText size="h6" margin={[0, 0, 0, 5]} fontFamily={fonts.Poppins_SemiBold}>{item?.market?.title}</ResponsiveText>
+                            </View>
+                        </View>
+
+                        <View style={{ flexDirection: "row", marginTop: wp(6), }}>
+                            <View style={{ flex: .19, alignItems: "flex-start" }}>
+                                <ResponsiveText size="h9">{"Ticker"}</ResponsiveText>
+                            </View>
+                            <View style={{ flex: .26, alignItems: "center" }}>
+                                <ResponsiveText size="h9">{"Quantity (MT)"}</ResponsiveText>
+                            </View>
+                            <View style={{ flex: .3 }}>
+                            </View>
+                            <View style={{ flex: .25, alignItems: "flex-end" }}>
+                                <ResponsiveText size="h9">{"GH₵/MT"}</ResponsiveText>
+                            </View>
+                        </View>
+
+                        {item?.tickers?.map((cardData) =>
+                            <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData.id, marketID: item.id })}
+                                style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7, }}>
+                                {/* <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{cardData.ticker}</ResponsiveText> */}
+                                <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{cardData?.ticker}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, wp(-12)]}>{cardData?.my_stocks?.qty}</ResponsiveText>
+
+                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    {cardData?.chartData[0]?.price !== undefined &&
+                                        <LineChart
+                                            data={{
+                                                datasets: [
+                                                    {
+                                                        data: cardData?.chartData?.map((itemm) => {
+                                                            return (
+                                                                parseInt(itemm.price)
+                                                            )
+                                                        })
+                                                    }
+                                                ]
+                                            }}
+                                            width={wp(30)} // from react-native
+                                            height={wp(11)}
+                                            withHorizontalLabels={false}
+                                            flatColor={true}
+                                            chartConfig={{
+                                                backgroundGradientFromOpacity: 0,
+                                                backgroundGradientToOpacity: 0,
+                                                color: (opacity = 1) => cardData.trend >= 0 ? Colors.greenColor : Colors.redColor,
+                                                propsForDots: { r: "0" },
+                                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
+                                            }}
+                                            bezier
+                                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
+                                        />
+                                    }
+
+                                    <View style={{ alignItems: "flex-end" }}>
+                                        <ResponsiveText size="h8" color={cardData.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(cardData.price).toFixed(1)}</ResponsiveText>
+                                        <ResponsiveText size="h10" color={cardData.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + cardData.trend + " %"}</ResponsiveText>
+                                    </View>
+                                </View>
+                            </Pressable>
+                        )}
+
+                        <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "60%", alignSelf: "center", marginVertical: 18 }} />
+                        <View style={{ flexDirection: "row" }}>
+                            <View style={{ flex: .19, alignItems: "flex-start" }}>
+                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} margin={[0, 0, wp(6), 0]}>{"Total"}</ResponsiveText>
+                            </View>
+                            <View style={{ flex: .26, alignItems: "center" }}>
+                                <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalQuantity[index]).toFixed(2)}</ResponsiveText>
+                            </View>
+                            <View style={{ flex: .3 }}>
+                            </View>
+                            <View style={{ flex: .25, alignItems: "flex-end" }}>
+                                <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalPrice[index]).toFixed(1)}</ResponsiveText>
+                            </View>
+                        </View>
+                    </Pressable>
+                )} />
 
 
 
 
-            <Pressable onPress={() => props.navigation.navigate("AssetsDetailss")}
+
+
+            {/* <Pressable onPress={() => props.navigation.navigate("AssetsDetailss")}
                 style={{ backgroundColor: "#CCCCCC33", paddingVertical: wp(4), paddingHorizontal: wp(3), paddingBottom: wp(2) }}>
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                     <View style={{ flexDirection: "row" }}>
@@ -134,96 +305,91 @@ const AssetsScreen = (props) => {
                     </View>
                 </View>
 
-                <View style={{ flexDirection: "row", marginTop: wp(6) }}>
+
+                <View style={{ flexDirection: "row", marginTop: wp(6),  }}>
 
                     <View style={{ flex: .19, alignItems: "flex-start" }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(6), 0]}>{"Ticker"}</ResponsiveText>
-                        <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{"GWAYM1"}</ResponsiveText>
-                        <ResponsiveText size="h8" margin={[wp(10), 0, 0, 0]}>{"GWAYM2"}</ResponsiveText>
-
-                    </View>
-                    <View style={{ flex: .26, alignItems: "center", }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(6), 0]}>{"Quantity (MT)"}</ResponsiveText>
-                        <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{"40"}</ResponsiveText>
-                        <ResponsiveText size="h8" margin={[wp(10), 0, 0, 0]}>{"70"}</ResponsiveText>
-
-                    </View>
-                    <View style={{ flex: .4, }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{""}</ResponsiveText>
-
-                        <LineChart
-                            data={Greendata}
-                            width={wp(30)} // from react-native
-                            height={wp(11)}
-                            withHorizontalLabels={false}
-                            flatColor={true}
-                            chartConfig={{
-                                backgroundGradientFromOpacity: 0,
-                                backgroundGradientToOpacity: 0,
-                                color: (opacity = 1) => Colors.greenColor,
-                                propsForDots: { r: "0" },
-                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                            }}
-                            bezier
-                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: 7 }], alignSelf: "center" }}
-                        />
-
-                        <LineChart
-                            data={Reddata}
-                            width={wp(30)} // from react-native
-                            height={wp(11)}
-                            withHorizontalLabels={false}
-                            flatColor={true}
-                            chartConfig={{
-                                backgroundGradientFromOpacity: 0,
-                                backgroundGradientToOpacity: 0,
-                                color: (opacity = 1) => "#DB1222",
-                                propsForDots: { r: "0" },
-                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                            }}
-                            bezier
-                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: 7 }], alignSelf: "center", marginTop: wp(2) }}
-                        />
-
-
-                    </View>
-                    <View style={{ flex: .15, alignItems: "flex-end", }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{"GH₵/MT"}</ResponsiveText>
-
-                        <View style={{ alignItems: "flex-end" }}>
-                            <ResponsiveText size="h8" color={Colors.greenColor}>{"2000"}</ResponsiveText>
-                            <ResponsiveText size="h10" color={Colors.greenColor} margin={[-4, 0, 0, 0]}>{"+10%"}</ResponsiveText>
-                        </View>
-
-                        <View style={{ alignItems: "flex-end", marginTop: wp(2) }}>
-                            <ResponsiveText size="h8" color={"#DB1222"}>{"1875"}</ResponsiveText>
-                            <ResponsiveText size="h10" color={"#DB1222"} margin={[-4, 0, 0, 0]}>{"-3.8%"}</ResponsiveText>
-                        </View>
-                    </View>
-                </View>
-
-                <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "60%", alignSelf: "center", marginVertical: 18 }} />
-                <View style={{ flexDirection: "row", }}>
-
-                    <View style={{ flex: .19, alignItems: "flex-start" }}>
-                        <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} margin={[0, 0, wp(6), 0]}>{"Total"}</ResponsiveText>
-
+                        <ResponsiveText size="h9">{"Ticker"}</ResponsiveText>
                     </View>
                     <View style={{ flex: .26, alignItems: "center" }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{"110"}</ResponsiveText>
-
+                        <ResponsiveText size="h9">{"Quantity (MT)"}</ResponsiveText>
                     </View>
                     <View style={{ flex: .3 }}>
-
                     </View>
                     <View style={{ flex: .25, alignItems: "flex-end" }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{"GH₵ 22000"}</ResponsiveText>
-
+                        <ResponsiveText size="h9">{"GH₵/MT"}</ResponsiveText>
                     </View>
 
                 </View>
 
-            </Pressable>
+
+                <FlatList
+                    data={TickersState}
+                    keyExtractor={(item, index) => index.toString()}
+                    style={{ marginTop: wp(0), }}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item, index }) => (
+
+                        <View style={{ paddingBottom: wp(2) }}>
+                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{item?.ticker}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, wp(-12)]}>{item?.my_stocks?.qty}</ResponsiveText>
+
+                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    {item?.chartData[0]?.price !== undefined &&
+                                        <LineChart
+                                            data={{
+                                                datasets: [
+                                                    {
+                                                        data: item?.chartData?.map((itemm) => {
+                                                            return (
+                                                                parseInt(itemm.price)
+                                                            )
+                                                        })
+                                                    }
+                                                ]
+                                            }}
+                                            width={wp(30)} // from react-native
+                                            height={wp(11)}
+                                            withHorizontalLabels={false}
+                                            flatColor={true}
+                                            chartConfig={{
+                                                backgroundGradientFromOpacity: 0,
+                                                backgroundGradientToOpacity: 0,
+                                                color: (opacity = 1) => item.trend >= 0 ? Colors.greenColor : Colors.redColor,
+                                                propsForDots: { r: "0" },
+                                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
+                                            }}
+                                            bezier
+                                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
+                                        />
+                                    }
+
+                                    <View style={{ alignItems: "flex-end" }}>
+                                        <ResponsiveText size="h8" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(item?.price).toFixed(1)}</ResponsiveText>
+                                        <ResponsiveText size="h10" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + item?.trend + " %"}</ResponsiveText>
+                                    </View>
+                                </View>
+
+                            </View>
+                        </View>
+                    )} />
+
+                <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "60%", alignSelf: "center", marginVertical: 18 }} />
+                <View style={{ flexDirection: "row" }}>
+                    <View style={{ flex: .19, alignItems: "flex-start" }}>
+                        <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} margin={[0, 0, wp(6), 0]}>{"Total"}</ResponsiveText>
+                    </View>
+                    <View style={{ flex: .26, alignItems: "center" }}>
+                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalQuantity).toFixed(2)}</ResponsiveText>
+                    </View>
+                    <View style={{ flex: .3 }}>
+                    </View>
+                    <View style={{ flex: .25, alignItems: "flex-end" }}>
+                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalPrice).toFixed(1)}</ResponsiveText>
+                    </View>
+                </View>
+            </Pressable> */}
 
 
 

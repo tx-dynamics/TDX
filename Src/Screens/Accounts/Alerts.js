@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -10,6 +10,11 @@ import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
+
+import { useSelector, useDispatch } from 'react-redux';
+
+import { _getAlerts, _removeNotification } from '../../Redux/Actions/Actions';
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 
 
 import {
@@ -53,12 +58,12 @@ const Reddata = {
 }
 
 const DATA = [
-    { id: "1", coinName:"GWAYM1", type:"green" , value:"2000", percent:"+10%" },
-    { id: "2", coinName:"GWAYM2", type:"red" , value:"1875", percent:"-3.8%" },
-    { id: "3", coinName:"GWAYM3", type:"green" , value:"2000", percent:"+10%" },
-    { id: "4", coinName:"GWAYM4", type:"red" , value:"1875", percent:"-3.8%" },
-    { id: "5", coinName:"GWAYM5", type:"green" , value:"2000", percent:"+10%" },
-    { id: "6", coinName:"GWAYM6", type:"green" , value:"2000", percent:"+10%" },
+    { id: "1", coinName: "GWAYM1", type: "green", value: "2000", percent: "+10%" },
+    { id: "2", coinName: "GWAYM2", type: "red", value: "1875", percent: "-3.8%" },
+    { id: "3", coinName: "GWAYM3", type: "green", value: "2000", percent: "+10%" },
+    { id: "4", coinName: "GWAYM4", type: "red", value: "1875", percent: "-3.8%" },
+    { id: "5", coinName: "GWAYM5", type: "green", value: "2000", percent: "+10%" },
+    { id: "6", coinName: "GWAYM6", type: "green", value: "2000", percent: "+10%" },
 
 ]
 
@@ -66,8 +71,29 @@ const DATA = [
 
 const Alerts = (props) => {
 
+    const dispatch = useDispatch();
+
     const [DropDownItem, setDropDownItem] = useState('')
     const [selectedBtn, setSelectedBtn] = useState("Open")
+
+    const [AlertsState, setAlertsState] = useState([])
+
+    const userToken = useSelector(state => state.AuthReducer.userToken);
+    const Alertss = useSelector(state => state.HomeReducer.Alertss);
+
+    useEffect(() => {
+        setAlertsState(Alertss)
+    }, [Alertss])
+
+    useEffect(() => {
+        getAllAlerts()
+    }, [])
+
+    const getAllAlerts = async () => {
+        let data = {}
+        data["token"] = userToken;
+        await dispatch(_getAlerts('get_alerts', data))
+    }
 
     return (
         <View style={styles.container}>
@@ -75,9 +101,8 @@ const Alerts = (props) => {
                 midtitle title={"Alerts"}
                 leftPress={() => props.navigation.goBack()} />
 
-
             <FlatList
-                data={DATA}
+                data={AlertsState}
                 keyExtractor={(item, index) => index.toString()}
                 style={{ marginTop: wp(5) }}
                 showsVerticalScrollIndicator={false}
@@ -85,36 +110,48 @@ const Alerts = (props) => {
 
                     <View style={{ padding: wp(4), paddingBottom: wp(2) }}>
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
-                            <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item.coinName}</ResponsiveText>
+                            <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item?.ticker}</ResponsiveText>
 
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <LineChart
-                                    data={item.type === "green" ? Greendata : Reddata}
-                                    width={wp(30)} // from react-native
-                                    height={wp(11)}
-                                    withHorizontalLabels={false}
-                                    flatColor={true}
-                                    chartConfig={{
-                                        backgroundGradientFromOpacity: 0,
-                                        backgroundGradientToOpacity: 0,
-                                        color: (opacity = 1) => item.type === "green" ? Colors.greenColor : "#DB1222",
-                                        propsForDots: { r: "0" },
-                                        propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                                    }}
-                                    bezier
-                                    style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
-                                />
+                                {item?.chartData[0]?.price !== undefined &&
+                                    <LineChart
+                                        data={{
+                                            datasets: [
+                                                {
+                                                    data: item?.chartData?.map((itemm) => {
+                                                        return (
+                                                            parseInt(itemm.price)
+                                                        )
+                                                    })
+                                                }
+                                            ]
+                                        }}
+                                        width={wp(30)} // from react-native
+                                        height={wp(11)}
+                                        withHorizontalLabels={false}
+                                        flatColor={true}
+                                        chartConfig={{
+                                            backgroundGradientFromOpacity: 0,
+                                            backgroundGradientToOpacity: 0,
+                                            color: (opacity = 1) => Colors.greenColor,
+                                            propsForDots: { r: "0" },
+                                            propsForBackgroundLines: { stroke: "#CCCCCC33" }
+                                        }}
+                                        bezier
+                                        style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
+                                    />
+                                }
 
                                 <View style={{ alignItems: "flex-end" }}>
-                                    <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#455154"}>{item.value}</ResponsiveText>
-                                    <ResponsiveText size="h10" color={item.type === "green" ? Colors.greenColor : "#455154"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
+                                    <ResponsiveText size="h8" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(item?.price).toFixed(1)}</ResponsiveText>
+                                    <ResponsiveText size="h10" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + item?.trend + " %"}</ResponsiveText>
                                 </View>
                             </View>
 
                         </View>
 
 
-                     
+
                     </View>
 
 

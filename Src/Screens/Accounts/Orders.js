@@ -173,12 +173,6 @@ const Orders = (props) => {
 
                 )} />
 
-
-
-
-
-
-
         </View>
     )
 }

@@ -10,7 +10,17 @@ import {
     CREATE_ORDER_LOADING,
     GET_ORDER,
     MARKET_NEWS,
-    GET_ORDER_HISTORY
+    GET_ORDER_HISTORY,
+    WATCHLIST_MARKETS,
+    ALL_NOTIFICATIONS,
+    ALL_ALERTS,
+    GET_ASSETS,
+    CHANGEPASSWORD_LOADING,
+    CHANGEPASSWORD_MSG,
+    DEPOSITE_MSG,
+    LATEST_ALERTS,
+    NOTIFICATION_LOADING,
+    DEPOSITEWITHDRAW
 } from '../Constants'
 const initialState = {
     Market_Loading: false,
@@ -25,6 +35,16 @@ const initialState = {
     Order_List: [],
     Order_List_History: [],
     Market_News: [],
+    WatchListMarkets: [],
+    Notifications: [],
+    Alertss: [],
+    AssetsDetails:'',
+    ChangePasswordLoading:false,
+    ChangePasswordMsg:'',
+    Deposite_Msg:'',
+    AlertsCount:'',
+    Notification_Loading:false,
+    TransationHistory:[]
 };
 
 const HomeReducer = (state = initialState, action) => {
@@ -89,6 +109,56 @@ const HomeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 Market_News: payload,
+            }
+        case WATCHLIST_MARKETS:
+            return {
+                ...state,
+                WatchListMarkets: payload,
+            }
+        case ALL_NOTIFICATIONS:
+            return {
+                ...state,
+                Notifications: payload,
+            }
+        case ALL_ALERTS:
+            return {
+                ...state,
+                Alertss: payload,
+            }
+        case GET_ASSETS:
+            return {
+                ...state,
+                AssetsDetails: payload,
+            }
+        case CHANGEPASSWORD_LOADING:
+            return {
+                ...state,
+                ChangePasswordLoading: payload,
+            }
+        case CHANGEPASSWORD_MSG:
+            return {
+                ...state,
+                ChangePasswordMsg: payload,
+            }
+        case DEPOSITE_MSG:
+            return {
+                ...state,
+                Deposite_Msg: payload,
+            }
+        case LATEST_ALERTS:
+            return {
+                ...state,
+                AlertsCount: payload,
+            }
+        case NOTIFICATION_LOADING:
+            return {
+                ...state,
+                Notification_Loading: payload,
+            }
+        case DEPOSITEWITHDRAW:
+            return {
+                ...state,
+                TransationHistory: payload,
             }
         default:
             return state;

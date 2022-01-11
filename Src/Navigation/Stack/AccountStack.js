@@ -11,6 +11,8 @@ import NotificationSettings from '../../Screens/Accounts/NotificationSettings'
 import Orders from '../../Screens/Accounts/Orders'
 import Alerts from '../../Screens/Accounts/Alerts'
 import RequestACall from '../../Screens/Accounts/RequestACall'
+import Notifications from '../../Screens/Accounts/Notifications'
+import DepositeAndWithdraw from '../../Screens/Accounts/DepositeAndWithdraw'
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +28,8 @@ function AccountStack(props) {
                 <Stack.Screen name="Orders" component={Orders} />
                 <Stack.Screen name="Alerts" component={Alerts} />
                 <Stack.Screen name="RequestACall" component={RequestACall} />
+                <Stack.Screen name="Notifications" component={Notifications} />
+                <Stack.Screen name="DepositeAndWithdraw" component={DepositeAndWithdraw} />
             </Stack.Navigator>
         </>
     );

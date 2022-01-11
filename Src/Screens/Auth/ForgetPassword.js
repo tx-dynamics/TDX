@@ -58,9 +58,6 @@ const ForgetPassword = (props) => {
         <View style={styles.container}>
             <ScrollView >
                 <Image source={iconPath.Logo} style={{ width: wp(30), height: wp(30), resizeMode: "contain", alignSelf: "center", marginTop: wp(3) }}></Image>
-
-
-
                 <View style={{ paddingHorizontal: wp(6), flex: 1 }}>
                     <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} textAlign={"center"} margin={[0, 0, wp(6), 0]}>{"Forgot Password!"}</ResponsiveText>
                     <ResponsiveText size="h8" margin={[wp(4), 0, -2, 0]}>{"Email"}</ResponsiveText>

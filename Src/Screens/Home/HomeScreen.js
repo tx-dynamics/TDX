@@ -15,7 +15,7 @@ import InputField from '../../Components/InputField';
 import { MARKET_DATA_LOADING } from '../../Redux/Constants'
 import { useSelector, useDispatch } from 'react-redux';
 
-import { _getMarketData } from '../../Redux/Actions/Actions';
+import { _getMarketData, _getAllWatchList } from '../../Redux/Actions/Actions';
 import {
     LineChart,
     BarChart,
@@ -24,8 +24,7 @@ import {
     ContributionGraph,
     StackedBarChart
 } from "react-native-chart-kit";
-import { _axiosPostAPI } from '../../Apis/Apis';
-import ModalDropdown from 'react-native-modal-dropdown';
+import { _axiosPostAPI, } from '../../Apis/Apis';
 
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
 
@@ -76,6 +75,7 @@ const HomeScreen = (props) => {
 
     const dispatch = useDispatch();
 
+    const [marketDataa, setMarketDataa] = useState([])
     const [filterModal, setFilterModal] = useState(false)
     const [filterApply, setFilterApply] = useState('')
     const [filter_value, setFilter_value] = useState('')
@@ -87,11 +87,17 @@ const HomeScreen = (props) => {
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const Market_Loading = useSelector(state => state.HomeReducer.Market_Loading);
     const marketData = useSelector(state => state.HomeReducer.marketData);
+    const WatchListMarkets = useSelector(state => state.HomeReducer.WatchListMarkets);
 
     useEffect(() => {
         // dispatch({ type: MARKET_DATA_LOADING, payload: true });
-        // console.log("Token::::: ", userToken)
+        console.log("Token::::: ", userToken)
         // getMarketData()
+        setMarketDataa(marketData?.markets)
+    }, [marketData])
+
+    useEffect(() => {
+        getWatchlistMarkets()
     }, [])
 
     useFocusEffect(
@@ -110,8 +116,17 @@ const HomeScreen = (props) => {
         data["limit"] = 30;
         data["page"] = 1;
         await dispatch(_getMarketData('get_markets', data))
-
         // alert(JSON.stringify(marketData.more_available))
+    }
+
+    const setWatchListData = async () => {
+        setMarketDataa(WatchListMarkets)
+    }
+
+    const getWatchlistMarkets = async () => {
+        let data = {}
+        data["token"] = userToken;
+        await dispatch(_getAllWatchList('get_watchlist', data))
     }
 
     const getFilteredData = async (filter, filter_Value) => {
@@ -200,9 +215,10 @@ const HomeScreen = (props) => {
                             </Pressable>
                         }
 
-                        <View style={{ backgroundColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, marginLeft: 8, height: wp(7), justifyContent: "center" }}>
+                        <Pressable onPress={() => {getWatchlistMarkets(), setWatchListData()}}
+                            style={{ backgroundColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, marginLeft: 8, height: wp(7), justifyContent: "center" }}>
                             <Image source={iconPath.greenEye} style={{ width: wp(4.5), height: wp(4.5), resizeMode: "contain" }} />
-                        </View>
+                        </Pressable>
                     </View>
                     <Pressable onPress={() => setFilterModal(true)}>
                         <Image source={iconPath.homeFilter} style={{ width: wp(6.5), height: wp(6.5), resizeMode: "contain" }} />
@@ -211,7 +227,7 @@ const HomeScreen = (props) => {
             </View>
 
             <FlatList
-                data={marketData.markets}
+                data={marketDataa}
                 keyExtractor={(item, index) => index.toString()}
                 style={{ marginTop: wp(3.5) }}
                 showsVerticalScrollIndicator={false}
@@ -238,12 +254,12 @@ const HomeScreen = (props) => {
                                 <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData.ticker}</ResponsiveText>
 
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                    {cardData?.chatData[0]?.price !== undefined &&
+                                    {cardData?.chartData[0]?.price !== undefined &&
                                         <LineChart
                                             data={{
                                                 datasets: [
                                                     {
-                                                        data: cardData?.chatData?.map((itemm) => {
+                                                        data: cardData?.chartData?.map((itemm) => {
                                                             return (
                                                                 parseInt(itemm.price)
                                                             )
@@ -286,26 +302,6 @@ const HomeScreen = (props) => {
                             </View>}
                     </Pressable>
                 )} />
-
-            {/* <VictoryChart
-                theme={VictoryTheme.material}
-            > */}
-            {/* <VictoryLine
-                    style={{
-                        data: { stroke: "green" },
-                        parent: { border: "1px solid #ccc" }
-                    }}
-                    interpolation="natural"
-                    data={[  40 , 40,
-                         40 ,
-                         45 ,
-                         60 ,
-                         55 ,
-                         90 ,
-                    ]}
-                /> */}
-            {/* </VictoryChart> */}
-
 
 
             <Modal
@@ -360,7 +356,6 @@ const HomeScreen = (props) => {
                 </Pressable>
             </Modal>
             <Loader loading={Market_Loading} />
-
 
         </View>
     )

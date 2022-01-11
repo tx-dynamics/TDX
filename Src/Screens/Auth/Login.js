@@ -34,10 +34,14 @@ const Login = (props) => {
             setApiError(true)
             setApiErrorMsg("Please Enter Password")
         }
+        else if (password.length < 6) {
+            setApiError(true)
+            setApiErrorMsg("Passwords must be at least 6 characters")
+        } 
         else {
             setLoading(true)
             let data = {}
-            data["email"] = EmailAdd;
+            data["email"] = EmailAdd.toLowerCase();
             data["password"] = password;
             await _axiosPostAPI("login", data)
                 .then(async (response) => {
@@ -47,7 +51,9 @@ const Login = (props) => {
                         if (response.data.is_password_set) {
                             ResponseHandle(response.data)
                         } else {
-                            SendOtp(response.data.token)
+                            // SendOtp(response.data.token)
+                            ResponseHandle(response.data)
+
                         }
                     } else {
                         setApiError(true)
@@ -64,7 +70,7 @@ const Login = (props) => {
     const SendOtp = async (tokenn) => {
         setLoading(true)
         let data = {}
-        data["email"] = EmailAdd;
+        data["email"] = EmailAdd.toLowerCase();
         await _axiosPostAPI("forgot_password", data)
             .then(async (response) => {
                 setLoading(false)
@@ -98,9 +104,6 @@ const Login = (props) => {
         <View style={styles.container}>
             <ScrollView >
                 <Image source={iconPath.Logo} style={{ width: wp(30), height: wp(30), resizeMode: "contain", alignSelf: "center", marginTop: wp(3) }}></Image>
-
-
-
                 <View style={{ paddingHorizontal: wp(6), flex: 1 }}>
                     <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} textAlign={"center"} margin={[wp(6), 0, 0, 0]}>{"Welcome!"}</ResponsiveText>
                     <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} textAlign={"center"} margin={[0, 0, wp(6), 0]}>{"Enter credentials to login"}</ResponsiveText>

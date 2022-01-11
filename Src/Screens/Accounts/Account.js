@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -9,12 +9,16 @@ import ResponsiveText from '../../Components/RnText';
 import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 
+import { useSelector, useDispatch } from 'react-redux';
+
+import { _getLatestAlerts } from '../../Redux/Actions/Actions';
+
 const DATA = [
     {
         id: '1',
         title: 'Notifications',
         imgName: iconPath.notification,
-        unread: true,
+        unread: false,
         unreadCount: "99+"
     },
     {
@@ -41,15 +45,39 @@ const DATA = [
 ];
 
 const Account = (props) => {
+    const dispatch = useDispatch();
+
+    const userToken = useSelector(state => state.AuthReducer.userToken);
+    const userInfo = useSelector(state => state.AuthReducer.userInfo);
+    const AlertsCount = useSelector(state => state.HomeReducer.AlertsCount);
+
+    useEffect(() => {
+        getAllAlerts()
+        // alert(JSON.stringify(AlertsCount))
+    }, [])
+
+    useEffect(() => {
+        // alert(JSON.stringify(userInfo))
+    }, [])
+
+
+    const getAllAlerts = async () => {
+        let data = {}
+        data["token"] = userToken;
+        await dispatch(_getLatestAlerts('get_latest_alerts', data))
+    }
 
     const Navigatee = (id) => {
         if (id === "3") {
             props.navigation.navigate("Orders")
         } else if (id === "2") {
             props.navigation.navigate("Alerts")
-        } 
+        } else if (id === "1") {
+            props.navigation.navigate("Notifications")
+        } else if (id === "4") {
+            props.navigation.navigate("DepositeAndWithdraw")
+        }
     }
-    
 
 
     return (
@@ -58,13 +86,13 @@ const Account = (props) => {
                 midtitle title={"Account"}
                 leftPress={() => props.navigation.openDrawer()} />
 
-            <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: 13, alignItems:"center" }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: 13, alignItems: "center" }}>
                 <View>
-                    <ResponsiveText size="h4" fontFamily={fonts.Poppins_SemiBold} >{"John Doe"}</ResponsiveText>
-                    <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText>
+                    <ResponsiveText size="h4" fontFamily={fonts.Poppins_SemiBold} >{userInfo?.name}</ResponsiveText>
+                    {/* <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText> */}
                 </View>
                 <Pressable onPress={() => props.navigation.navigate("SettingScreen")}>
-                {/* <Pressable onPress={() => alert("jhhhjj")}> */}
+                    {/* <Pressable onPress={() => alert("jhhhjj")}> */}
                     <Image source={iconPath.Drawer1} style={{ width: wp(6.3), height: wp(6.3), resizeMode: "contain" }} />
                 </Pressable>
             </View>
@@ -80,7 +108,7 @@ const Account = (props) => {
                         flexDirection: "row", backgroundColor: "#EEEEEE", paddingHorizontal: wp(4), justifyContent: "space-between",
                         alignItems: "center", paddingVertical: wp(6), borderRadius: 12, marginTop: 12
                     }}
-                    onPress={() => Navigatee(item.id)}
+                        onPress={() => Navigatee(item.id)}
                     >
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                             <Image source={item.imgName} style={{ width: wp(5.6), height: wp(5.6), resizeMode: "contain" }} />
@@ -89,7 +117,7 @@ const Account = (props) => {
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                             {item.unread &&
                                 <View style={{ backgroundColor: "#DB1222", justifyContent: "center", paddingHorizontal: 6, borderRadius: 25, paddingVertical: 5 }}>
-                                    <ResponsiveText size="h10" color={"#fff"} margin={[-5, 0, -5, 0]}>{item.unreadCount}</ResponsiveText>
+                                    <ResponsiveText size="h10" color={"#fff"} margin={[-5, 0, -5, 0]}>{AlertsCount}</ResponsiveText>
                                 </View>}
                             <Fonticon type={"MaterialIcons"} name={"navigate-next"} size={wp(7)} color={Colors.black} />
                         </View>

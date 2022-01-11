@@ -47,7 +47,11 @@ const TradeScreen = (props) => {
 
     const dispatch = useDispatch();
 
-    const symbolDropDownRef = useRef(null);
+    const symbolDropDownRef = React.createRef(ModalDropdown);
+    const marketDropDownRef = React.createRef(ModalDropdown);
+    const harvestDropDownRef = React.createRef(ModalDropdown);
+    const seasonDropDownRef = React.createRef(ModalDropdown);
+
 
     const [DateModal, setDateModal] = useState(false)
     const [selectedDate, setSelectedDate] = useState('')
@@ -86,6 +90,7 @@ const TradeScreen = (props) => {
 
     const [IsQuantityError, setIsQuantityError] = useState(false);
     const [sellOrdersList, setSellOrdersList] = useState([]);
+    const [sellOrdersQtyList, setSellOrdersQtyList] = useState([]);
 
     const marketList = useSelector(state => state.HomeReducer.marketList);
     const singleMarketData = useSelector(state => state.HomeReducer.singleMarketData);
@@ -107,21 +112,22 @@ const TradeScreen = (props) => {
     const getSellOrderList = async () => {
         if (Order_List_History?.length > 0) {
             let Arr = []
+            let Arr1 = []
             Order_List_History.map((item) =>
                 Arr.push(item.ticker)
             )
-            // alert(JSON.stringify(Arr))
+            Order_List_History.map((item) =>
+                Arr1.push(item.qty)
+            )
             setSellOrdersList(Arr)
-            // setSellOrdersList()
+            setSellOrdersQtyList(Arr1)
         }
     }
-
     useFocusEffect(
         React.useCallback(() => {
             getTickerDataHistory("history")
         }, [])
     );
-
     useEffect(() => {
         setMarkets()
     }, [marketList])
@@ -144,6 +150,10 @@ const TradeScreen = (props) => {
         setFullTypeValue("Partial")
         setOrderValidityValue("Day")
         setSelectedBtn("Buy")
+        symbolDropDownRef.current.select(-1)
+        marketDropDownRef.current.select(-1)
+        harvestDropDownRef.current.select(-1)
+        seasonDropDownRef.current.select(-1)
     }
     const getSingleMarketData = async (id) => {
         let data = {}
@@ -201,7 +211,7 @@ const TradeScreen = (props) => {
         data["symbol"] = "";
         renderButtonText1(data)
         setSymbolData(["", ""])
-        // symbolDropDownRef.current.select(-1)
+        symbolDropDownRef.current.select(-1)
     }
     const ClearSymbolSelect = () => {
         setWareHouseName('')
@@ -321,15 +331,38 @@ const TradeScreen = (props) => {
     }
     const SellOrderApi = async () => {
 
+        if (tickerTitle !== '') {
+            var holder = {};
+            Order_List_History?.forEach(function (d) {
+                if (d?.type.includes("buy")) {
+                    if (holder.hasOwnProperty(d?.ticker)) {
+                        holder[d?.ticker] = holder[d.ticker] + parseFloat(d?.qty);
+                    } else {
+                        holder[d?.ticker] = parseFloat(d?.qty);
+                    }
+                }
+            });
+            var obj2 = [];
+            for (var prop in holder) {
+                obj2?.push({ name: prop, value: holder[prop] });
+            }
+            let newArr = []
+            obj2.map((item) =>
+                newArr.push(item?.name)
+            )
+            let index = newArr?.indexOf(tickerTitle);
+            var totalQty = obj2[index]?.value;
+        }
+
         if (marketId === '') {
             alert("Please Select Order")
         }
         else if (tickerId === '') {
             alert("Please Select Symbol")
         }
-        else if (!tickerTitle.includes(sellOrdersList)) {
-            alert("You Can't Place Order for '"+tickerSymbol+"'")
-        } 
+        else if (!sellOrdersList?.includes(tickerTitle)) {
+            alert("You Can't Place Order for '" + tickerSymbol + "'")
+        }
         else if (HarvestYear === '') {
             alert("Please Select Harvest Year")
         }
@@ -337,6 +370,9 @@ const TradeScreen = (props) => {
             alert("Please Select Season")
         }
         else if ((Quantity === '' || IsQuantityError === true)) {
+            setIsQuantityError(true)
+        }
+        else if (Quantity > totalQty) {
             setIsQuantityError(true)
         }
         else if ((orderTypeValue === 'Limit' && price === '')) {
@@ -368,9 +404,29 @@ const TradeScreen = (props) => {
     const SellOrderApiBasic = async () => {
         // alert(selectedBtn.toLowerCase())
         setIsQuantityError(false)
-        
-        // alert(JSON.stringify(sellOrdersList))
-        // alert(JSON.stringify(tickerTitle))
+
+        if (tickerTitle !== '') {
+            var holder = {};
+            Order_List_History?.forEach(function (d) {
+                if (d?.type.includes("buy")) {
+                    if (holder.hasOwnProperty(d?.ticker)) {
+                        holder[d?.ticker] = holder[d.ticker] + parseFloat(d?.qty);
+                    } else {
+                        holder[d?.ticker] = parseFloat(d?.qty);
+                    }
+                }
+            });
+            var obj2 = [];
+            for (var prop in holder) {
+                obj2?.push({ name: prop, value: holder[prop] });
+            }
+            let newArr = []
+            obj2.map((item) =>
+                newArr.push(item?.name)
+            )
+            let index = newArr?.indexOf(tickerTitle);
+            var totalQty = obj2[index]?.value;
+        }
 
         if (marketId === '') {
             alert("Please Select Order")
@@ -378,10 +434,14 @@ const TradeScreen = (props) => {
         else if (tickerId === '') {
             alert("Please Select Commodity type")
         }
-        else if (!tickerTitle.includes(sellOrdersList)) {
-            alert("You Can't Place Order for '"+tickerSymbol+"'")
-        } 
+        else if (!sellOrdersList?.includes(tickerTitle)) {
+            alert("You Can't Place Order for '" + tickerSymbol + "'")
+            return
+        }
         else if ((Quantity === '' || IsQuantityError === true)) {
+            setIsQuantityError(true)
+        }
+        else if (Quantity > totalQty) {
             setIsQuantityError(true)
         }
         else {
@@ -402,9 +462,7 @@ const TradeScreen = (props) => {
             data["gtd_date"] = callDate;
             data["advanced"] = 0;
 
-            // alert(JSON.stringify(data))
             await dispatch(_createOrder('create_order', data))
-
         }
 
     }
@@ -412,7 +470,7 @@ const TradeScreen = (props) => {
         setIsQuantityError(false)
         setQuantity(text)
         let kilo = parseFloat(text) * 1000;
-        let bag = kilo / 20;
+        let bag = kilo / 50;
         if (!isNaN(bag)) {
             setBags(bag)
             if (!Number.isInteger(bag)) {
@@ -421,10 +479,9 @@ const TradeScreen = (props) => {
         } else {
             setBags("0")
         }
-        if (bag < 50) {
+        if (bag < 20) {
             setIsQuantityError(true)
         }
-
     }
     const dateSelect = async (day) => {
         // alert(JSON.stringify(day.dateString))
@@ -440,7 +497,6 @@ const TradeScreen = (props) => {
             setDateModal(true)
         }
     }
-
     const getTickerDataHistory = async (type) => {
         let data = {}
         data["token"] = userToken;
@@ -481,6 +537,7 @@ const TradeScreen = (props) => {
 
                 <ModalDropdown options={orderFor}
                     // defaultValue={DropDownItemOrder}
+                    ref={marketDropDownRef}
                     style={[styles.dropDown, { backgroundColor: assetsDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: assetsDropdownShow ? 1 : 0 }]}
                     dropdownStyle={styles.dropDown_dropDownStyle1}
                     dropdownTextStyle={styles.dropDown_textStyle}
@@ -496,7 +553,7 @@ const TradeScreen = (props) => {
                 <TradeHeading title={AdvanceOptions ? "Symbol :" : "Commodity type :"} top={15} />
 
                 <ModalDropdown options={symbolData}
-                    // ref={symbolDropDownRef}
+                    ref={symbolDropDownRef}
                     style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: withdrawDropdownShow ? 1 : 0 }]}
                     dropdownStyle={[styles.dropDown_dropDownStyle1, { height: wp(40) }]}
                     dropdownTextStyle={styles.dropDown_textStyle}
@@ -523,6 +580,7 @@ const TradeScreen = (props) => {
                                 <TradeHeading title={"Harvest Year :"} top={15} />
 
                                 <ModalDropdown options={['2022', '2021', '2020', '2019', '2018']}
+                                    ref={harvestDropDownRef}
                                     style={styles.dropDown}
                                     defaultValue={'Any'}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
@@ -537,6 +595,7 @@ const TradeScreen = (props) => {
                                 <TradeHeading title={"Season :"} top={15} />
 
                                 <ModalDropdown options={['1', '2', '3', '4']}
+                                    ref={seasonDropDownRef}
                                     style={styles.dropDown}
                                     defaultValue={''}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
@@ -586,6 +645,7 @@ const TradeScreen = (props) => {
                 <InputField height={60}
                     value={Quantity}
                     onChangeText={text => setQuantityFun(text)}
+                    keyboardType="number-pad"
                 // onChangeText={text => setQuantity(text)}
                 />
 
@@ -620,7 +680,7 @@ const TradeScreen = (props) => {
                             )}
                         </View>
 
-                        <TradeHeading title={"Full Type :"} top={15} bottom={5} />
+                        <TradeHeading title={"Fill Type :"} top={15} bottom={5} />
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             {FullType.map((item, index) =>
                                 <Pressable onPress={() => setFullTypeValue(item.value)}

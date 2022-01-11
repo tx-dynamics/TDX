@@ -86,6 +86,7 @@ const TradeScreen = (props) => {
 
     const [IsQuantityError, setIsQuantityError] = useState(false);
     const [sellOrdersList, setSellOrdersList] = useState([]);
+    const [sellOrdersQtyList, setSellOrdersQtyList] = useState([]);
 
     const marketList = useSelector(state => state.HomeReducer.marketList);
     const singleMarketData = useSelector(state => state.HomeReducer.singleMarketData);
@@ -107,21 +108,22 @@ const TradeScreen = (props) => {
     const getSellOrderList = async () => {
         if (Order_List_History?.length > 0) {
             let Arr = []
+            let Arr1 = []
             Order_List_History.map((item) =>
                 Arr.push(item.ticker)
             )
-            // alert(JSON.stringify(Arr))
+            Order_List_History.map((item) =>
+                Arr1.push(item.qty)
+            )
             setSellOrdersList(Arr)
-            // setSellOrdersList()
+            setSellOrdersQtyList(Arr1)
         }
     }
-
     useFocusEffect(
         React.useCallback(() => {
             getTickerDataHistory("history")
         }, [])
     );
-
     useEffect(() => {
         setMarkets()
     }, [marketList])
@@ -200,7 +202,7 @@ const TradeScreen = (props) => {
         let data = {}
         data["symbol"] = "";
         renderButtonText1(data)
-        setSymbolData([])
+        setSymbolData(["", ""])
         // symbolDropDownRef.current.select(-1)
     }
     const ClearSymbolSelect = () => {
@@ -321,15 +323,38 @@ const TradeScreen = (props) => {
     }
     const SellOrderApi = async () => {
 
+        if (tickerTitle !== '') {
+            var holder = {};
+            Order_List_History?.forEach(function (d) {
+                if (d?.type.includes("buy")) {
+                    if (holder.hasOwnProperty(d?.ticker)) {
+                        holder[d?.ticker] = holder[d.ticker] + parseFloat(d?.qty);
+                    } else {
+                        holder[d?.ticker] = parseFloat(d?.qty);
+                    }
+                }
+            });
+            var obj2 = [];
+            for (var prop in holder) {
+                obj2?.push({ name: prop, value: holder[prop] });
+            }
+            let newArr = []
+            obj2.map((item) =>
+                newArr.push(item?.name)
+            )
+            let index = newArr?.indexOf(tickerTitle);
+            var totalQty = obj2[index]?.value;
+        }
+
         if (marketId === '') {
             alert("Please Select Order")
         }
         else if (tickerId === '') {
             alert("Please Select Symbol")
         }
-        else if (!tickerTitle.includes(sellOrdersList)) {
-            alert("You Can't Place Order for '"+tickerSymbol+"'")
-        } 
+        else if (!sellOrdersList?.includes(tickerTitle)) {
+            alert("You Can't Place Order for '" + tickerSymbol + "'")
+        }
         else if (HarvestYear === '') {
             alert("Please Select Harvest Year")
         }
@@ -337,6 +362,9 @@ const TradeScreen = (props) => {
             alert("Please Select Season")
         }
         else if ((Quantity === '' || IsQuantityError === true)) {
+            setIsQuantityError(true)
+        }
+        else if (Quantity > totalQty) {
             setIsQuantityError(true)
         }
         else if ((orderTypeValue === 'Limit' && price === '')) {
@@ -368,10 +396,29 @@ const TradeScreen = (props) => {
     const SellOrderApiBasic = async () => {
         // alert(selectedBtn.toLowerCase())
         setIsQuantityError(false)
-        
-      
-        // alert(JSON.stringify(sellOrdersList))
-        // alert(JSON.stringify(tickerTitle))
+
+        if (tickerTitle !== '') {
+            var holder = {};
+            Order_List_History?.forEach(function (d) {
+                if (d?.type.includes("buy")) {
+                    if (holder.hasOwnProperty(d?.ticker)) {
+                        holder[d?.ticker] = holder[d.ticker] + parseFloat(d?.qty);
+                    } else {
+                        holder[d?.ticker] = parseFloat(d?.qty);
+                    }
+                }
+            });
+            var obj2 = [];
+            for (var prop in holder) {
+                obj2?.push({ name: prop, value: holder[prop] });
+            }
+            let newArr = []
+            obj2.map((item) =>
+                newArr.push(item?.name)
+            )
+            let index = newArr?.indexOf(tickerTitle);
+            var totalQty = obj2[index]?.value;
+        }
 
         if (marketId === '') {
             alert("Please Select Order")
@@ -379,10 +426,14 @@ const TradeScreen = (props) => {
         else if (tickerId === '') {
             alert("Please Select Commodity type")
         }
-        else if (!tickerTitle.includes(sellOrdersList)) {
+        else if (!sellOrdersList?.includes(tickerTitle)) {
             alert("You Can't Place Order for '"+tickerSymbol+"'")
+            return
         } 
         else if ((Quantity === '' || IsQuantityError === true)) {
+            setIsQuantityError(true)
+        }
+        else if (Quantity > totalQty) {
             setIsQuantityError(true)
         }
         else {
@@ -403,9 +454,7 @@ const TradeScreen = (props) => {
             data["gtd_date"] = callDate;
             data["advanced"] = 0;
 
-            // alert(JSON.stringify(data))
             await dispatch(_createOrder('create_order', data))
-
         }
 
     }
@@ -413,7 +462,7 @@ const TradeScreen = (props) => {
         setIsQuantityError(false)
         setQuantity(text)
         let kilo = parseFloat(text) * 1000;
-        let bag = kilo / 20;
+        let bag = kilo / 50;
         if (!isNaN(bag)) {
             setBags(bag)
             if (!Number.isInteger(bag)) {
@@ -422,7 +471,7 @@ const TradeScreen = (props) => {
         } else {
             setBags("0")
         }
-        if (bag < 50) {
+        if (bag < 20) {
             setIsQuantityError(true)
         }
 
@@ -441,7 +490,6 @@ const TradeScreen = (props) => {
             setDateModal(true)
         }
     }
-
     const getTickerDataHistory = async (type) => {
         let data = {}
         data["token"] = userToken;
@@ -450,7 +498,6 @@ const TradeScreen = (props) => {
         data["limit"] = 50;
         await dispatch(_getOrdersHistory('get_orders', data))
     }
-
 
     return (
         <View style={styles.container}>
@@ -621,7 +668,7 @@ const TradeScreen = (props) => {
                             )}
                         </View>
 
-                        <TradeHeading title={"Full Type :"} top={15} bottom={5} />
+                        <TradeHeading title={"Fill Type :"} top={15} bottom={5} />
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             {FullType.map((item, index) =>
                                 <Pressable onPress={() => setFullTypeValue(item.value)}
@@ -845,12 +892,8 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     dropDownIcon: {
-        // width: wp(4.5),
-        // height: "100%",
-        // alignSelf: "flex-end",
         resizeMode: "contain",
         marginRight: 10,
-        // marginTop: wp(-8)
     },
     inputContainer: {
         alignSelf: 'center',

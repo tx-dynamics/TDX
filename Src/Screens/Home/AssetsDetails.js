@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Modal, FlatList, Pressable } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import {
+    View, Text, StyleSheet, Image, StatusBar,
+    Modal, FlatList, Pressable, Dimensions, Linking
+} from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
@@ -13,7 +16,11 @@ import Button from '../../Components/Button';
 import InputField from '../../Components/InputField';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { _getTickerData, _getNewsData } from '../../Redux/Actions/Actions';
+import {
+    _getTickerData, _getNewsData, _addToWishList,
+    _getAllWatchList, _addAlert
+} from '../../Redux/Actions/Actions';
+import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
 
 
 const NewsDATA = [
@@ -47,6 +54,8 @@ import {
     ContributionGraph,
     StackedBarChart
 } from "react-native-chart-kit";
+import Toast, { DURATION } from 'react-native-easy-toast'
+
 
 const Greendata = {
     datasets: [
@@ -69,21 +78,52 @@ const Greendata = {
 const AssetsDetails = (props) => {
 
     const dispatch = useDispatch();
+    // const toastRef = useRef(null)
+    const toastRef = React.createRef(Toast)
+    const toastReff = React.createRef(Toast)
 
     const [DropDownItem, setDropDownItem] = useState('USD')
     const [filterModal, setFilterModal] = useState(false)
     const [alertModal, setAlertModal] = useState(false)
+    const [allWatchLists, setAllWatchLists] = useState([])
+    const [isThisWatchList, setIsThisWatchList] = useState(false)
+    const [alertPrice, setAlertPrice] = useState('')
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const tickerData = useSelector(state => state.HomeReducer.tickerData);
     const newsData = useSelector(state => state.HomeReducer.newsData);
+    const WatchListMarkets = useSelector(state => state.HomeReducer.WatchListMarkets);
 
     useEffect(() => {
         // console.log("Token::::: ", userToken)
         // alert(JSON.stringify(props.route.params.tickerId))
         // alert(JSON.stringify(props.route.params.marketID))
+        // alert(JSON.stringify(WatchListMarkets))
         getTickerData()
+        getWatchlistMarkets()
     }, [])
+
+    useEffect(() => {
+        if (WatchListMarkets !== undefined) {
+            setAllWatchLists(WatchListMarkets)
+            CheckIsWatchList()
+        }
+    }, [WatchListMarkets])
+
+    const CheckIsWatchList = () => {
+        if (WatchListMarkets?.length > 0) {
+            WatchListMarkets.map((item) => {
+                if (item?.id === props.route.params.marketID) {
+                    setIsThisWatchList(true)
+                } else {
+                    setIsThisWatchList(false)
+                }
+            })
+        }
+        else {
+            setIsThisWatchList(false)
+        }
+    }
 
     const getTickerData = async () => {
         let data = {}
@@ -97,9 +137,42 @@ const AssetsDetails = (props) => {
         // alert(JSON.stringify(tickerData))
     }
 
+    const getWatchlistMarkets = async () => {
+        let data = {}
+        data["token"] = userToken;
+        await dispatch(_getAllWatchList('get_watchlist', data))
+        // alert(JSON.stringify(tickerData))
+    }
+
     const openAlertModal = () => {
         setFilterModal(false)
         setAlertModal(true)
+    }
+
+    const AddToWashList = async () => {
+        let data = {}
+        data["token"] = userToken;
+        data["id"] = props.route.params.marketID;
+        if (isThisWatchList) {
+            await dispatch(_addToWishList('remove_watchlist', data, userToken))
+        } else {
+            await dispatch(_addToWishList('add_watchlist', data, userToken))
+        }
+        setFilterModal(false)
+    }
+
+    const AddAlert = async () => {
+        if (alertPrice === '') {
+            toastReff.current.show('Please Enter Price', 2500);
+        } else {
+
+            let data = {}
+            data["token"] = userToken;
+            data["ticker_id"] = props.route.params.tickerId;
+            data["price"] = alertPrice;
+            await dispatch(_addAlert('set_alert', data))
+            setAlertModal(false)
+        }
     }
 
     return (
@@ -127,15 +200,21 @@ const AssetsDetails = (props) => {
                     <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4) }}>
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 5]}>{tickerData?.ticker?.ticker}</ResponsiveText>
                         <View style={{ alignItems: "flex-end" }}>
-                            <ResponsiveText size="h8" color={tickerData?.ticker?.price >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(tickerData?.ticker?.price).toFixed(1)}</ResponsiveText>
+                            <ResponsiveText size="h8" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(tickerData?.ticker?.price).toFixed(1)}</ResponsiveText>
                             <ResponsiveText size="h9" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{tickerData?.ticker?.trend + " %"}</ResponsiveText>
                         </View>
                     </View>
 
                     <View style={{ width: "100%", alignItems: "center", marginTop: wp(5) }}>
+
                         {tickerData?.ticker?.chartData !== undefined &&
                             <LineChart
                                 data={{
+                                    labels: tickerData?.ticker?.chartData.map((itemm) => {
+                                        return (
+                                            itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
+                                        )
+                                    }),
                                     datasets: [
                                         {
                                             data: tickerData?.ticker?.chartData.map((itemm) => {
@@ -146,31 +225,36 @@ const AssetsDetails = (props) => {
                                         }
                                     ]
                                 }}
-                                width={wp(100)} // from react-native
-                                height={140}
-                                withHorizontalLabels={false}
-                                flatColor={true}
+                                width={Dimensions.get("window").width} // from react-native
+                                height={160}
+                                yAxisLabel="$"
+                                // yAxisSuffix="k"
+                                // yAxisInterval={1} // optional, defaults to 1
                                 chartConfig={{
                                     backgroundGradientFromOpacity: 0,
                                     backgroundGradientToOpacity: 0,
-                                    color: (opacity = 1) => Colors.greenColor,
+                                    decimalPlaces: 2,
+                                    color: (opacity = 1) => tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor,
+                                    labelColor: (opacity = 1) => Colors.black,
                                     propsForDots: { r: "0" },
-                                    propsForBackgroundLines: { stroke: "#CCCCCC33" }
+                                    propsForBackgroundLines: { stroke: "#CCCCCC33" },
+
                                 }}
                                 bezier
-                                style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: 28 }] }}
-                            />}
-
+                                style={{
+                                    marginVertical: 8,
+                                    transform: [{ translateX: 10 }]
+                                }}
+                            />
+                        }
                     </View>
 
                     <View style={{ paddingHorizontal: wp(4), marginTop: wp(-4), marginBottom: wp(6), flexDirection: "row", justifyContent: "space-between" }}>
-                        {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}> */}
-                        {tickerData?.ticker?.chartData.map((item, index) =>
+                        {/* {tickerData?.ticker?.chartData.map((item, index) =>
                             <Pressable style={{}}>
                                 <ResponsiveText size="h9" margin={[0, 0, 0, 0]}>{item.date.split('T')[0].split('-')[2] + "/" + item.date.split('-')[1]}</ResponsiveText>
                             </Pressable>
-                        )}
-                        {/* </ScrollView> */}
+                        )} */}
                     </View>
 
                     <View style={{ paddingHorizontal: wp(4) }}>
@@ -249,10 +333,11 @@ const AssetsDetails = (props) => {
                         <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.grade_symbol}</ResponsiveText>
                     </View>
 
-                    <Pressable style={{
-                        backgroundColor: "#455154", paddingHorizontal: wp(5), paddingVertical: wp(2), alignSelf: "center",
-                        borderRadius: 11, alignItems: "center"
-                    }}>
+                    <Pressable onPress={() => Linking.openURL('http://' + tickerData?.ticker?.contract_link)}
+                        style={{
+                            backgroundColor: "#455154", paddingHorizontal: wp(5), paddingVertical: wp(2), alignSelf: "center",
+                            borderRadius: 11, alignItems: "center"
+                        }}>
                         <ResponsiveText size="h7" textAlign={"center"} color={"#F3BA2F"} >{"View Soya Bean \n Contract"}</ResponsiveText>
                     </Pressable>
                 </View>
@@ -268,8 +353,6 @@ const AssetsDetails = (props) => {
                         <ResponsiveText size="h9" margin={[-2, 0, 0, 0]} color={"#6B6B6B"}>{item.description}</ResponsiveText>
                     </View>
                 )}
-
-
 
             </ScrollView>
 
@@ -303,10 +386,10 @@ const AssetsDetails = (props) => {
                     onPress={() => setFilterModal(false)}
                     style={styles.modalBackground}>
                     <View style={[styles.activityIndicatorWrapper, { padding: 0 }]}>
-                        <Pressable onPress={() => setFilterModal(false)}
+                        <Pressable onPress={() => AddToWashList()}
                             style={{ flexDirection: "row", paddingHorizontal: wp(3), marginLeft: 5 }}>
                             <Image source={iconPath.passwordUnhide} style={{ width: wp(5), height: wp(5), resizeMode: "contain" }} />
-                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(2)]}>{"Add to watch list"}</ResponsiveText>
+                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(2)]}>{isThisWatchList ? "Remove from watch list" : "Add to watch list"}</ResponsiveText>
                         </Pressable>
                         <View style={{ height: .5, backgroundColor: "#000", marginVertical: wp(3) }} />
                         <Pressable onPress={() => openAlertModal()}
@@ -338,16 +421,37 @@ const AssetsDetails = (props) => {
                                     placeholder={"Set an alert price"}
                                     placeholderTextColor={"#CACACA"}
                                     backgroundColor={"#fff"}
+                                    value={alertPrice}
+                                    onChangeText={txt => setAlertPrice(txt)}
                                 />
                             </View>
                         </View>
-                        <Pressable onPress={() => setAlertModal(false)}
+                        <Pressable onPress={() => AddAlert()}
                             style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
                             <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
                         </Pressable>
                     </View>
+
+                    <Toast
+                        ref={toastReff}
+                        style={{ backgroundColor: 'white', paddingVertical: 15, paddingHorizontal: 30, borderRadius: 30 }}
+                        position='bottom'
+                        positionValue={150}
+                        opacity={0.9}
+                        textStyle={{ color: 'black' }}
+                    />
+
                 </Pressable>
             </Modal>
+
+            <Toast
+                ref={toastRef}
+                style={{ backgroundColor: 'white', paddingVertical: 15, paddingHorizontal: 30, borderRadius: 30 }}
+                position='bottom'
+                positionValue={150}
+                opacity={0.9}
+                textStyle={{ color: 'black' }}
+            />
 
 
         </View>

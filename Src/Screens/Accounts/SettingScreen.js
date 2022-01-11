@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -12,11 +12,48 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 import ModalDropdown from 'react-native-modal-dropdown';
 
+import { useSelector, useDispatch } from 'react-redux';
+
+import { _updateCurrency } from '../../Redux/Actions/Actions';
+
 
 const SettingScreen = (props) => {
 
+    const dispatch = useDispatch();
+
     const [DropDownItem, setDropDownItem] = useState('USD')
     const [assetsDropdownShow, setAssetsDropdownShow] = useState(false)
+    const [currencySign, setCurrencySign] = useState('')
+
+    const userInfo = useSelector(state => state.AuthReducer.userInfo);
+    const userToken = useSelector(state => state.AuthReducer.userToken);
+
+    useEffect(() => {
+        // alert(JSON.stringify(userInfo.currency))
+        // alert(JSON.stringify(userInfo.currency_iso))
+        setDropDownItem(userInfo?.currency_iso)
+        setCurrencySign(userInfo?.currency)
+    }, [])
+
+    const changeCurrency = async(value) =>{
+        setDropDownItem(value)
+        let currencyS = '$';
+        if (value === 'GHS') {
+            setCurrencySign('GH₵')
+            currencyS='GH₵'
+        } else {
+            setCurrencySign('$')
+            currencyS='$'
+        }
+        let data = {}
+        data["token"] = userToken;
+        data["currency"] = currencyS;
+        data["currency_iso"] = value;
+        // alert(JSON.stringify(data))
+        await dispatch(_updateCurrency('set_currency', data, userToken))
+
+
+    }
 
     return (
         <View style={styles.container}>
@@ -27,12 +64,12 @@ const SettingScreen = (props) => {
 
                 <View style={[styles.headingContainer, { flexDirection: "row", justifyContent: "space-between" }]}>
                     <ResponsiveText size="h8" >{"Contact Details"}</ResponsiveText>
-                    <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} >{"Edit Profile"}</ResponsiveText>
+                    {/* <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} >{"Edit Profile"}</ResponsiveText> */}
                 </View>
 
                 <View style={{ paddingHorizontal: wp(4), marginVertical: wp(4) }}>
-                    <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} >{"John Doe"}</ResponsiveText>
-                    <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText>
+                    <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} >{userInfo?.name}</ResponsiveText>
+                    {/* <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText> */}
                 </View>
 
                 <View style={styles.headingContainer}>
@@ -44,7 +81,9 @@ const SettingScreen = (props) => {
                     backgroundColor: assetsDropdownShow ? "#fff" : "#F4F4F4", elevation: assetsDropdownShow ? 1 : 0
                 }}>
 
-                    <ResponsiveText size="h8" color={assetsDropdownShow ? "#fff" : "#6F7074"} fontFamily={fonts.Poppins_SemiBold} >{"GH₵"}</ResponsiveText>
+                    <View style={{width:wp(8), alignItems:"center"}}>
+                        <ResponsiveText size="h8" color={assetsDropdownShow ? "#fff" : "#6F7074"} fontFamily={fonts.Poppins_SemiBold} >{currencySign}</ResponsiveText>
+                    </View>
                     <ModalDropdown options={['GHS', 'USD']}
                         defaultValue={DropDownItem}
                         style={[styles.dropDown, {}]}
@@ -53,7 +92,7 @@ const SettingScreen = (props) => {
                         onDropdownWillHide={() => setAssetsDropdownShow(false)}
                         dropdownTextStyle={styles.dropDown_textStyle}
                         textStyle={{ color: assetsDropdownShow ? "#fff" : "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(69), fontFamily: fonts.Poppins, }}
-                        onSelect={(idx, DropDownItem) => setDropDownItem(DropDownItem)}
+                        onSelect={(idx, DropDownItem) => changeCurrency(DropDownItem)}
                         renderRightComponent={() => (<Fonticon type={"AntDesign"} name={assetsDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                     />
 

@@ -36,7 +36,12 @@ const SetupNewPassword = (props) => {
         if (newPassword === '') {
             setApiError(true)
             setApiErrorMsg("Please Enter New Password")
-        } else if (confirmPassword === '') {
+        } 
+        else if (newPassword.length < 6) {
+            setApiError(true)
+            setApiErrorMsg("Passwords must be at least 6 characters")
+        } 
+        else if (confirmPassword === '') {
             setApiError(true)
             setApiErrorMsg("Please Enter Confirm Password")
         }
