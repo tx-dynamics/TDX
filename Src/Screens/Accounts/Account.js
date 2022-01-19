@@ -57,7 +57,7 @@ const Account = (props) => {
     }, [])
 
     useEffect(() => {
-        // alert(JSON.stringify(userInfo))
+        // alert(JSON.stringify(userInfo.id))
     }, [])
 
 
@@ -89,7 +89,7 @@ const Account = (props) => {
             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: 13, alignItems: "center" }}>
                 <View>
                     <ResponsiveText size="h4" fontFamily={fonts.Poppins_SemiBold} >{userInfo?.name}</ResponsiveText>
-                    {/* <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText> */}
+                    <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: "+userInfo?.id}</ResponsiveText>
                 </View>
                 <Pressable onPress={() => props.navigation.navigate("SettingScreen")}>
                     {/* <Pressable onPress={() => alert("jhhhjj")}> */}
@@ -124,8 +124,6 @@ const Account = (props) => {
 
                     </Pressable>
                 )} />
-
-
 
         </View>
     )

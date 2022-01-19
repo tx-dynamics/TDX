@@ -69,7 +69,7 @@ const SettingScreen = (props) => {
 
                 <View style={{ paddingHorizontal: wp(4), marginVertical: wp(4) }}>
                     <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} >{userInfo?.name}</ResponsiveText>
-                    {/* <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: 107461 "}</ResponsiveText> */}
+                    <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: "+userInfo?.id}</ResponsiveText>
                 </View>
 
                 <View style={styles.headingContainer}>

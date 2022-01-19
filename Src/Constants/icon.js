@@ -13,6 +13,7 @@ const Drawer4 = require("../Assets/Images/Drawer4.png");
 const drawerIcon = require("../Assets/Images/drawerIcon.png");
 const marketIcon = require("../Assets/Images/marketIcon.png");
 const greenEye = require("../Assets/Images/greenEye.png");
+const whiteEye = require("../Assets/Images/whiteEye.png");
 const homeFilter = require("../Assets/Images/homeFilter.png");
 const coin1 = require("../Assets/Images/coin1.png");
 const marketInfo2 = require("../Assets/Images/marketInfo2.png");
@@ -29,6 +30,7 @@ const DROPDOWN = require("../Assets/Images/DROPDOWN.png");
 const passwordHide = require("../Assets/Images/passwordHide.png");
 const passwordUnhide = require("../Assets/Images/passwordUnhide.png");
 const greenRadioBtn = require("../Assets/Images/greenRadioBtn.png");
+const greenRadioBtn1 = require("../Assets/Images/greenRadioBtn1.png");
 const darkRadioBtn = require("../Assets/Images/darkRadioBtn.png");
 const Deposit = require("../Assets/Images/Deposit.png");
 const Withdrawal = require("../Assets/Images/Withdrawal.png");
@@ -62,6 +64,7 @@ export const iconPath = {
   drawerIcon,
   marketIcon,
   greenEye,
+  whiteEye,
   homeFilter,
   coin1,
   marketInfo1,
@@ -78,6 +81,7 @@ export const iconPath = {
   passwordHide,
   passwordUnhide,
   greenRadioBtn,
+  greenRadioBtn1,
   darkRadioBtn,
   Deposit,
   Withdrawal,

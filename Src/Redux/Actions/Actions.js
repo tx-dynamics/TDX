@@ -84,6 +84,26 @@ export const _getSingleMarketData = (url, params) => {
     }
 }
 
+export const _sendPushNotification = (url, params) => {
+    try {
+        return async dispatch => {
+            await _axiosPostAPI(url, params)
+                .then(async (response) => {
+                    if (response.action === "success") {
+                        // alert(JSON.stringify(response))
+                    } else {
+                        alert(JSON.stringify(response.error))
+                    }
+                })
+                .catch((err) => {
+                    console.log(JSON.stringify(err))
+                })
+        };
+    } catch (error) {
+        console.log(JSON.stringify(error))
+    }
+}
+
 export const _getMarketData = (url, params) => {
     try {
         return async dispatch => {
@@ -95,6 +115,7 @@ export const _getMarketData = (url, params) => {
                     dispatch({ type: MARKET_DATA_LOADING, payload: false });
                     if (response.action === "success") {
                         // alert(JSON.stringify(response.data))
+                        // console.log("ressssssssssssss ",JSON.stringify(response.data))
                         dispatch({
                             type: MARKET_DATA,
                             payload: response.data,
@@ -384,6 +405,31 @@ export const _getLatestAlerts = (url, params) => {
                             type: LATEST_ALERTS,
                             payload: response?.data?.alerts?.length,
                         });
+                    } else {
+                        alert(JSON.stringify(response.error))
+                    }
+                })
+                .catch((err) => {
+                    console.log(JSON.stringify(err))
+                })
+        };
+    } catch (error) {
+        console.log(JSON.stringify(error))
+    }
+}
+
+export const _removeAlert = (url, params, token) => {
+    try {
+        return async dispatch => {
+            await _axiosPostAPI(url, params)
+                .then(async (response) => {
+
+                    if (response.action === "success") {
+                        // alert(JSON.stringify(response))
+                        let data = {}
+                        data["token"] = token;
+                        dispatch(_getAlerts('get_alerts', data))
+                        
                     } else {
                         alert(JSON.stringify(response.error))
                     }

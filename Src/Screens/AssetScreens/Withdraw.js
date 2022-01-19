@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Modal, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Modal, Image, TouchableOpacity, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
@@ -19,21 +19,27 @@ import { useSelector, useDispatch } from 'react-redux';
 import Loader from '../../Components/Loader';
 import Toast, { DURATION } from 'react-native-easy-toast'
 
-import { _postTransaction } from '../../Redux/Actions/Actions';
+import { _postTransaction, _getSingleMarketData } from '../../Redux/Actions/Actions';
 
 const Withdraw = (props) => {
 
     const dispatch = useDispatch();
 
     const toastRef = React.createRef(Toast)
+    const symbolDropDownRef = React.createRef(ModalDropdown);
+
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const ChangePasswordLoading = useSelector(state => state.HomeReducer.ChangePasswordLoading);
     const AssetsDetails = useSelector(state => state.HomeReducer.AssetsDetails);
+    const singleMarketData = useSelector(state => state.HomeReducer.singleMarketData);
 
     const [DropDownItem, setDropDownItem] = useState('Cash')
     const [DropDownItemm, setDropDownItemm] = useState('Bank Account')
     const [DropDownItemmm, setDropDownItemmm] = useState('')
+    const [MaxSellQuantity, setMaxSellQuantity] = useState(0);
+    const [tickerId, setTickerId] = useState('');
+    const [tickerTitle, setTickerTitle] = useState("");
     const [assetsDropdownShow, setAssetsDropdownShow] = useState(false)
     const [TickerDropdownShow, setTickerDropdownShow] = useState(false)
     const [withdrawDropdownShow, setwithdrawDropdownShow] = useState(false)
@@ -48,17 +54,23 @@ const Withdraw = (props) => {
     const [quantity, setQuantity] = useState('')
     const [tickerData, setTickerData] = useState([])
 
+    const [IsQuantityError, setIsQuantityError] = useState(false);
 
     useEffect(() => {
-        // alert(JSON.stringify(AssetsDetails?.stocks?.length))
         var tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         setMinDate(tomorrow.toISOString().split('T')[0])
         setCallDate(tomorrow.toISOString().split('T')[0])
         setSelectedDate({ [tomorrow.toISOString().split('T')[0]]: { selected: true, selectedColor: "#000" } })
-        setTickerValue()
+        // setTickerValue()
+        getSingleMarketData()
         // alert(new Date().toISOString().split('T')[0])
     }, [])
+
+    useEffect(() => {
+        // alert(JSON.stringify(singleMarketData))
+        setTickerValuee()
+    }, [singleMarketData])
 
     useEffect(() => {
         if (ChangePasswordLoading !== undefined) {
@@ -67,6 +79,55 @@ const Withdraw = (props) => {
             setLoading(false)
         }
     }, [ChangePasswordLoading])
+
+    const getSingleMarketData = async () => {
+        let data = {}
+        let data1 = {}
+        data1["searching"] = false;
+        data1["filtering"] = false;
+        data["token"] = userToken;
+        data["search"] = data1;
+        data["selling"] = 1;
+        await dispatch(_getSingleMarketData('get_markets', data))
+        // alert(JSON.stringify(marketData.more_available))
+    }
+
+    const setTickerValuee = async () => {
+        // alert(JSON.stringify(singleMarketData?.markets[0]?.tickers))
+        if (singleMarketData?.markets?.length !== undefined) {
+            if (singleMarketData?.markets?.length > 0) {
+                let Tickerss = []
+                singleMarketData?.markets.map((item) => {
+                    item?.tickers?.map((itemm) =>
+                        Tickerss.push(itemm)
+                    )
+                })
+                // alert(JSON.stringify(Tickerss))
+                setTickerData(Tickerss)
+            }
+        }
+    }
+
+    const renderDropDownList1 = (rowData) => {
+        const { id, symbol } = rowData;
+        return (
+            <View style={{ backgroundColor: "#fff" }}>
+                <View
+                    // activeOpacity={.1}
+                    activeOpacity={0.4}
+                    underlayColor="#ffffff00"
+                    //  underlayColor="gray" 
+                    style={{ marginVertical: 10, }}>
+                    <Text style={[{ fontSize: 15, color: "#000", fontFamily: fonts.Poppins }]}>{symbol}</Text>
+                </View>
+            </View>
+        )
+    }
+
+    const renderButtonText1 = (rowData) => {
+        const { symbol } = rowData;
+        return <View><Text style={styles.dropDown_textStyle}>{symbol}</Text></View>;
+    }
 
     const setTickerValue = async () => {
         if (AssetsDetails?.stocks?.length !== undefined) {
@@ -95,18 +156,16 @@ const Withdraw = (props) => {
     }
 
     const CommodityWithdraw = async () => {
-        if (DropDownItemmm === "") {
+        if (tickerTitle === "") {
             toastRef.current.show('Please Select Ticker', 2500);
-        } else if (quantity === '') {
-            toastRef.current.show('Please Enter Quantity', 2500);
-        } else {
-            let tickerId =''
-            AssetsDetails?.stocks[0]?.tickers?.map((item) =>{
-                if (item?.ticker === DropDownItemmm) {
-                    tickerId = item?.id
-                }
-            })
-
+        }
+        else if ((quantity === '' || IsQuantityError === true)) {
+            setIsQuantityError(true)
+        }
+        else if (quantity > MaxSellQuantity) {
+            setIsQuantityError(true)
+        }
+        else {
             let data = {}
             data["token"] = userToken
             data["amount"] = quantity
@@ -116,14 +175,16 @@ const Withdraw = (props) => {
             data["image"] = ''
             data["withdraw_type"] = DropDownItem
             data["withdraw_date"] = callDate
-            data["ticker"] = DropDownItemmm
+            data["ticker"] = tickerTitle
             data["ticker_id"] = tickerId
             await dispatch(_postTransaction('new_transaction', data))
             setAmount('')
             setQuantity('')
+            symbolDropDownRef.current.select(-1)
             // alert(JSON.stringify(data))
         }
     }
+    
     const CashWithdraw = async () => {
 
         if (amount === '') {
@@ -143,6 +204,37 @@ const Withdraw = (props) => {
             await dispatch(_postTransaction('new_transaction', data))
             setAmount('')
             // alert(JSON.stringify(data))
+        }
+    }
+
+    const setTickerDataaa = (item) => {
+        setTickerTitle(item?.ticker)
+        setTickerId(item?.id)
+        if (item?.my_stocks?.qty === null) {
+            setMaxSellQuantity(0)
+        } else {
+            setMaxSellQuantity(parseFloat(item?.my_stocks?.qty))
+        }
+        // setDropDownItemmm(item)
+    }
+
+    const setQuantityFunSell = (text) => {
+        setIsQuantityError(false)
+        setQuantity(text)
+        let kilo = parseFloat(text) * 1000;
+        let bag = kilo / 50;
+        if (!isNaN(bag)) {
+            if (!Number.isInteger(bag)) {
+                setIsQuantityError(true)
+            }
+        } else {
+        }
+        if (bag < 20) {
+            setIsQuantityError(true)
+        }
+        // alert(text+"  "+MaxSellQuantity)
+        if (text > MaxSellQuantity) {
+            setIsQuantityError(true)
         }
     }
 
@@ -207,14 +299,17 @@ const Withdraw = (props) => {
                     <>
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose Ticker :"}</ResponsiveText>
                         <ModalDropdown options={tickerData}
+                            ref={symbolDropDownRef}
                             defaultValue={DropDownItemmm}
                             style={[styles.dropDown, { backgroundColor: TickerDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: TickerDropdownShow ? 1 : 0 }]}
                             dropdownStyle={[styles.dropDown_dropDownStyle, { height: wp(42) }]}
                             dropdownTextStyle={styles.dropDown_textStyle}
+                            renderRow={(rowData, rowID) => renderDropDownList1(rowData, rowID)}
+                            renderButtonText={(rowData) => renderButtonText1(rowData)}
                             onDropdownWillShow={() => setTickerDropdownShow(true)}
                             onDropdownWillHide={() => setTickerDropdownShow(false)}
                             textStyle={{ color: TickerDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(80), fontFamily: fonts.Poppins }}
-                            onSelect={(idx, DropDownItem) => setDropDownItemmm(DropDownItem)}
+                            onSelect={(idx, DropDownItem) => setTickerDataaa(DropDownItem)}
                             renderRightComponent={() => (<Fonticon type={"AntDesign"} name={TickerDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                         />
 
@@ -222,8 +317,13 @@ const Withdraw = (props) => {
                         <InputField
                             height={60}
                             value={quantity}
-                            onChangeText={txt => setQuantity(txt)}
+                            onChangeText={text => setQuantityFunSell(text)}
                         />
+                        {IsQuantityError ?
+                            <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{"Please Enter Valid Quantity"}</Text>
+                            :
+                            <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}> {""}</Text>
+                        }
 
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose Date of Withdrawl"}</ResponsiveText>
                         <Pressable onPress={() => setDateModal(true)}>

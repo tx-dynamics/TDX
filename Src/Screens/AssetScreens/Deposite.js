@@ -207,12 +207,14 @@ const Deposite = (props) => {
                         <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Enter Transaction ID :"}</ResponsiveText>
                         <InputField
                             height={60}
+                            maxLength={20}
+                            keyboardType="numeric"
                             value={TransactionId}
-                            onChangeText={txt => setTransactionId(txt)}
+                            // onChangeText={txt => setTransactionId(txt)}
+                            onChangeText={txt => setTransactionId(txt.replace(/[^0-9]/g, ''))}
                         />
                     </>
                 }
-
 
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: DropDownItem === "Bank Deposit" ? wp(50) : wp(63), marginVertical: 20, }}>

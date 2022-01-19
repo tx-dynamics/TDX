@@ -13,7 +13,7 @@ import Button from '../../Components/Button';
 
 import { useSelector, useDispatch } from 'react-redux';
 
-import { _getAlerts, _removeNotification } from '../../Redux/Actions/Actions';
+import { _getAlerts, _removeNotification, _removeAlert } from '../../Redux/Actions/Actions';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 
 
@@ -92,8 +92,62 @@ const Alerts = (props) => {
     const getAllAlerts = async () => {
         let data = {}
         data["token"] = userToken;
-        await dispatch(_getAlerts('get_alerts', data))
+         dispatch(_getAlerts('get_alerts', data))
     }
+    const removeAlert = async (alertId) => {
+        let data = {}
+        data["token"] = userToken; 
+        data["alert_id"] = alertId;
+        // alert(JSON.stringify(alertId))
+         dispatch(_removeAlert('remove_alert', data, userToken ))
+    }
+
+    const optionsStyles = {
+        optionsContainer: {
+            width: wp(23),
+            borderRadius: 10,
+            marginTop: wp(8),
+            alignItems:"center"
+        },
+        optionsWrapper: {
+            //   backgroundColor: 'purple',
+        },
+        optionWrapper: {
+            //   backgroundColor: 'yellow',
+            margin: 5,
+        },
+        optionTouchable: {
+            //   underlayColor: 'gold',
+            activeOpacity: 70,
+        },
+        optionText: {
+            //   color: 'brown',
+        },
+    };
+
+    const triggerStyles = {
+        triggerText: {
+            color: 'white',
+        },
+        triggerOuterWrapper: {
+            //   backgroundColor: 'orange',
+            padding: 5,
+            flex: 1,
+        },
+        triggerWrapper: {
+            //   backgroundColor: 'blue',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+        },
+        triggerTouchable: {
+            //   underlayColor: 'darkblue',
+            activeOpacity: 70,
+            style: {
+                flex: 1,
+            },
+        },
+    };
 
     return (
         <View style={styles.container}>
@@ -146,6 +200,25 @@ const Alerts = (props) => {
                                     <ResponsiveText size="h8" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(item?.price).toFixed(1)}</ResponsiveText>
                                     <ResponsiveText size="h10" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + item?.trend + " %"}</ResponsiveText>
                                 </View>
+
+                                <Menu style={{  }}
+                                    rendererProps={{ anchorStyle: styles.anchorStyle }}
+                                    style={{ height: 50 }}>
+                                    <MenuTrigger customStyles={triggerStyles}>
+                                        <Fonticon type={"Entypo"} name={"dots-three-vertical"} size={16} color={Colors.black} 
+                                        style={{marginLeft:5, marginRight:-5 }}
+                                        />
+                                    </MenuTrigger>
+                                    <MenuOptions customStyles={optionsStyles}>
+                                        <MenuOption 
+                                        onSelect={() => removeAlert(item?.alert_id)}
+                                        >
+                                            <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{"Remove"}</ResponsiveText>
+                                        </MenuOption>
+                                    </MenuOptions>
+                                </Menu>
+
+
                             </View>
 
                         </View>
@@ -156,6 +229,12 @@ const Alerts = (props) => {
 
 
                 )} />
+
+                {Alertss.length < 1 &&
+                    <View style={{ justifyContent: "center", alignItems: "center" , position:"absolute", top:"20%", alignSelf:"center"}}>
+                        <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[wp(5), 0, 0, 0]}>{"No Alert Found"}</ResponsiveText>
+                    </View>
+                }
         </View>
     )
 }

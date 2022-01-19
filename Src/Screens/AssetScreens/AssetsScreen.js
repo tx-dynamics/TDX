@@ -60,6 +60,7 @@ const AssetsScreen = (props) => {
     const [Notificationss, setNotificationss] = useState([])
     const [cash_balance, setCash_balance] = useState('')
     const [currency_iso, setCurrency_iso] = useState('')
+    const [totalStock, setTotalStock] = useState('')
     const [totalQuantity, setTotalQuantity] = useState('')
     const [totalPrice, setTotalPrice] = useState('')
     const [AlertsState, setAlertsState] = useState([])
@@ -84,6 +85,7 @@ const AssetsScreen = (props) => {
         if ((AssetsDetails !== "" || AssetsDetails !== undefined)) {
             setCash_balance(AssetsDetails?.cash_balance)
             setCurrency_iso(AssetsDetails?.currency_iso)
+            setTotalStock(AssetsDetails?.total_stocks)
             setTickerValue()
             setTotalValues()
         }
@@ -135,10 +137,7 @@ const AssetsScreen = (props) => {
                 midtitle title={"Assets"}
                 leftPress={() => props.navigation.openDrawer()} />
 
-            <View style={{
-                backgroundColor: Colors.TextInputBackgroundColor, paddingHorizontal: wp(4), marginHorizontal: wp(4),
-                paddingTop: wp(4), paddingBottom: wp(1), marginTop: wp(3), borderRadius: 14
-            }}>
+            <View style={styles.cashBalance}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} color={"#FDBD20"}>{"Cash Balance"}</ResponsiveText>
@@ -166,26 +165,21 @@ const AssetsScreen = (props) => {
                         </View>
                         <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{"Withdrawal"}</ResponsiveText>
                     </Pressable>
-
                 </View>
-
             </View>
 
 
-            <View style={{
-                backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", justifyContent: "space-between",
-                marginVertical: wp(5), paddingVertical: wp(4), paddingHorizontal: wp(4), alignItems: "center"
-            }}>
+            <View style={styles.totalStock}>
                 <ResponsiveText size="h7" color={"#000"}>{"Total Stock"}</ResponsiveText>
 
                 <View style={{ flexDirection: "row" }}>
                     <View style={{ alignItems: "center" }}>
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{"Quantity (MT)"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{"0"}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{totalStock}</ResponsiveText>
                     </View>
                     <View style={{ alignItems: "center", marginLeft: wp(5) }}>
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{"GH₵ Value"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{"0"}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{'0'}</ResponsiveText>
                     </View>
                 </View>
             </View>
@@ -205,7 +199,7 @@ const AssetsScreen = (props) => {
                 renderItem={({ item, index }) => (
 
                     <Pressable
-                        style={{ backgroundColor: "#CCCCCC33", paddingVertical: wp(4), paddingHorizontal: wp(3), paddingBottom: wp(2), marginBottom:20 }}>
+                        style={{ backgroundColor: "#CCCCCC33", paddingVertical: wp(4), paddingHorizontal: wp(3), paddingBottom: wp(2), marginBottom: 20 }}>
 
 
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -229,7 +223,7 @@ const AssetsScreen = (props) => {
                             </View>
                         </View>
 
-                        {item?.tickers?.map((cardData) =>
+                        {item?.tickers?.reverse()?.map((cardData) =>
                             <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData.id, marketID: item.id })}
                                 style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7, }}>
                                 {/* <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{cardData.ticker}</ResponsiveText> */}
@@ -290,10 +284,6 @@ const AssetsScreen = (props) => {
                         </View>
                     </Pressable>
                 )} />
-
-
-
-
 
 
             {/* <Pressable onPress={() => props.navigation.navigate("AssetsDetailss")}
@@ -405,5 +395,13 @@ const styles = StyleSheet.create({
         // backgroundColor: Colors.white,
         // justifyContent: "center",
         // alignItems: "center"
+    },
+    totalStock: {
+        backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", justifyContent: "space-between",
+        marginVertical: wp(5), paddingVertical: wp(4), paddingHorizontal: wp(4), alignItems: "center"
+    },
+    cashBalance:{
+        backgroundColor: Colors.TextInputBackgroundColor, paddingHorizontal: wp(4), marginHorizontal: wp(4),
+        paddingTop: wp(4), paddingBottom: wp(1), marginTop: wp(3), borderRadius: 14
     }
 })

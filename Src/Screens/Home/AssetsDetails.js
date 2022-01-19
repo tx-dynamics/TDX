@@ -14,6 +14,7 @@ import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
 import InputField from '../../Components/InputField';
+import HTMLView from 'react-native-htmlview';
 
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -178,7 +179,7 @@ const AssetsDetails = (props) => {
     return (
         <View style={styles.container}>
             <Header left LeftImage ImageName={iconPath.backArrow}
-                midtitle title={"Assets"}
+                midtitle title={""}
                 leftPress={() => props.navigation.goBack()} />
 
             <ScrollView>
@@ -217,7 +218,7 @@ const AssetsDetails = (props) => {
                                     }),
                                     datasets: [
                                         {
-                                            data: tickerData?.ticker?.chartData.map((itemm) => {
+                                            data: tickerData?.ticker?.chartData?.map((itemm) => {
                                                 return (
                                                     parseInt(itemm.price)
                                                 )
@@ -350,7 +351,13 @@ const AssetsDetails = (props) => {
                         paddingVertical: wp(2), borderRadius: 16
                     }}>
                         <ResponsiveText size="h7" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_Medium}>{item.title}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[-2, 0, 0, 0]} color={"#6B6B6B"}>{item.description}</ResponsiveText>
+                        {/* <ResponsiveText size="h9" margin={[-2, 0, 0, 0]} color={"#6B6B6B"}>{item.description}</ResponsiveText> */}
+                        <HTMLView
+                            value={item?.description}
+                        // styles={{fontSize:19}}
+                        />
+
+
                     </View>
                 )}
 

@@ -272,7 +272,7 @@ const TradeScreen = (props) => {
             data["order_validity"] = OrderValidityValue.toLowerCase();
             data["market_id"] = marketId;
             data["ticker_id"] = tickerId;
-            data["price"] = price;
+            data["limit_price"] = price;
             data["qty"] = Quantity;
             data["symbol"] = tickerSymbol;
             data["harvest_year"] = HarvestYear;
@@ -376,7 +376,7 @@ const TradeScreen = (props) => {
             data["token"] = userToken;
             data["type"] = selectedBtn.toLowerCase();
             data["order_type"] = orderTypeValue.toLowerCase();
-            data["price"] = price;
+            data["limit_price"] = price;
             data["full_type"] = FullTypeValue.toLowerCase();
             data["order_validity"] = OrderValidityValue.toLowerCase();
             data["market_id"] = marketId;

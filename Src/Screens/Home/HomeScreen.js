@@ -14,8 +14,10 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-m
 import InputField from '../../Components/InputField';
 import { MARKET_DATA_LOADING } from '../../Redux/Constants'
 import { useSelector, useDispatch } from 'react-redux';
+import { _getMarketData, _getAllWatchList, _sendPushNotification } from '../../Redux/Actions/Actions';
 
-import { _getMarketData, _getAllWatchList } from '../../Redux/Actions/Actions';
+import { firebase } from '@react-native-firebase/messaging';
+
 import {
     LineChart,
     BarChart,
@@ -24,7 +26,7 @@ import {
     ContributionGraph,
     StackedBarChart
 } from "react-native-chart-kit";
-import { _axiosPostAPI, } from '../../Apis/Apis';
+import { _axiosPostAPI } from '../../Apis/Apis';
 
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
 
@@ -76,10 +78,12 @@ const HomeScreen = (props) => {
     const dispatch = useDispatch();
 
     const [marketDataa, setMarketDataa] = useState([])
+    const [expandedIndexes, setExpandedIndexes] = useState([])
     const [filterModal, setFilterModal] = useState(false)
     const [filterApply, setFilterApply] = useState('')
     const [filter_value, setFilter_value] = useState('')
     const [CommodityValue, setCommodityValue] = useState('')
+    const [activeButton, setActiveButton] = useState('all')
     const [CommodityValueError, setCommodityValueError] = useState(false)
     const [GradeDropDownValue, setGradeDropDownValue] = useState('1')
     const [WarehouseDropDownValue, setWarehouseDropDownValue] = useState('W9')
@@ -91,13 +95,14 @@ const HomeScreen = (props) => {
 
     useEffect(() => {
         // dispatch({ type: MARKET_DATA_LOADING, payload: true });
-        console.log("Token::::: ", userToken)
+        // console.log("Token::::: ", userToken)
         // getMarketData()
         setMarketDataa(marketData?.markets)
     }, [marketData])
 
     useEffect(() => {
         getWatchlistMarkets()
+        Fcm()
     }, [])
 
     useFocusEffect(
@@ -106,7 +111,30 @@ const HomeScreen = (props) => {
         }, [])
     );
 
+    const Fcm = async () => {
+        const enabled = await firebase.messaging().hasPermission();
+        if (enabled) {
+        } else {
+            try {
+                await firebase.messaging().requestPermission();
+            } catch (error) {
+            }
+        }
+        const fcmToken = await firebase.messaging().getToken();
+        if (fcmToken) {
+            console.log(userToken)
+            let data = {}
+            data["token"] = userToken;
+            data["push_token"] = fcmToken;
+            // console.log(data)
+            dispatch(_sendPushNotification('store_push_token', data))
+        } else {
+            console.warn('no token');
+        }
+    }
+
     const getMarketData = async () => {
+
         let data = {}
         let data1 = {}
         data1["searching"] = false;
@@ -116,11 +144,13 @@ const HomeScreen = (props) => {
         data["limit"] = 30;
         data["page"] = 1;
         await dispatch(_getMarketData('get_markets', data))
+        setActiveButton('all')
         // alert(JSON.stringify(marketData.more_available))
     }
 
     const setWatchListData = async () => {
         setMarketDataa(WatchListMarkets)
+        setActiveButton('eye')
     }
 
     const getWatchlistMarkets = async () => {
@@ -133,15 +163,18 @@ const HomeScreen = (props) => {
         let data = {}
         let data1 = {}
 
-        data1["searching"] = false;
-        data1["filtering"] = true;
-        data1["filter_type"] = filter;
-        data1["filter_value"] = filter_Value;
+        data1["searching"] = true;
+        data1["search_text"] = filter_Value;
+        data1["filtering"] = false;
+        data1["filter_type"] = '';
+        data1["filter_value"] = '';
         data["token"] = userToken;
         data["search"] = data1;
         data["filters"] = [];
+        data["selling"] = 0;
         data["limit"] = 30;
         data["page"] = 1;
+        // console.log(data)
         await dispatch(_getMarketData('get_markets', data))
         setCommodityValue('')
     }
@@ -174,16 +207,17 @@ const HomeScreen = (props) => {
         if (CommodityValue === '') {
             setCommodityValueError(true)
         } else {
-
             getFilteredData("Commodity", CommodityValue)
             setFilterModal(false)
             setFilterApply('')
-
         }
+    }
 
-        // setFilterApply("Commodity")
-        // setFilterModal(false)
-        // getFilteredData("Commodity")
+    const addIndexExpand = (index) => {
+        var selectedIdss = [...expandedIndexes]
+        selectedIdss.push(index)
+        setExpandedIndexes(selectedIdss)
+        // alert(selectedIdss)
     }
 
 
@@ -204,20 +238,20 @@ const HomeScreen = (props) => {
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: wp(3) }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        {filterApply === "Commodity" ?
+                        {/* {filterApply === "Commodity" ?
                             <Pressable style={{ backgroundColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, height: wp(7), justifyContent: "center" }}>
                                 <ResponsiveText size="h8" color={Colors.white} >{"Commodity"}</ResponsiveText>
                             </Pressable>
-                            :
+                            : */}
                             <Pressable onPress={() => getMarketData()}
-                                style={{ backgroundColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, height: wp(7), justifyContent: "center" }}>
+                                style={{ backgroundColor: activeButton === 'all'? Colors.greenColor : "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, height: wp(7), justifyContent: "center" }}>
                                 <ResponsiveText size="h8" color={Colors.white} >{"All"}</ResponsiveText>
                             </Pressable>
-                        }
+                        {/* } */}
 
-                        <Pressable onPress={() => {getWatchlistMarkets(), setWatchListData()}}
-                            style={{ backgroundColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, marginLeft: 8, height: wp(7), justifyContent: "center" }}>
-                            <Image source={iconPath.greenEye} style={{ width: wp(4.5), height: wp(4.5), resizeMode: "contain" }} />
+                        <Pressable onPress={() => { getWatchlistMarkets(), setWatchListData() }}
+                            style={{ backgroundColor: activeButton === 'eye'? Colors.greenColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, marginLeft: 8, height: wp(7), justifyContent: "center" }}>
+                            <Image source={activeButton === 'eye'? iconPath.whiteEye : iconPath.greenEye} style={{ width: wp(4.5), height: wp(4.5), resizeMode: "contain" }} />
                         </Pressable>
                     </View>
                     <Pressable onPress={() => setFilterModal(true)}>
@@ -248,7 +282,7 @@ const HomeScreen = (props) => {
                             <ResponsiveText size="h9" margin={[0, 0, 0, 5]} fontFamily={fonts.Poppins_SemiBold}>{item.pair}</ResponsiveText>
                         </View>
 
-                        {item?.tickers?.map((cardData) =>
+                        {item?.tickers?.slice(0, expandedIndexes.includes(index) ? item?.tickers?.length : 2).map((cardData, indx) =>
                             <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData.id, marketID: item.id })}
                                 style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7, }}>
                                 <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData.ticker}</ResponsiveText>
@@ -289,11 +323,16 @@ const HomeScreen = (props) => {
                                     </View>
                                 </View>
                             </Pressable>
-                        )}
 
-                        {/* {item.dot &&
-                            <Image source={iconPath.threeHorizontalDots} style={{ width: wp(10), height: wp(8), resizeMode: "contain" }} />
-                        } */}
+                        )}
+                        {!expandedIndexes.includes(index) &&
+                            item?.tickers?.length > 2 &&
+                            <Pressable
+                                onPress={() => addIndexExpand(index)}
+                            >
+                                <Image source={iconPath.threeHorizontalDots} style={{ width: wp(10), height: wp(8), resizeMode: "contain" }} />
+                            </Pressable>
+                        }
                         {index === DATA.length - 1 ?
                             <View style={{ backgroundColor: "transparent", height: 1.5, width: "98%", alignSelf: "center", marginTop: 18 }}>
                             </View>

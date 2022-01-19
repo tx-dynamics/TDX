@@ -27,7 +27,7 @@ const InputField = (props) => {
                 placeholder={props.placeholder}
                 value={props.value}
                 // caretHidden={true}
-                // keyboardType="number-pad"
+                // keyboardType="numeric"
                 placeholderTextColor={props.placeholderTextColor ? props.placeholderTextColor : "#00000099"}
                 // onChangeText={text => onChangeText(text)}
                 style={{

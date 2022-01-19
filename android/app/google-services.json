@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "429131838278",
+    "project_id": "tdxapp-7fe06",
+    "storage_bucket": "tdxapp-7fe06.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:429131838278:android:0cb09e075df9e18d036b47",
+        "android_client_info": {
+          "package_name": "com.TDx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "429131838278-08uv7cq35mrthmuua8f720l13sh6oj0e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCj3tcPjIZuYv3ZdkvYhCYQAFA8JDnp_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "429131838278-08uv7cq35mrthmuua8f720l13sh6oj0e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
