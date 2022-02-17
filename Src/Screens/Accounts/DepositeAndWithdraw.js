@@ -7,6 +7,7 @@ import Button from '../../Components/Button';
 import { wp } from '../../Helpers/Responsiveness';
 import ResponsiveText from '../../Components/RnText';
 import { fonts } from '../../Constants/Fonts';
+import moment from 'moment';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { _getDepositeWithdraw } from '../../Redux/Actions/Actions';
@@ -43,7 +44,8 @@ export default function DepositeAndWithdraw(props) {
         })
         setDepositHistory(deposite)
         setWithdrawHistory(withdraw)
-        // alert(JSON.stringify(deposite[0]))
+        // console.log(userToken)
+        // alert(JSON.stringify(withdraw[3])) 
     }
 
     const GetHistory = async () => {
@@ -55,7 +57,7 @@ export default function DepositeAndWithdraw(props) {
     return (
         <View style={styles.container}>
             <Header left LeftImage ImageName={iconPath.backArrow}
-                midtitle title={"Deposite & Withdraw"}
+                midtitle title={"Deposits & Withdrawals"}
                 leftPress={() => props.navigation.goBack()} />
 
             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(2) }}>
@@ -63,7 +65,7 @@ export default function DepositeAndWithdraw(props) {
                     <Button
                         // onPress={() => setTickerData("Deposit")}
                         onPress={() => setSelectedBtn("Deposit")}
-                        Text={'Deposit'}
+                        Text={'Deposits'}
                         height={52}
                         TextColor={selectedBtn === "Deposit" ? "#fff" : "rgba(255, 255, 255, 0.5)"}
                         backgroundColor={selectedBtn === "Deposit" ? "#979797" : "#BABABA"}
@@ -73,7 +75,7 @@ export default function DepositeAndWithdraw(props) {
                     <Button
                         // onPress={() => setTickerDataHistory("Withdraw")}
                         onPress={() => setSelectedBtn("Withdraw")}
-                        Text={'Withdraw'}
+                        Text={'Withdrawals'}
                         height={52}
                         TextColor={selectedBtn === "Deposit" ? "rgba(255, 255, 255, 0.5)" : "#fff"}
                         backgroundColor={selectedBtn === "Deposit" ? "#BABABA" : "#979797"}
@@ -90,15 +92,29 @@ export default function DepositeAndWithdraw(props) {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
                     <>
+                        {/* 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : */}
                         <View style={styles.notification}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item?.type}</ResponsiveText>
-                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : item?.status === 3 && "red"} textAlign={"center"}>{item?.status === 0 ? "Pending" : item?.status === 1 ? "Partial" : item?.status === 2 ? "Completed" : item?.status === 3 && "Rejected"}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{selectedBtn === "Deposit" ? item?.type : item.type+" "+item.withdraw_type + " " + item.ticker}</ResponsiveText>
+                                <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#F4BB32" : item?.status === 1 ? "#019146" : item?.status === 2 && "#DB1222"} textAlign={"center"}>{item?.status_text}</ResponsiveText>
                             </View>
-                            <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{"Amount:"}</ResponsiveText>
-                            <ResponsiveText size="h8" margin={[-3, 0, 0, 5]}>{item?.amount}</ResponsiveText>
-                        </View>
+                            <View style={{ flexDirection: "row", marginTop:wp(2) }}>
+                                <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{item?.withdraw_type ==="Commodity" ? "Quantity (MT):" :"Amount (GH¢):" }</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[10, 0, 0, 8]}>{item?.amount}</ResponsiveText>
+                            </View>
 
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>
+                                <View style={{ flexDirection: "row" }}>
+                                    <ResponsiveText size="h11" margin={[10, 0, 0, 5]}>{"Requested Date:"}</ResponsiveText>
+                                    <ResponsiveText size="h11" margin={[10, 0, 0, 8]}>{moment(item?.created_at).format('DD MMM YYYY')}</ResponsiveText>
+                                </View>
+                                {item?.withdraw_date !== "" ?
+                                    <View style={{ flexDirection: "row" }}>
+                                        <ResponsiveText size="h11" margin={[10, 0, 0, 5]}>{"Withrawal date"}</ResponsiveText>
+                                        <ResponsiveText size="h11" margin={[10, 0, 0, 8]}>{moment(item?.withdraw_date).format('DD MMM YYYY')}</ResponsiveText>
+                                    </View> : null}
+                            </View>
+                        </View>
                     </>
                 )} />
 

@@ -234,6 +234,7 @@ const TradeScreen = (props) => {
     }
     const onSymbolSelect = (item) => {
         setQuantity('')
+        // alert(JSON.stringify(item))
         setWareHouseName(item?.warehouse?.title)
         setWareHouseId(item?.warehouse?.id)
         setDropDownItem1(DropDownItem)
@@ -427,10 +428,10 @@ const TradeScreen = (props) => {
         else if (tickerId === '') {
             alert("Please Select Commodity type")
         }
-        else if (!sellOrdersList?.includes(tickerTitle)) {
-            alert("You Can't Place Order for '" + tickerSymbol + "'")
-            return
-        }
+        // else if (!sellOrdersList?.includes(tickerTitle)) {
+        //     alert("You Can't Place Order for '" + tickerSymbol + "'")
+        //     return
+        // }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
@@ -455,7 +456,7 @@ const TradeScreen = (props) => {
             data["gtd_date"] = callDate;
             data["advanced"] = 0;
 
-            await dispatch(_createOrder('create_order', data))
+            dispatch(_createOrder('create_order', data))
         }
 
     }
@@ -565,22 +566,22 @@ const TradeScreen = (props) => {
                 />
 
 
-                
-                        <TradeHeading title={AdvanceOptions? "Symbol :": "Commodity type :"} top={15} />
-                        <ModalDropdown options={symbolData}
-                            ref={symbolDropDownRef}
-                            style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: withdrawDropdownShow ? 1 : 0 }]}
-                            dropdownStyle={[styles.dropDown_dropDownStyle1, { height: wp(40) }]}
-                            dropdownTextStyle={styles.dropDown_textStyle}
-                            onDropdownWillShow={() => setwithdrawDropdownShow(true)}
-                            onDropdownWillHide={() => setwithdrawDropdownShow(false)}
-                            renderRow={(rowData, rowID) => renderDropDownList1(rowData, rowID)}
-                            renderButtonText={(rowData) => renderButtonText1(rowData)}
-                            textStyle={{ color: withdrawDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(78), fontFamily: fonts.Poppins }}
-                            onSelect={(idx, DropDownItem) => onSymbolSelect(DropDownItem)}
-                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={withdrawDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
-                        />
-                    
+
+                <TradeHeading title={AdvanceOptions ? "Symbol :" : "Commodity type :"} top={15} />
+                <ModalDropdown options={symbolData}
+                    ref={symbolDropDownRef}
+                    style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: withdrawDropdownShow ? 1 : 0 }]}
+                    dropdownStyle={[styles.dropDown_dropDownStyle1, { height: wp(40) }]}
+                    dropdownTextStyle={styles.dropDown_textStyle}
+                    onDropdownWillShow={() => setwithdrawDropdownShow(true)}
+                    onDropdownWillHide={() => setwithdrawDropdownShow(false)}
+                    renderRow={(rowData, rowID) => renderDropDownList1(rowData, rowID)}
+                    renderButtonText={(rowData) => renderButtonText1(rowData)}
+                    textStyle={{ color: withdrawDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(78), fontFamily: fonts.Poppins }}
+                    onSelect={(idx, DropDownItem) => onSymbolSelect(DropDownItem)}
+                    renderRightComponent={() => (<Fonticon type={"AntDesign"} name={withdrawDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
+                />
+
 
                 {AdvanceOptions &&
                     <>
@@ -601,8 +602,6 @@ const TradeScreen = (props) => {
                             renderRightComponent={() => (<Fonticon type={"AntDesign"} name={withdrawDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                         /> */}
 
-
-
                         <TradeHeading title={"Warehouse :"} top={15} />
                         <InputField value={wareHouseName} editable={false} height={60} />
 
@@ -610,42 +609,42 @@ const TradeScreen = (props) => {
                             <View style={{ flex: 1 }}>
                                 <TradeHeading title={"Harvest Year :"} top={15} />
 
-                                <InputField height={60}
+                                {/* <InputField height={60}
                                     value={HarvestYear}
                                     editable={false}
                                     keyboardType="number-pad"
-                                />
+                                /> */}
 
-                                {/* <ModalDropdown options={['2022', '2021', '2020', '2019', '2018']}
+                                <ModalDropdown options={['2022', '2021', '2020', '2019', '2018']}
                                     ref={harvestDropDownRef}
                                     style={styles.dropDown}
-                                    defaultValue={'Any'}
+                                    defaultValue={'2022'}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
                                     dropdownTextStyle={styles.dropDown_textStyle}
                                     textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
                                     onSelect={(idx, DropDownItem) => setHarvestYear(DropDownItem)}
                                     renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} style={styles.dropDownIcon} />)}
-                                /> */}
+                                />
                             </View>
 
                             <View style={{ marginLeft: 10, flex: 1 }}>
                                 <TradeHeading title={"Season :"} top={15} />
 
-                                <InputField height={60}
+                                {/* <InputField height={60}
                                     value={Season}
                                     keyboardType="number-pad"
-                                />
+                                /> */}
 
-                                {/* <ModalDropdown options={['1', '2', '3', '4']}
+                                <ModalDropdown options={['1', '2', '3', '4']}
                                     ref={seasonDropDownRef}
                                     style={styles.dropDown}
-                                    defaultValue={''}
+                                    defaultValue={'1'}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
                                     dropdownTextStyle={styles.dropDown_textStyle}
                                     textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
                                     onSelect={(idx, DropDownItem) => setSeason(DropDownItem)}
                                     renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} style={styles.dropDownIcon} />)}
-                                /> */}
+                                />
 
                             </View>
 
@@ -698,13 +697,16 @@ const TradeScreen = (props) => {
                     // onChangeText={text => setQuantity(text)}
                     />
                 }
+                {selectedBtn === "Buy" ? null :
+                    <View style={{ alignItems: "flex-end" }}>
+                        <TradeHeading title={"Available Quantity: " + MaxSellQuantity} />
+                    </View>}
 
                 {IsQuantityError ?
-                    <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{"Please Enter Valid Quantity"}</Text>
-                    :
-                    <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}> {""}</Text>
+                    <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{'Quantity must not exceed 2 decimal places.\n Second decimal place digit must be either "5" or "0"'}</Text>
+                    : 
+                    selectedBtn === "Buy" ? <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{""}</Text>: null
                 }
-
 
 
                 {AdvanceOptions &&
@@ -746,11 +748,11 @@ const TradeScreen = (props) => {
                     </>
                 }
                 {!AdvanceOptions ?
-                    <Pressable onPress={() => {setAdvanceOptions(true), ClearSymbolSelect()}}>
+                    <Pressable onPress={() => { setAdvanceOptions(true), ClearSymbolSelect() }}>
                         <ResponsiveText size="h8" fontFamily={fonts.Poppins_Light} textAlign={"center"} margin={[wp(10), 0, wp(10), 0]}>{"Advance Options"}</ResponsiveText>
                     </Pressable>
                     :
-                    <Pressable onPress={() => {setAdvanceOptions(false), ClearSymbolSelect()}}>
+                    <Pressable onPress={() => { setAdvanceOptions(false), ClearSymbolSelect() }}>
                         <ResponsiveText size="h8" fontFamily={fonts.Poppins_Light} textAlign={"center"} margin={[wp(10), 0, wp(10), 0]}>{"Basic Options"}</ResponsiveText>
                     </Pressable>
                 }
@@ -873,23 +875,27 @@ const TradeScreen = (props) => {
                 style={{ flex: 1, }}
                 animationType="slide"
                 transparent={true}
-                // visible={false}
+                // visible={true}
                 visible={orderCreated}
                 onRequestClose={() => { dispatch({ type: CREATE_ORDER, payload: false }) }}>
                 <Pressable onPress={() => dispatch({ type: CREATE_ORDER, payload: false })}
                     style={{ width: '100%', height: '100%', justifyContent: 'center', alignSelf: 'center', borderRadius: 15, backgroundColor: "rgba(240, 244, 244, 0.4)", }}>
                     <View style={[styles.boxWithShadow, styles.inputContainer]}>
-                        <Image source={iconPath.WithdrawSuccess} style={{ width: wp(87), height: wp(40), borderTopRightRadius: 20, borderTopLeftRadius: 20 }}></Image>
-
-                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, width: wp(87), paddingBottom: 15 }}>
-                            <ResponsiveText size="h5" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(5), 0, 0, 0]}>{"Sucessfully order submitted"}</ResponsiveText>
-                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(4), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your order request has been successfully submitted</Text>
-                            <View style={{ paddingHorizontal: wp(5), marginTop: wp(8) }}>
+                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderRadius: 20, width: wp(80) }}>
+                            <Fonticon type={"Entypo"} name={"cross"} size={wp(4)} color={Colors.black} style={{ alignSelf: "flex-end", margin: 5 }}
+                                onPress={() => dispatch({ type: CREATE_ORDER, payload: false })}
+                            />
+                            <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
+                            <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your order request has been successfully submitted</Text>
+                            <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
                                 <Button
                                     onPress={() => dispatch({ type: CREATE_ORDER, payload: false })}
-                                    Text={'Done'}
+                                    Text={'Okay'}
                                     fontFamily={fonts.Poppins_Medium}
                                     fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
                                 />
                             </View>
                         </View>

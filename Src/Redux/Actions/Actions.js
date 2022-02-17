@@ -90,9 +90,8 @@ export const _sendPushNotification = (url, params) => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        // alert(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -108,20 +107,17 @@ export const _getMarketData = (url, params) => {
     try {
         return async dispatch => {
             // dispatch({ type: MARKET_DATA_LOADING, payload: true });
-            // alert(JSON.stringify(params))
-
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     dispatch({ type: MARKET_DATA_LOADING, payload: false });
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response.data))
                         // console.log("ressssssssssssss ",JSON.stringify(response.data))
                         dispatch({
                             type: MARKET_DATA,
                             payload: response.data,
                         });
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {

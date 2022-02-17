@@ -15,6 +15,7 @@ import InputField from '../../Components/InputField';
 import { MARKET_DATA_LOADING } from '../../Redux/Constants'
 import { useSelector, useDispatch } from 'react-redux';
 import { _getMarketData, _getAllWatchList, _sendPushNotification } from '../../Redux/Actions/Actions';
+import ModalDropdown from 'react-native-modal-dropdown';
 
 import { firebase } from '@react-native-firebase/messaging';
 
@@ -156,7 +157,7 @@ const HomeScreen = (props) => {
     const getWatchlistMarkets = async () => {
         let data = {}
         data["token"] = userToken;
-        await dispatch(_getAllWatchList('get_watchlist', data))
+        dispatch(_getAllWatchList('get_watchlist', data))
     }
 
     const getFilteredData = async (filter, filter_Value) => {
@@ -175,7 +176,27 @@ const HomeScreen = (props) => {
         data["limit"] = 30;
         data["page"] = 1;
         // console.log(data)
-        await dispatch(_getMarketData('get_markets', data))
+         dispatch(_getMarketData('get_markets', data))
+        setCommodityValue('')
+    }
+
+    const getFilteredDataGrade = async (filter, filter_Value) => {
+        let data = {}
+        let data1 = {}
+
+
+        data1["searching"] = false;
+        data1["filtering"] = true;
+        data1["filter_type"] = filter;
+        data1["filter_value"] = filter_Value;
+        data["token"] = userToken;
+        data["search"] = data1;
+        data["filters"] = [];
+        data["limit"] = 30;
+        data["page"] = 1;
+        data["selling"] = 0;
+        // console.log(data)
+         dispatch(_getMarketData('get_markets', data))
         setCommodityValue('')
     }
 
@@ -195,10 +216,21 @@ const HomeScreen = (props) => {
     }
 
     const applyFilter = async (item) => {
-        await setFilterApply(item.title)
-        if (item.title !== "Commodity") {
+         setFilterApply(item.title)
+        // if (item.title !== "Commodity") {
+        //     setFilterModal(false)
+        //     getFilteredDataFilter(item.title)
+        // }
+        
+        
+        if (item?.title === "Grade") {
+            
+        } else if(item?.title === "Commodity"){
+            
+        }else{
             setFilterModal(false)
-            getFilteredDataFilter(item.title)
+            getFilteredData(item.title)
+
         }
     }
 
@@ -211,6 +243,13 @@ const HomeScreen = (props) => {
             setFilterModal(false)
             setFilterApply('')
         }
+
+        if (filterApply === "Grade") {
+            getFilteredDataGrade("Grade", GradeDropDownValue)
+            setFilterModal(false)
+            setFilterApply('')
+        }
+
     }
 
     const addIndexExpand = (index) => {
@@ -273,7 +312,6 @@ const HomeScreen = (props) => {
                 renderItem={({ item, index }) => (
 
                     <Pressable style={{ backgroundColor: "#CCCCCC33", padding: wp(4), paddingBottom: wp(2) }}>
-
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                             <View style={{ flexDirection: "row" }}>
                                 <Image source={{ uri: item.image_url }} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
@@ -285,7 +323,7 @@ const HomeScreen = (props) => {
                         {item?.tickers?.slice(0, expandedIndexes.includes(index) ? item?.tickers?.length : 2).map((cardData, indx) =>
                             <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData.id, marketID: item.id })}
                                 style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7, }}>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData.ticker}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData?.ticker}</ResponsiveText>
 
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                                     {cardData?.chartData[0]?.price !== undefined &&
@@ -356,7 +394,7 @@ const HomeScreen = (props) => {
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} padding={[0, 0, 0, wp(1)]}>{"Filters:"}</ResponsiveText>
                         <View style={{ marginTop: wp(5), paddingBottom: wp(6), }}>
                             <ScrollView horizontal>
-                                {FilterDate.map((item, index) =>
+                                {FilterDate?.map((item, index) =>
                                     <Pressable onPress={() => applyFilter(item)}
                                         style={{
                                             backgroundColor: filterApply === "Commodity" ? index === 1 ? "#fff" : "#CCCCCC" : "#CCCCCC", marginLeft: index === 0 ? wp(2) : wp(4), paddingVertical: wp(2), paddingHorizontal: wp(4), borderRadius: 7,
@@ -366,6 +404,38 @@ const HomeScreen = (props) => {
                                     </Pressable>
                                 )}
                             </ScrollView>
+
+
+                            {filterApply === "Grade" &&
+                                <>
+                                    <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
+                                        <ModalDropdown options={['1', '2']}
+                                            defaultValue={GradeDropDownValue}
+                                            style={[styles.dropDown, {}]}
+                                            dropdownStyle={styles.dropDown_dropDownStyle}
+                                            dropdownTextStyle={styles.dropDown_textStyle}
+                                            textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(75), fontFamily: fonts.Poppins, }}
+                                            onSelect={(idx, DropDownItem) => setGradeDropDownValue(DropDownItem)}
+                                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} />)}
+                                        />
+
+                                    </View>
+                                    <Pressable
+                                        onPress={() => applyFilterCom()}
+                                        style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
+                                        <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
+                                    </Pressable>
+                                </>
+                            }
+
+
+
+
+
+
+
+
+
                             {filterApply === "Commodity" &&
                                 <>
                                     <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>

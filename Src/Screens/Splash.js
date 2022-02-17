@@ -21,7 +21,7 @@ const Splash = () => {
         // alert(JSON.stringify(userToken))
         let data = {}
         data["token"] = userToken;
-        await dispatch(_checkLogin('check_login', data))
+         dispatch(_checkLogin('check_login', data))
 
     }
 

@@ -13,19 +13,6 @@ import Button from '../../Components/Button';
 import { useFocusEffect } from '@react-navigation/native';
 
 
-const DATA = [
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Pending" },
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Pending" },
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Pending" },
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Partial" },
-]
-const DATA1 = [
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Completed" },
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Completed" },
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Completed" },
-    { date: "28/10/21", ticker: "GWAYM6", type: "Market/sell", price: "2000", qty: "32", status: "Completed" },
-]
-
 import { useSelector, useDispatch } from 'react-redux';
 import { _getOrders, _getOrdersHistory } from '../../Redux/Actions/Actions';
 

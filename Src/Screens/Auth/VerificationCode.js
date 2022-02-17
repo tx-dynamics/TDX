@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
 
 import Fonticon from '../../Constants/FontIcon';
 import { wp } from '../../Helpers/Responsiveness';
@@ -51,7 +51,7 @@ export default function VerificationCode(props) {
                 .then(async (response) => {
                     setLoading(false)
                     if (response.action === "success") {
-                            props.navigation.navigate("SetupResetPassword", { Otpcode: otpValue })
+                        props.navigation.navigate("SetupResetPassword", { Otpcode: otpValue })
                     } else {
                         setApiError(true)
                         setApiErrorMsg(response.error)
@@ -104,9 +104,9 @@ export default function VerificationCode(props) {
                     :
                     <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}> {""}</Text>
                 }
-
-
-                <ResponsiveText size="h7" margin={[wp(22), 0, 0, 0]} fontFamily={fonts.Poppins_Medium} textAlign={"center"}>{"Resend Code?"}</ResponsiveText>
+                {/* <Pressable onPress={() => }> */}
+                    <ResponsiveText size="h7" margin={[wp(22), 0, 0, 0]} fontFamily={fonts.Poppins_Medium} textAlign={"center"}>{"Resend Code?"}</ResponsiveText>
+                {/* </Pressable> */}
 
                 <View style={{ width: wp(48), alignSelf: "center" }}>
                     <Button

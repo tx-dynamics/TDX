@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import {
     View, Text, StyleSheet, Image, StatusBar,
     Modal, FlatList, Pressable, Dimensions, Linking
@@ -14,7 +14,11 @@ import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
 import InputField from '../../Components/InputField';
+import moment from 'moment';
 import HTMLView from 'react-native-htmlview';
+import ViewMoreText from 'react-native-view-more-text';
+import HTML from 'react-native-render-html';
+import SeeMore from 'react-native-see-more-inline';
 
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -87,8 +91,11 @@ const AssetsDetails = (props) => {
     const [filterModal, setFilterModal] = useState(false)
     const [alertModal, setAlertModal] = useState(false)
     const [allWatchLists, setAllWatchLists] = useState([])
+    const [blogsPosts, setBlogsPosts] = useState([])
     const [isThisWatchList, setIsThisWatchList] = useState(false)
     const [alertPrice, setAlertPrice] = useState('')
+    const [seeMore, setSeeMore] = useState(false)
+    const [isLargeNumberLines, setIsLargeNumberLines] = useState(true)
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const tickerData = useSelector(state => state.HomeReducer.tickerData);
@@ -96,13 +103,23 @@ const AssetsDetails = (props) => {
     const WatchListMarkets = useSelector(state => state.HomeReducer.WatchListMarkets);
 
     useEffect(() => {
-        // console.log("Token::::: ", userToken)
-        // alert(JSON.stringify(props.route.params.tickerId))
-        // alert(JSON.stringify(props.route.params.marketID))
-        // alert(JSON.stringify(WatchListMarkets))
         getTickerData()
         getWatchlistMarkets()
     }, [])
+
+    useEffect(() => {
+
+        let payload = newsData.blogs?.map((item) => {
+            return {
+                ...item,
+                seeMore: false,
+                isLinesLarger: item?.description?.length > 121 ? true : false
+            }
+        })
+        setBlogsPosts(payload)
+        // alert(JSON.stringify(newsData.blogs[0].created_at))
+
+    }, [newsData])
 
     useEffect(() => {
         if (WatchListMarkets !== undefined) {
@@ -130,11 +147,11 @@ const AssetsDetails = (props) => {
         let data = {}
         data["token"] = userToken;
         data["id"] = props.route.params.tickerId;
-        await dispatch(_getTickerData('get_ticker', data))
+        dispatch(_getTickerData('get_ticker', data))
         let data1 = {}
         data1["token"] = userToken;
         data1["tickers"] = [props.route.params.tickerId];
-        await dispatch(_getNewsData('get_blogs', data1))
+        dispatch(_getNewsData('get_blogs', data1))
         // alert(JSON.stringify(tickerData))
     }
 
@@ -153,11 +170,12 @@ const AssetsDetails = (props) => {
     const AddToWashList = async () => {
         let data = {}
         data["token"] = userToken;
-        data["id"] = props.route.params.marketID;
+        data["id"] = props.route.params.tickerId;
+
         if (isThisWatchList) {
-            await dispatch(_addToWishList('remove_watchlist', data, userToken))
+            dispatch(_addToWishList('remove_watchlist', data, userToken))
         } else {
-            await dispatch(_addToWishList('add_watchlist', data, userToken))
+            dispatch(_addToWishList('add_watchlist', data, userToken))
         }
         setFilterModal(false)
     }
@@ -171,10 +189,34 @@ const AssetsDetails = (props) => {
             data["token"] = userToken;
             data["ticker_id"] = props.route.params.tickerId;
             data["price"] = alertPrice;
-            await dispatch(_addAlert('set_alert', data))
+            dispatch(_addAlert('set_alert', data))
             setAlertModal(false)
         }
     }
+
+
+    const showMoreClick = (indx, isShowMore) => {
+        // alert(JSON.stringify(isShowMore))
+        let payload = newsData.blogs?.map((item, index) => {
+            if (indx === index) {
+                return {
+                    ...item,
+                    seeMore: !isShowMore,
+                    isLinesLarger: item?.description?.length > 121 ? true : false
+                }
+            } else {
+                return {
+                    ...item,
+                    seeMore: false,
+                    isLinesLarger: item?.description?.length > 121 ? true : false
+                }
+
+            }
+        })
+        setBlogsPosts(payload)
+    };
+
+
 
     return (
         <View style={styles.container}>
@@ -250,19 +292,12 @@ const AssetsDetails = (props) => {
                         }
                     </View>
 
-                    <View style={{ paddingHorizontal: wp(4), marginTop: wp(-4), marginBottom: wp(6), flexDirection: "row", justifyContent: "space-between" }}>
-                        {/* {tickerData?.ticker?.chartData.map((item, index) =>
-                            <Pressable style={{}}>
-                                <ResponsiveText size="h9" margin={[0, 0, 0, 0]}>{item.date.split('T')[0].split('-')[2] + "/" + item.date.split('-')[1]}</ResponsiveText>
-                            </Pressable>
-                        )} */}
-                    </View>
 
                     <View style={{ paddingHorizontal: wp(4) }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {DayDATA.map((item, index) =>
                                 <Pressable style={{ marginLeft: index === 0 ? 0 : wp(4), backgroundColor: "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
-                                    <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{item.title}</ResponsiveText>
+                                    <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{item?.title}</ResponsiveText>
                                 </Pressable>
                             )}
                         </ScrollView>
@@ -334,28 +369,47 @@ const AssetsDetails = (props) => {
                         <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{tickerData?.ticker?.commudity?.grade_symbol}</ResponsiveText>
                     </View>
 
-                    <Pressable onPress={() => Linking.openURL('http://' + tickerData?.ticker?.contract_link)}
+                    <Pressable
+                        // onPress={() => setSeeMore(!seeMore)}
+                        onPress={() => Linking.openURL(tickerData?.ticker?.contract_link)}
                         style={{
                             backgroundColor: "#455154", paddingHorizontal: wp(5), paddingVertical: wp(2), alignSelf: "center",
                             borderRadius: 11, alignItems: "center"
                         }}>
-                        <ResponsiveText size="h7" textAlign={"center"} color={"#F3BA2F"} >{"View Soya Bean \n Contract"}</ResponsiveText>
+                        <ResponsiveText size="h7" textAlign={"center"} color={"#F3BA2F"} >{"View Contract"}</ResponsiveText>
                     </Pressable>
                 </View>
 
                 <ResponsiveText size="h7" margin={[wp(4), 0, 0, wp(4)]} fontFamily={fonts.Poppins_Medium}>{"News"}</ResponsiveText>
 
-                {newsData?.blogs?.map((item) =>
+                {/* seeMore: true, */}
+                {/* isLinesLarger: true */}
+                {blogsPosts?.map((item, index) =>
                     <View style={{
                         backgroundColor: Colors.TextInputBackgroundColor, marginTop: wp(2), marginHorizontal: wp(4), paddingHorizontal: wp(4),
-                        paddingVertical: wp(2), borderRadius: 16
+                        paddingVertical: wp(2), borderRadius: 16,
                     }}>
-                        <ResponsiveText size="h7" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_Medium}>{item.title}</ResponsiveText>
-                        {/* <ResponsiveText size="h9" margin={[-2, 0, 0, 0]} color={"#6B6B6B"}>{item.description}</ResponsiveText> */}
-                        <HTMLView
+                        <ResponsiveText size="h10" textAlign={"right"} margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins}>{moment(item?.created_at).format('DD MMM YYYY')}</ResponsiveText>
+                        <ResponsiveText size="h7" margin={[0, 0, 0, 0]} fontFamily={fonts.Poppins_Medium}>{item?.title}</ResponsiveText>
+                        {/* <HTMLView
                             value={item?.description}
                         // styles={{fontSize:19}}
-                        />
+                        /> */}
+                        <View style={{
+                            height: item?.seeMore ? undefined : wp(17),
+                            flexDirection: "row",
+                        }}>
+                            <Text
+                                numberOfLines={item?.seeMore ? undefined : 3}
+                                style={{ color: "#6B6B6B", fontFamily: fonts.Poppins }}>
+                                {item?.description?.slice(0, item?.seeMore ? item?.description.length : 121).replace(/<\/?[^>]+(>|$)/g, "")}
+                                <Text onPress={() => showMoreClick(index, item?.seeMore)} style={{ color: "blue" }}>{item?.isLinesLarger ? item?.seeMore ? " See less" : " See more..." : ""} </Text>
+                                {/* {isLargeNumberLines ? " Yes Show more" : ""} */}
+                            </Text>
+
+
+                        </View>
+
 
 
                     </View>

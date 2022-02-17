@@ -64,7 +64,7 @@ const Account = (props) => {
     const getAllAlerts = async () => {
         let data = {}
         data["token"] = userToken;
-        await dispatch(_getLatestAlerts('get_latest_alerts', data))
+        dispatch(_getLatestAlerts('get_latest_alerts', data))
     }
 
     const Navigatee = (id) => {

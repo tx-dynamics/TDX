@@ -184,7 +184,7 @@ const Withdraw = (props) => {
             // alert(JSON.stringify(data))
         }
     }
-    
+
     const CashWithdraw = async () => {
 
         if (amount === '') {
@@ -313,19 +313,22 @@ const Withdraw = (props) => {
                             renderRightComponent={() => (<Fonticon type={"AntDesign"} name={TickerDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                         />
 
-                        <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Enter Quantity :"}</ResponsiveText>
+                        <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Enter Quantity (MT):"}</ResponsiveText>
                         <InputField
                             height={60}
                             value={quantity}
                             onChangeText={text => setQuantityFunSell(text)}
                         />
+
+                        <View style={{ alignItems: "flex-end" }}>
+                            <ResponsiveText size="h8" color={"#616161"} margin={[5, 0, 0, 0]}>{"Available Quantity: " + MaxSellQuantity}</ResponsiveText>
+                        </View>
                         {IsQuantityError ?
-                            <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{"Please Enter Valid Quantity"}</Text>
-                            :
-                            <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}> {""}</Text>
+                            <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{"Insufficent Stock Balance"}</Text>
+                            :null
                         }
 
-                        <ResponsiveText size="h8" color={"#616161"} margin={[15, 0, 5, 0]}>{"Choose Date of Withdrawl"}</ResponsiveText>
+                        <ResponsiveText size="h8" color={"#616161"} margin={[5, 0, 5, 0]}>{"Choose Date of Withdrawal"}</ResponsiveText>
                         <Pressable onPress={() => setDateModal(true)}>
                             <InputField
                                 height={60}

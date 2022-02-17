@@ -39,7 +39,7 @@ const ForgetPassword = (props) => {
                 .then(async (response) => {
                     setLoading(false)
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response.otp))
+                        // alert(JSON.stringify(response))
                         props.navigation.navigate("VerificationCode", { fromScreen: "forget" })
                         setEmailAdd('')
                     } else {
