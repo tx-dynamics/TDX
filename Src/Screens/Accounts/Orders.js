@@ -31,12 +31,10 @@ const Orders = (props) => {
     const Order_List_History = useSelector(state => state.HomeReducer.Order_List_History);
     const Order_Loading = useSelector(state => state.HomeReducer.Order_Loading);
     const userToken = useSelector(state => state.AuthReducer.userToken);
+    const current_currency_rate = useSelector(state => state.HomeReducer.current_currency_rate);
 
     useEffect(() => {
         console.log(userToken)
-        // alert(JSON.stringify(Order_List_History))
-        // getTickerData("open")
-        // getTickerDataHistory("history")
     }, [])
 
     useFocusEffect(
@@ -161,7 +159,7 @@ const Orders = (props) => {
                                 <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.type}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center" }}>
-                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.price}</ResponsiveText>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{(item?.price * current_currency_rate).toFixed(1)}</ResponsiveText>
                             </View>
                             <View style={{ flex: 1, justifyContent: "center" }}>
                                 <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.qty}</ResponsiveText>

@@ -21,11 +21,7 @@ import HTML from 'react-native-render-html';
 import SeeMore from 'react-native-see-more-inline';
 
 import { useSelector, useDispatch } from 'react-redux';
-import {
-    _getTickerData, _getNewsData, _addToWishList,
-    _getAllWatchList, _addAlert, _getGraphData
-} from '../../Redux/Actions/Actions';
-import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
+import { _getTickerData, _getNewsData, _addToWishList, _getAllWatchList, _addAlert, _getGraphData } from '../../Redux/Actions/Actions';
 import { ADD_ALERT_ORDER } from '../../Redux/Constants';
 
 const DayDATA = [
@@ -37,14 +33,7 @@ const DayDATA = [
     { id: "6", title: "1 Y" },
     { id: "7", title: "All" },
 ]
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
-} from "react-native-chart-kit";
+import { LineChart } from "react-native-chart-kit";
 import Toast, { DURATION } from 'react-native-easy-toast'
 
 
@@ -193,12 +182,12 @@ const AssetsDetails = (props) => {
     const changeDataset = (item) => {
         if (item?.id !== "1") {
             setselectedId(item?.id)
-        } 
-            let data = {}
-            data["token"] = userToken;
-            data["id"] = props?.route?.params?.tickerId;
-            data["days"] = item?.id === "2" ? 1 :item?.id === "3"?  5 : item?.id === "4"? 15 : item?.id === "5"? 30 : item?.id === "6"? 61 : item?.id === "7 "? 365 : 1;
-            dispatch(_getGraphData('get_chart', data))       
+        }
+        let data = {}
+        data["token"] = userToken;
+        data["id"] = props?.route?.params?.tickerId;
+        data["days"] = item?.id === "2" ? 1 : item?.id === "3" ? 5 : item?.id === "4" ? 15 : item?.id === "5" ? 30 : item?.id === "6" ? 61 : item?.id === "7 " ? 365 : 1;
+        dispatch(_getGraphData('get_chart', data))
     }
 
 
@@ -227,14 +216,14 @@ const AssetsDetails = (props) => {
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 5]}>{tickerData?.ticker?.ticker}</ResponsiveText>
                         <View style={{ alignItems: "flex-end" }}>
                             <View style={{ flexDirection: "row" }}>
-                                <ResponsiveText size="h8" color={"#000"}>{userInfo?.currency_iso+"  "}</ResponsiveText>
+                                <ResponsiveText size="h8" color={"#000"}>{userInfo?.currency_iso + "  "}</ResponsiveText>
                                 <ResponsiveText size="h8" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(tickerData?.ticker?.price * current_currency_rate).toFixed(1)}</ResponsiveText>
                             </View>
                             <ResponsiveText size="h9" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{tickerData?.ticker?.trend + " %"}</ResponsiveText>
                         </View>
                     </View>
 
-                    <View style={{ width: "100%", alignItems: "center", marginTop: wp(5) }}>
+                    <View style={{ width: "100%", alignItems: "center", marginTop: wp(5), }}>
 
                         {dataSetArray?.length > 0 &&
                             <LineChart
@@ -254,9 +243,9 @@ const AssetsDetails = (props) => {
                                         }
                                     ]
                                 }}
-                                width={Dimensions.get("window").width } // from react-native
+                                width={Dimensions.get("window").width - 7} // from react-native
                                 height={160}
-                                yAxisLabel={userInfo?.currency_iso}
+                                yAxisLabel={userInfo?.currency}
                                 // yAxisSuffix="k"
                                 // yAxisInterval={1} // optional, defaults to 1
                                 chartConfig={{
@@ -272,7 +261,8 @@ const AssetsDetails = (props) => {
                                 bezier
                                 style={{
                                     marginVertical: 8,
-                                    transform: [{ translateX: 10 }]
+                                    // backgroundColor:"green",
+                                    transform: [{ translateX: 3 }]
                                 }}
                             />
                         }
@@ -284,7 +274,7 @@ const AssetsDetails = (props) => {
                             {DayDATA.map((item, index) =>
                                 <Pressable onPress={() => changeDataset(item)}
                                     style={{ marginLeft: index === 0 ? 0 : wp(4), backgroundColor: selectedId === item?.id ? Colors.greenColor : "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
-                                    <ResponsiveText color={selectedId === item?.id ? "#fff": "#000"} size="h8" margin={[0, 0, 0, 0]}>{item?.title}</ResponsiveText>
+                                    <ResponsiveText color={selectedId === item?.id ? "#fff" : "#000"} size="h8" margin={[0, 0, 0, 0]}>{item?.title}</ResponsiveText>
                                 </Pressable>
                             )}
                         </ScrollView>

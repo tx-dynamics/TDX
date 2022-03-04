@@ -14,14 +14,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { _getMarketData } from '../../Redux/Actions/Actions';
 import { _axiosPostAPI } from '../../Apis/Apis';
-
-const DATA = [
-    { id: "1", title: "Maize" },
-    { id: "2", title: "Soya Bean" },
-    { id: "3", title: "Sorghum" },
-    { id: "4", title: "Sesame" },
-    { id: "5", title: "Rice" },
-]
+import Toast from 'react-native-toast-message';
 
 const SearchScreen = (props) => {
 
@@ -57,6 +50,8 @@ const SearchScreen = (props) => {
                             // alert(JSON.stringify(response.data.markets.length))
                             if (response?.data?.markets?.length > 0) {
                                 props.navigation.navigate("SearchDetails", {allData: response?.data?.markets})
+                            }else {
+                                Toast.show({ type: "message", position: "bottom", props: { body: "No Result Found" } })
                             }
                         } else {
                             console.log(JSON.stringify(response.error))
@@ -94,7 +89,7 @@ const SearchScreen = (props) => {
 
                 {marketData?.markets?.map((item) =>
                     <Pressable
-                        onPress={() => props.navigation.navigate("SearchNextScreen")}
+                        onPress={() => props.navigation.navigate("SearchNextScreen", {SelectedMarket: item})}
                         style={{ flexDirection: "row", marginTop: wp(10) }}>
                         <Image source={{uri: item?.image_url}} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
                         <ResponsiveText size="h6" margin={[0, 0, 0, 10]} fontFamily={fonts.Poppins_Medium}>{item?.title}</ResponsiveText>

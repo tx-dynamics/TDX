@@ -25,13 +25,14 @@ export default function DepositeAndWithdraw(props) {
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const TransationHistory = useSelector(state => state.HomeReducer.TransationHistory);
     const Transaction_Loading = useSelector(state => state.HomeReducer.Transaction_Loading);
+    const current_currency_rate = useSelector(state => state.HomeReducer.current_currency_rate);
+    const userInfo = useSelector(state => state.AuthReducer.userInfo);
 
     useEffect(() => {
         GetHistory()
     }, [])
     useEffect(() => {
         seperateTransaction()
-        // alert(JSON.stringify(TransationHistory))
     }, [TransationHistory])
 
     const seperateTransaction = async () => {
@@ -46,15 +47,11 @@ export default function DepositeAndWithdraw(props) {
         })
         setDepositHistory(deposite)
         setWithdrawHistory(withdraw)
-        // console.log(userToken)
-        // alert(JSON.stringify(withdraw[3])) 
     }
 
     const GetHistory = async () => {
         let data = {}
         data["token"] = userToken;
-        // data["page"] = 1;
-        // data["limit"] = 10;
         dispatch(_getDepositeWithdraw('get_transactions', data))
     }
 
@@ -99,12 +96,16 @@ export default function DepositeAndWithdraw(props) {
                         {/* 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : */}
                         <View style={styles.notification}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{selectedBtn === "Deposit" ? item?.type : item.type + " " + item.withdraw_type + " " + item.ticker}</ResponsiveText>
+                                {selectedBtn === "Deposit" ?
+                                    <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item?.type}</ResponsiveText>
+                                    :
+                                    <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item.type === "Bank Account"? item.type  + " " + item.withdraw_type: item.withdraw_type + " " + item.ticker}</ResponsiveText>
+                                }
                                 <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#F4BB32" : item?.status === 1 ? "#019146" : item?.status === 2 && "#DB1222"} textAlign={"center"}>{item?.status_text}</ResponsiveText>
                             </View>
                             <View style={{ flexDirection: "row", marginTop: wp(2) }}>
-                                <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{item?.withdraw_type === "Commodity" ? "Quantity (MT):" : "Amount (GH¢):"}</ResponsiveText>
-                                <ResponsiveText size="h8" margin={[10, 0, 0, 8]}>{item?.amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</ResponsiveText>
+                                <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{item?.withdraw_type === "Commodity" ? "Quantity (MT):" : `${"Amount ("}${userInfo?.currency_iso}${"):"}`}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[10, 0, 0, 8]}>{(item?.amount * current_currency_rate).toFixed(1)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</ResponsiveText>
                             </View>
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>

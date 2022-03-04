@@ -24,6 +24,7 @@ const AssetsScreen = (props) => {
     const [totalStock, setTotalStock] = useState('')
     const [totalValue, setTotalValue] = useState('')
     const [totalQuantity, setTotalQuantity] = useState('')
+    const [totalAllQuantity, setTotalAllQuantity] = useState('')
     const [totalPrice, setTotalPrice] = useState('')
     const [AlertsState, setAlertsState] = useState([])
     const [TickersState, setTickersState] = useState([])
@@ -116,6 +117,7 @@ const AssetsScreen = (props) => {
         let totalQuantity = []
         let totalPrice = []
         let totalPriceAll = 0
+        let totalAllQuantity = 0
 
         newArray.map((item, index) => {
             let PriceCount = 0
@@ -124,12 +126,15 @@ const AssetsScreen = (props) => {
                 PriceCount = PriceCount + (parseFloat(itemm?.price) * parseFloat(itemm?.my_stocks?.qty))
                 totalPriceAll = totalPriceAll + PriceCount
                 QtyCount = QtyCount + parseFloat(itemm?.my_stocks?.qty)
+                totalAllQuantity = totalAllQuantity + QtyCount
             })
 
             totalPrice.push(PriceCount)
             totalQuantity.push(QtyCount)
         })
 
+        // alert(JSON.stringify(totalAllQuantity))
+        setTotalAllQuantity(totalAllQuantity)
         setTotalQuantity(totalQuantity)
         setTotalPrice(totalPrice)
         setTotalValue(totalPriceAll)
@@ -188,14 +193,13 @@ const AssetsScreen = (props) => {
                 </View>
             </View>
 
-
             <View style={styles.totalStock}>
                 <ResponsiveText size="h7" color={"#000"}>{"Total Stock"}</ResponsiveText>
 
                 <View style={{ flexDirection: "row" }}>
                     <View style={{ alignItems: "center" }}>
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{"Quantity (MT)"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{totalStock}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{totalAllQuantity}</ResponsiveText>
                     </View>
                     <View style={{ alignItems: "center", marginLeft: wp(5) }}>
                         <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{userInfo?.currency_iso+" Value"}</ResponsiveText>
@@ -260,7 +264,7 @@ const AssetsScreen = (props) => {
                                         </View>
                                     </View>
                                     <View style={{ flex: .25, alignItems: "flex-end" }}>
-                                        <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{parseFloat(itemm?.price * current_currency_rate) * parseFloat(itemm?.my_stocks?.qty)}</ResponsiveText>
+                                        <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{(parseFloat(itemm?.price * current_currency_rate) * parseFloat(itemm?.my_stocks?.qty)).toFixed(1)}</ResponsiveText>
                                     </View>
                                 </Pressable>
                             )}

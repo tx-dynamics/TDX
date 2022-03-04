@@ -92,7 +92,7 @@ const Alerts = (props) => {
     const getAllAlerts = async () => {
         let data = {}
         data["token"] = userToken;
-         dispatch(_getAlerts('get_alerts', data))
+         dispatch(_getAlerts('get_latest_alerts', data))
     }
     const removeAlert = async (alertId) => {
         let data = {}

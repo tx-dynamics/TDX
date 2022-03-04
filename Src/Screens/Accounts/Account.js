@@ -10,8 +10,8 @@ import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
 
 import { useSelector, useDispatch } from 'react-redux';
-
 import { _getLatestAlerts } from '../../Redux/Actions/Actions';
+import { useFocusEffect } from '@react-navigation/native';
 
 const DATA = [
     {
@@ -51,20 +51,16 @@ const Account = (props) => {
     const userInfo = useSelector(state => state.AuthReducer.userInfo);
     const AlertsCount = useSelector(state => state.HomeReducer.AlertsCount);
 
-    useEffect(() => {
-        getAllAlerts()
-        // alert(JSON.stringify(AlertsCount))
-    }, [])
-
-    useEffect(() => {
-        // alert(JSON.stringify(userInfo.id))
-    }, [])
-
+    useFocusEffect(
+        React.useCallback(() => {
+            getAllAlerts()
+        }, [])
+    );
 
     const getAllAlerts = async () => {
         let data = {}
         data["token"] = userToken;
-        dispatch(_getLatestAlerts('get_latest_alerts', data))
+        dispatch(_getLatestAlerts('get_alerts_unread_count', data))
     }
 
     const Navigatee = (id) => {
@@ -79,7 +75,6 @@ const Account = (props) => {
         }
     }
 
-
     return (
         <View style={styles.container}>
             <Header left LeftImage ImageName={iconPath.drawerIcon}
@@ -89,7 +84,7 @@ const Account = (props) => {
             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: 13, alignItems: "center" }}>
                 <View>
                     <ResponsiveText size="h4" fontFamily={fonts.Poppins_SemiBold} >{userInfo?.name}</ResponsiveText>
-                    <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: "+userInfo?.id}</ResponsiveText>
+                    <ResponsiveText size="h8" margin={[-8, 0, 0, 0]} >{"ID: " + userInfo?.id}</ResponsiveText>
                 </View>
                 <Pressable onPress={() => props.navigation.navigate("SettingScreen")}>
                     {/* <Pressable onPress={() => alert("jhhhjj")}> */}
@@ -115,10 +110,11 @@ const Account = (props) => {
                             <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item.title}</ResponsiveText>
                         </View>
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            {item.unread &&
-                                <View style={{ backgroundColor: "#DB1222", justifyContent: "center", paddingHorizontal: 6, borderRadius: 25, paddingVertical: 5 }}>
-                                    <ResponsiveText size="h10" color={"#fff"} margin={[-5, 0, -5, 0]}>{AlertsCount}</ResponsiveText>
-                                </View>}
+                            {AlertsCount === 1 ?
+                                item.unread &&
+                                <View style={{ backgroundColor: "#DB1222", justifyContent: "center", paddingHorizontal: 6, borderRadius: 25, paddingVertical: 4 }}>
+                                    <ResponsiveText size="h10" color={"#fff"} margin={[-5, 0, -5, 0]}>{""}</ResponsiveText>
+                                </View> : null}
                             <Fonticon type={"MaterialIcons"} name={"navigate-next"} size={wp(7)} color={Colors.black} />
                         </View>
 

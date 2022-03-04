@@ -463,7 +463,7 @@ export const _getLatestAlerts = (url, params) => {
                     if (response.action === "success") {
                         dispatch({
                             type: LATEST_ALERTS,
-                            payload: response?.data?.alerts?.length,
+                            payload: response?.data?.count,
                         });
                     } else {
                         console.log(JSON.stringify(response.error))
