@@ -15,17 +15,40 @@ import { fonts } from '../../Constants/Fonts';
 import Button from '../../Components/Button';
 import { Calendar, CalendarList, Agenda, LocaleConfig } from 'react-native-calendars';
 import DatePicker from 'react-native-date-picker'
+import moment from 'moment';
+
+import { useSelector, useDispatch } from 'react-redux';
+import { _callRequest } from '../../Redux/Actions/Actions';
+import { CREATE_CALL_REQ } from '../../Redux/Constants';
+
 
 const RequestACall = (props) => {
 
+    const dispatch = useDispatch();
+
     const [DateModal, setDateModal] = useState(false)
     const [timeModal, setTimeModal] = useState(false)
+    const [EndtimeModal, setEndtimeModal] = useState(false)
     const [selectedDate, setSelectedDate] = useState('')
     const [minDate, setMinDate] = useState('')
     const [callDate, setCallDate] = useState('')
     const [time, setTime] = useState(new Date())
     const [minTime, setMinTime] = useState('')
+    const [startTime, setStartTime] = useState('10:00 AM')
+    const [endTime, setEndTime] = useState('04:00 PM')
+
+    const [sHour, setSHour] = useState('10')
+    const [sMin, setSMin] = useState('00')
+    const [sAM_PM, setSAM_PM] = useState('AM')
+
+    const [eHour, setEHour] = useState('04')
+    const [eMin, setEMin] = useState('00')
+    const [eAM_PM, setEAM_PM] = useState('AM')
     // state = { date: new Date() }
+
+    const userToken = useSelector(state => state.AuthReducer.userToken);
+    const callReqCreated = useSelector(state => state.HomeReducer.callReqCreated);
+
 
     useEffect(() => {
         var tomorrow = new Date();
@@ -56,10 +79,21 @@ const RequestACall = (props) => {
         // alert(JSON.stringify(day))
         setSelectedDate({ [day.dateString]: { selected: true, selectedColor: "#000" } })
         setDateModal(false)
-        await setCallDate(day.dateString)
+        setCallDate(day.dateString)
     }
     const setCallDatee = () => {
         // setCallDate()
+    }
+
+    const  onRequestSubmit = () =>{
+        let data = {}
+        data["token"] = userToken;
+        data["time_from"] = startTime;
+        data["time_to"] = endTime;
+        data["date"] = callDate;
+
+        // alert(JSON.stringify(data))
+        dispatch(_callRequest('request_call', data))
     }
 
     const checkDay = (value) => value.split(" ")[1] === 'Saturday' || value.split(" ")[1] === 'Sunday'
@@ -90,18 +124,18 @@ const RequestACall = (props) => {
                         style={{ flexDirection: "row", alignItems: "center" }}>
 
                         <View style={{ backgroundColor: "#EEEEEE", width: wp(12), height: wp(11), borderRadius: 4, justifyContent: "center", alignItems: "center" }}>
-                            <ResponsiveText size="h8" >{"10"}</ResponsiveText>
+                            <ResponsiveText size="h8" >{sHour}</ResponsiveText>
                         </View>
                         <ResponsiveText size="h5" margin={[0, wp(3), 0, wp(3)]} textAlign={"center"} >{":"}</ResponsiveText>
                         <View style={{ backgroundColor: "#EEEEEE", width: wp(12), height: wp(11), borderRadius: 4, justifyContent: "center", alignItems: "center" }}>
-                            <ResponsiveText size="h8" >{"00"}</ResponsiveText>
+                            <ResponsiveText size="h8" >{sMin}</ResponsiveText>
                         </View>
 
                         <View style={{
                             backgroundColor: "#EEEEEE", width: wp(12), height: wp(11), borderRadius: 4,
                             justifyContent: "center", alignItems: "center", marginLeft: wp(12)
                         }}>
-                            <ResponsiveText size="h8" >{"AM"}</ResponsiveText>
+                            <ResponsiveText size="h8" >{sAM_PM}</ResponsiveText>
                         </View>
                     </Pressable>
 
@@ -116,12 +150,15 @@ const RequestACall = (props) => {
                         format="HH:mm"
                         minDate={minTime}
                         maxDate="19:30"
-                        textColor={"#fff"}
+                        textColor={"#000"}
                         style={{ color: "#fff" }}
                         onConfirm={(date) => {
                             setTimeModal(false)
                             setTime(date)
-                            alert(time)
+                            setStartTime(moment(date).format('hh:mm a'))
+                            setSHour(moment(date).format('hh'))
+                            setSMin(moment(date).format('mm'))
+                            setSAM_PM(moment(date).format('a'))
                         }}
                         onCancel={() => {
                             setTimeModal(false)
@@ -134,25 +171,53 @@ const RequestACall = (props) => {
                 <ResponsiveText size="h8" margin={[wp(6), 0, wp(6), 0]} >{"To"}</ResponsiveText>
 
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Pressable onPress={() => setEndtimeModal(true)}
+                        style={{ flexDirection: "row", alignItems: "center" }}>
 
                         <View style={{ backgroundColor: "#EEEEEE", width: wp(12), height: wp(11), borderRadius: 4, justifyContent: "center", alignItems: "center" }}>
-                            <ResponsiveText size="h8" >{"05"}</ResponsiveText>
+                            <ResponsiveText size="h8" >{eHour}</ResponsiveText>
                         </View>
                         <ResponsiveText size="h5" margin={[0, wp(3), 0, wp(3)]} textAlign={"center"} >{":"}</ResponsiveText>
                         <View style={{ backgroundColor: "#EEEEEE", width: wp(12), height: wp(11), borderRadius: 4, justifyContent: "center", alignItems: "center" }}>
-                            <ResponsiveText size="h8" >{"00"}</ResponsiveText>
+                            <ResponsiveText size="h8" >{eMin}</ResponsiveText>
                         </View>
 
                         <View style={{
                             backgroundColor: "#EEEEEE", width: wp(12), height: wp(11), borderRadius: 4,
                             justifyContent: "center", alignItems: "center", marginLeft: wp(12)
                         }}>
-                            <ResponsiveText size="h8" >{"PM"}</ResponsiveText>
+                            <ResponsiveText size="h8" >{eAM_PM}</ResponsiveText>
                         </View>
                     </Pressable>
 
                     <Image source={iconPath.timeIcon} style={{ width: wp(6), height: wp(6), resizeMode: "contain" }} />
+
+
+                    <DatePicker
+                        modal
+                        open={EndtimeModal}
+                        date={time}
+                        onDateChange={date => setTime(date)}
+                        mode={'time'}
+                        format="HH:mm"
+                        minDate={minTime}
+                        maxDate="19:30"
+                        textColor={"#000"}
+                        style={{ color: "#fff" }}
+                        onConfirm={(date) => {
+                            setEndtimeModal(false)
+                            setTime(date)
+                            setEndTime(moment(date).format('hh:mm a'))
+                            setEHour(moment(date).format('hh'))
+                            setEMin(moment(date).format('mm'))
+                            setEAM_PM(moment(date).format('a'))
+                        }}
+                        onCancel={() => {
+                            setEndtimeModal(false)
+                        }}
+                    />
+
+
 
                 </View>
 
@@ -161,6 +226,7 @@ const RequestACall = (props) => {
 
                     <View style={{ width: "38%", alignSelf: "center" }}>
                         <Button
+                            onPress={() => onRequestSubmit()}
                             Text={'Request'}
                             fontFamily={fonts.Poppins_Medium}
                             fontSize={16}
@@ -179,6 +245,39 @@ const RequestACall = (props) => {
 
             </View>
 
+            <Modal
+                style={{ flex: 1, }}
+                animationType="slide"
+                transparent={true}
+                // visible={true}
+                visible={callReqCreated}
+                onRequestClose={() => { dispatch({ type: CREATE_CALL_REQ, payload: false }) }}>
+                <Pressable onPress={() => dispatch({ type: CREATE_CALL_REQ, payload: false })}
+                    style={{ width: '100%', height: '100%', justifyContent: 'center', alignSelf: 'center', borderRadius: 15, backgroundColor: "rgba(240, 244, 244, 0.4)", }}>
+                    <View style={[styles.boxWithShadow, styles.inputContainer]}>
+                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderRadius: 20, width: wp(80) }}>
+                            <Fonticon type={"Entypo"} name={"cross"} size={wp(4)} color={Colors.black} style={{ alignSelf: "flex-end", margin: 5 }}
+                                onPress={() => dispatch({ type: CREATE_CALL_REQ, payload: false })}
+                            />
+                            <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
+                            <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your order request has been successfully submitted</Text>
+                            <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
+                                <Button
+                                    onPress={() => dispatch({ type: CREATE_CALL_REQ, payload: false })}
+                                    Text={'Okay'}
+                                    fontFamily={fonts.Poppins_Medium}
+                                    fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
+                                />
+                            </View>
+                        </View>
+
+                    </View>
+                </Pressable>
+
+            </Modal>
 
 
 
@@ -275,6 +374,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-around',
         // paddingVertical:wp(6)
-    }
+    },
+    inputContainer: {
+        alignSelf: 'center',
+        borderRadius: 18,
+    },
+    boxWithShadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: "#fff"
+    },
 })
 

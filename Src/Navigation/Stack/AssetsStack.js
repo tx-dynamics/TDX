@@ -9,6 +9,7 @@ import Deposite from '../../Screens/AssetScreens/Deposite'
 import Withdraw from '../../Screens/AssetScreens/Withdraw'
 import AssetsDetailss from '../../Screens/AssetScreens/AssetsDetailss'
 import TradeScreenn from '../../Screens/AssetScreens/TradeScreenn'
+import AssetsDetails from '../../Screens/Home/AssetsDetails'
 
 const Stack = createNativeStackNavigator();
 
@@ -16,13 +17,14 @@ function AssetsStack(props) {
 
     return (
         <>
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="AssetsScreen" component={AssetsScreen} />
-                    <Stack.Screen name="Deposite" component={Deposite} />
-                    <Stack.Screen name="Withdraw" component={Withdraw} />
-                    <Stack.Screen name="AssetsDetailss" component={AssetsDetailss} />
-                    <Stack.Screen name="TradeScreenn" component={TradeScreenn} />
-                </Stack.Navigator>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="AssetsScreen" component={AssetsScreen} />
+                <Stack.Screen name="AssetsDetails" component={AssetsDetails} />
+                <Stack.Screen name="Deposite" component={Deposite} />
+                <Stack.Screen name="Withdraw" component={Withdraw} />
+                <Stack.Screen name="AssetsDetailss" component={AssetsDetailss} />
+                <Stack.Screen name="TradeScreenn" component={TradeScreenn} />
+            </Stack.Navigator>
 
         </>
     );

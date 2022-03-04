@@ -7,6 +7,8 @@ import {
     MARKET_LIST,
     GET_SINGLE_MARKET,
     CREATE_ORDER,
+    DEPOSITE_WITHDRAW_ORDER,
+    ADD_ALERT_ORDER,
     CREATE_ORDER_LOADING,
     GET_ORDER,
     MARKET_NEWS,
@@ -20,10 +22,20 @@ import {
     DEPOSITE_MSG,
     LATEST_ALERTS,
     NOTIFICATION_LOADING,
-    DEPOSITEWITHDRAW
+    DEPOSITEWITHDRAW,
+    CURRENCY_FACTOR,
+    CURRENT_CURRENCY_FACTOR,
+    TICKER_GRAPH_DATA,
+    CREATE_CALL_REQ,
+    ASSETS_DATA_LOADING,
+    ORDER_DATA_LOADING,
+    TRANSACTION_DATA_LOADING
 } from '../Constants'
 const initialState = {
     Market_Loading: false,
+    Assets_Loading: false,
+    Order_Loading: false,
+    Transaction_Loading: false,
     Ticker_Loading: false,
     marketData: [],
     tickerData: [],
@@ -31,6 +43,9 @@ const initialState = {
     marketList: [],
     singleMarketData: [],
     orderCreated: false,
+    callReqCreated: false,
+    Deposite_Withdraw_Created: false,
+    add_Alert_Created: false,
     OrderLoading: false,
     Order_List: [],
     Order_List_History: [],
@@ -44,7 +59,10 @@ const initialState = {
     Deposite_Msg:'',
     AlertsCount:'',
     Notification_Loading:false,
-    TransationHistory:[]
+    TransationHistory:[],
+    currencyRate:[],
+    current_currency_rate:"",
+    graphDataSet:[],
 };
 
 const HomeReducer = (state = initialState, action) => {
@@ -59,6 +77,21 @@ const HomeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 Market_Loading: payload,
+            }
+        case ASSETS_DATA_LOADING:
+            return {
+                ...state,
+                Assets_Loading: payload,
+            }
+        case ORDER_DATA_LOADING:
+            return {
+                ...state,
+                Order_Loading: payload,
+            }
+        case TRANSACTION_DATA_LOADING:
+            return {
+                ...state,
+                Transaction_Loading: payload,
             }
         case TICKER_DATA:
             return {
@@ -89,6 +122,21 @@ const HomeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 orderCreated: payload,
+            }
+        case CREATE_CALL_REQ:
+            return {
+                ...state,
+                callReqCreated: payload,
+            }
+        case DEPOSITE_WITHDRAW_ORDER:
+            return {
+                ...state,
+                Deposite_Withdraw_Created: payload,
+            }
+        case ADD_ALERT_ORDER:
+            return {
+                ...state,
+                add_Alert_Created: payload,
             }
         case CREATE_ORDER_LOADING:
             return {
@@ -159,6 +207,21 @@ const HomeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 TransationHistory: payload,
+            }
+        case CURRENCY_FACTOR:
+            return {
+                ...state,
+                currencyRate: payload,
+            }
+        case CURRENT_CURRENCY_FACTOR:
+            return {
+                ...state,
+                current_currency_rate: payload,
+            }
+        case TICKER_GRAPH_DATA:
+            return {
+                ...state,
+                graphDataSet: payload,
             }
         default:
             return state;

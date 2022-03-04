@@ -9,6 +9,7 @@ import {
     GET_SINGLE_MARKET,
     CREATE_ORDER,
     CREATE_ORDER_LOADING,
+    DEPOSITE_WITHDRAW_ORDER,
     GET_ORDER,
     GET_ORDER_HISTORY,
     MARKET_NEWS,
@@ -21,7 +22,14 @@ import {
     DEPOSITE_MSG,
     LATEST_ALERTS,
     NOTIFICATION_LOADING,
-    DEPOSITEWITHDRAW
+    DEPOSITEWITHDRAW,
+    ADD_ALERT_ORDER,
+    CURRENCY_FACTOR,
+    TICKER_GRAPH_DATA,
+    CREATE_CALL_REQ,
+    ASSETS_DATA_LOADING,
+    ORDER_DATA_LOADING,
+    TRANSACTION_DATA_LOADING
 } from '../Constants'
 
 import { _axiosPostAPI } from '../../Apis/Apis';
@@ -38,7 +46,6 @@ export const _checkLogin = (url, params) => {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
-                    // alert(JSON.stringify(response))
                     if (response.action === "success") {
                     } else {
                         let data = {}
@@ -64,13 +71,12 @@ export const _getSingleMarketData = (url, params) => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response.data))
                         dispatch({
                             type: GET_SINGLE_MARKET,
                             payload: response.data,
                         });
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -91,7 +97,6 @@ export const _sendPushNotification = (url, params) => {
                 .then(async (response) => {
                     if (response.action === "success") {
                     } else {
-                        // alert(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -131,15 +136,35 @@ export const _getMarketData = (url, params) => {
     }
 }
 
+export const _getGraphData = (url, params) => {
+    try {
+        return async dispatch => {
+            await _axiosPostAPI(url, params)
+                .then(async (response) => {
+                    if (response.action === "success") {
+                        dispatch({ type: TICKER_GRAPH_DATA, payload: response?.data?.chartData })
+                    } else {
+                        console.log(response?.error)
+                    }
+                })
+                .catch((err) => {
+                    console.log(JSON.stringify(err))
+                })
+        };
+    } catch (error) {
+        console.log(JSON.stringify(error))
+    }
+}
+
 export const _addAlert = (url, params) => {
     try {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     if (response.action === "success") {
-                        alert(JSON.stringify(response.action))
+                        dispatch({ type: ADD_ALERT_ORDER, payload: true })
                     } else {
-                        alert(JSON.stringify(response.error))
+                        // alert(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -157,12 +182,11 @@ export const _addToWishList = (url, params, token) => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response.action))
                         let data = {}
                         data["token"] = token;
                         await dispatch(_getAllWatchList('get_watchlist', data))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -182,11 +206,9 @@ export const _changePasssword = (url, params) => {
                 .then(async (response) => {
                     dispatch({ type: CHANGEPASSWORD_LOADING, payload: false });
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         dispatch({ type: CHANGEPASSWORD_MSG, payload: "Password Changed" });
                     } else {
                         dispatch({ type: CHANGEPASSWORD_MSG, payload: response.error });
-                        // alert(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -207,12 +229,11 @@ export const _removeNotification = (url, params, token) => {
                 .then(async (response) => {
 
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         let data = {}
                         data["token"] = token;
                         dispatch(_getNotification('get_notifications', data))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -227,24 +248,26 @@ export const _removeNotification = (url, params, token) => {
 export const _getAssets = (url, params) => {
     try {
         return async dispatch => {
+            dispatch({ type: ASSETS_DATA_LOADING, payload: true });
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
-
+                    dispatch({ type: ASSETS_DATA_LOADING, payload: false });
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         dispatch({
                             type: GET_ASSETS,
                             payload: response?.data,
                         });
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
+                    dispatch({ type: ASSETS_DATA_LOADING, payload: false });
                     console.log(JSON.stringify(err))
                 })
         };
     } catch (error) {
+        dispatch({ type: ASSETS_DATA_LOADING, payload: false });
         console.log(JSON.stringify(error))
     }
 }
@@ -256,16 +279,17 @@ export const _postTransaction = (url, params) => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     dispatch({ type: CHANGEPASSWORD_LOADING, payload: false });
+                    alert(JSON.stringify(response))
                     if (response.action === "success") {
                         // dispatch({ type: DEPOSITE_MSG, payload: response.action });
-                        alert(JSON.stringify(response.action))
+                        dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: true })
                     } else {
                         // dispatch({ type: DEPOSITE_MSG, payload: response.error });
-                        alert(JSON.stringify(response.error))
+                        // alert(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
-                    console.log(JSON.stringify(err))
+                    console.log(JSON.stringify(err.response))
                     dispatch({ type: CHANGEPASSWORD_LOADING, payload: false });
                 })
         };
@@ -275,20 +299,16 @@ export const _postTransaction = (url, params) => {
     }
 }
 
-export const _getDepositeWithdraw = (url, params) => {
+export const _callRequest = (url, params) => {
     try {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
-
+                    // alert(JSON.stringify(response))
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
-                        dispatch({
-                            type: DEPOSITEWITHDRAW,
-                            payload: response?.transactions,
-                        });
+                        dispatch({ type: CREATE_CALL_REQ, payload: true })
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -296,6 +316,33 @@ export const _getDepositeWithdraw = (url, params) => {
                 })
         };
     } catch (error) {
+        console.log(JSON.stringify(error))
+    }
+}
+
+export const _getDepositeWithdraw = (url, params) => {
+    try {
+        return async dispatch => {
+            dispatch({ type: TRANSACTION_DATA_LOADING, payload: true })
+            await _axiosPostAPI(url, params)
+                .then(async (response) => {
+                    dispatch({ type: TRANSACTION_DATA_LOADING, payload: false })
+                    if (response.action === "success") {
+                        dispatch({
+                            type: DEPOSITEWITHDRAW,
+                            payload: response?.transactions,
+                        });
+                    } else {
+                        console.log(JSON.stringify(response.error))
+                    }
+                })
+                .catch((err) => {
+                    dispatch({ type: TRANSACTION_DATA_LOADING, payload: false })
+                    console.log(JSON.stringify(err))
+                })
+        };
+    } catch (error) {
+        dispatch({ type: TRANSACTION_DATA_LOADING, payload: false })
         console.log(JSON.stringify(error))
     }
 }
@@ -307,13 +354,12 @@ export const _getNotification = (url, params) => {
                 .then(async (response) => {
 
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         dispatch({
                             type: ALL_NOTIFICATIONS,
                             payload: response?.notifications,
                         });
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -343,9 +389,9 @@ export const _updateNotificaion = (url, params, token) => {
                             type: SESSION,
                             payload: data,
                         });
-                        
+
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -359,6 +405,26 @@ export const _updateNotificaion = (url, params, token) => {
     }
 }
 
+export const _getCurrencyRate = (url, params, token) => {
+    try {
+        return async dispatch => {
+            await _axiosPostAPI(url, params)
+                .then(async (response) => {
+                    if (response.action === "success") {
+                        dispatch({ type: CURRENCY_FACTOR, payload: response?.data?.currencies });
+                    } else {
+                        console.log(JSON.stringify(response.error))
+                    }
+                })
+                .catch((err) => {
+                    console.log(JSON.stringify(err))
+                })
+        };
+    } catch (error) {
+        console.log(JSON.stringify(error))
+    }
+}
+
 export const _updateCurrency = (url, params, token) => {
     try {
         return async dispatch => {
@@ -366,7 +432,6 @@ export const _updateCurrency = (url, params, token) => {
                 .then(async (response) => {
 
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response.data.id))
                         let data = {}
                         data["isLogin"] = true;
                         data["userToken"] = token;
@@ -377,7 +442,7 @@ export const _updateCurrency = (url, params, token) => {
                             payload: data,
                         });
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -396,17 +461,16 @@ export const _getLatestAlerts = (url, params) => {
                 .then(async (response) => {
 
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response?.data?.alerts?.length))
                         dispatch({
                             type: LATEST_ALERTS,
                             payload: response?.data?.alerts?.length,
                         });
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
-                    console.log(JSON.stringify(err))
+                    console.log(JSON.stringify(err.response))
                 })
         };
     } catch (error) {
@@ -421,13 +485,11 @@ export const _removeAlert = (url, params, token) => {
                 .then(async (response) => {
 
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         let data = {}
                         data["token"] = token;
                         dispatch(_getAlerts('get_alerts', data))
-                        
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -446,13 +508,12 @@ export const _getAlerts = (url, params) => {
                 .then(async (response) => {
 
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         dispatch({
                             type: ALL_ALERTS,
                             payload: response?.data?.alerts,
                         });
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -474,9 +535,8 @@ export const _getAllWatchList = (url, params) => {
                             type: WATCHLIST_MARKETS,
                             payload: response?.data?.markets,
                         });
-                        // alert(JSON.stringify(response?.data?.markets))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -495,15 +555,13 @@ export const _getTickerData = (url, params) => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     dispatch({ type: TICKER_DATA_LOADING, payload: false });
-                    // alert(JSON.stringify(response))
                     if (response.action === "success") {
                         dispatch({
                             type: TICKER_DATA,
                             payload: response.data,
                         });
-                        // alert(JSON.stringify(response))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -522,15 +580,13 @@ export const _getNewsData = (url, params) => {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
-                    // alert(JSON.stringify(response))
                     if (response.action === "success") {
                         dispatch({
                             type: NEWS_DATA,
                             payload: response.data,
                         });
-                        // alert(JSON.stringify(response))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -547,15 +603,13 @@ export const _getMarketList = (url, params) => {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
-                    // alert(JSON.stringify(response))
                     if (response.action === "success") {
                         dispatch({
                             type: MARKET_LIST,
                             payload: response.data,
                         });
-                        // alert(JSON.stringify(response))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -575,10 +629,9 @@ export const _createOrder = (url, params) => {
                 .then(async (response) => {
                     dispatch({ type: CREATE_ORDER_LOADING, payload: false });
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         dispatch({ type: CREATE_ORDER, payload: true })
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -592,16 +645,19 @@ export const _createOrder = (url, params) => {
     }
 }
 
-export const _getOrders = (url, params) => {
+export const _cancelOrder = (url, params, token) => {
     try {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     if (response.action === "success") {
                         // alert(JSON.stringify(response))
-                        dispatch({ type: GET_ORDER, payload: response.data.orders })
+                        let data = {}
+                        data["token"] = token;
+                        data["type"] = "open";
+                        dispatch(_getOrders('get_orders', data))
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -613,16 +669,39 @@ export const _getOrders = (url, params) => {
     }
 }
 
+export const _getOrders = (url, params) => {
+    try {
+        return async dispatch => {
+            dispatch({ type: ORDER_DATA_LOADING, payload: true })
+            await _axiosPostAPI(url, params)
+                .then(async (response) => {
+                    dispatch({ type: ORDER_DATA_LOADING, payload: false })
+                    if (response.action === "success") {
+                        dispatch({ type: GET_ORDER, payload: response.data.orders })
+                    } else {
+                        console.log(JSON.stringify(response.error))
+                    }
+                })
+                .catch((err) => {
+                    dispatch({ type: ORDER_DATA_LOADING, payload: false })
+                    console.log(JSON.stringify(err))
+                })
+        };
+    } catch (error) {
+        dispatch({ type: ORDER_DATA_LOADING, payload: false })
+        console.log(JSON.stringify(error))
+    }
+}
+
 export const _getOrdersHistory = (url, params) => {
     try {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     if (response.action === "success") {
-                        // alert(JSON.stringify(response))
                         dispatch({ type: GET_ORDER_HISTORY, payload: response.data.orders })
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -642,7 +721,7 @@ export const _getMarketNews = (url, params) => {
                     if (response.action === "success") {
                         dispatch({ type: MARKET_NEWS, payload: response.data.infos })
                     } else {
-                        alert(JSON.stringify(response.error))
+                        console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {

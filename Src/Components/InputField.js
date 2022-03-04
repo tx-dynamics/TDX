@@ -28,6 +28,7 @@ const InputField = (props) => {
                 value={props.value}
                 // caretHidden={true}
                 // keyboardType="numeric"
+                onSubmitEditing={props.onSubmitEditing}
                 placeholderTextColor={props.placeholderTextColor ? props.placeholderTextColor : "#00000099"}
                 // onChangeText={text => onChangeText(text)}
                 style={{

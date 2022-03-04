@@ -1,66 +1,30 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image, Modal, ScrollView, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, Modal, ScrollView, FlatList, Pressable, Alert } from 'react-native'
 
 import { useFocusEffect } from '@react-navigation/native';
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
 import { iconPath } from '../../Constants/icon';
 import { wp } from '../../Helpers/Responsiveness';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import ResponsiveText from '../../Components/RnText';
 import Loader from '../../Components/Loader';
 import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
-import InputField from '../../Components/InputField';
-import { MARKET_DATA_LOADING } from '../../Redux/Constants'
 import { useSelector, useDispatch } from 'react-redux';
-import { _getMarketData, _getAllWatchList, _sendPushNotification } from '../../Redux/Actions/Actions';
+import {
+    _getMarketData, _getAllWatchList, _sendPushNotification,
+    _getMarketList, _getCurrencyRate
+} from '../../Redux/Actions/Actions';
+import { CURRENT_CURRENCY_FACTOR, MARKET_DATA_LOADING } from '../../Redux/Constants';
+
 import ModalDropdown from 'react-native-modal-dropdown';
 
 import { firebase } from '@react-native-firebase/messaging';
-
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
-} from "react-native-chart-kit";
+import { LineChart } from "react-native-chart-kit";
 import { _axiosPostAPI } from '../../Apis/Apis';
+import { _updateCurrency } from '../../Redux/Actions/Actions';
 
-import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
-
-const Greendata = {
-    datasets: [
-        {
-            data: [
-                10,
-                8,
-                15,
-                10,
-                15,
-                10,
-                15
-            ]
-        }
-    ]
-}
-const Reddata = {
-    datasets: [
-        {
-            data: [
-                15,
-                10,
-                13,
-                10,
-                12,
-                8,
-                10
-            ]
-        }
-    ]
-}
 const DATA = [
     { id: "1", coinName: "Maize", dot: true },
     { id: "2", coinName: "Soya Bean", dot: false },
@@ -82,36 +46,71 @@ const HomeScreen = (props) => {
     const [expandedIndexes, setExpandedIndexes] = useState([])
     const [filterModal, setFilterModal] = useState(false)
     const [filterApply, setFilterApply] = useState('')
+    const [orderFor, setOrderFor] = useState([])
     const [filter_value, setFilter_value] = useState('')
     const [CommodityValue, setCommodityValue] = useState('')
     const [activeButton, setActiveButton] = useState('all')
     const [CommodityValueError, setCommodityValueError] = useState(false)
     const [GradeDropDownValue, setGradeDropDownValue] = useState('1')
     const [WarehouseDropDownValue, setWarehouseDropDownValue] = useState('W9')
+    const [currencymultiplyer, setCurrencymultiplyer] = useState('')
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const Market_Loading = useSelector(state => state.HomeReducer.Market_Loading);
     const marketData = useSelector(state => state.HomeReducer.marketData);
     const WatchListMarkets = useSelector(state => state.HomeReducer.WatchListMarkets);
+    const marketList = useSelector(state => state.HomeReducer.marketList);
+    const currencyRate = useSelector(state => state.HomeReducer.currencyRate);
+    const current_currency_rate = useSelector(state => state.HomeReducer.current_currency_rate);
+    const userInfo = useSelector(state => state.AuthReducer.userInfo);
 
     useEffect(() => {
-        // dispatch({ type: MARKET_DATA_LOADING, payload: true });
-        // console.log("Token::::: ", userToken)
-        // getMarketData()
         setMarketDataa(marketData?.markets)
     }, [marketData])
 
     useEffect(() => {
         getWatchlistMarkets()
         Fcm()
+        getMarketList()
+        dispatch({ type: MARKET_DATA_LOADING, payload: true });
     }, [])
+
+    useEffect(() => {
+        setCurrencyRate()
+    }, [currencyRate])
+
+    useEffect(() => {
+        setMarkets()
+    }, [marketList])
+    useEffect(() => {
+        getCurrentCurrency()
+    }, [userInfo])
 
     useFocusEffect(
         React.useCallback(() => {
             getMarketData()
         }, [])
-    );
+    )
 
+    const setCurrencyRate = () => {
+        if (userInfo?.currency_iso === "USD") {
+            dispatch({ type: CURRENT_CURRENCY_FACTOR, payload: currencyRate[0]?.factor });
+        } else {
+            dispatch({ type: CURRENT_CURRENCY_FACTOR, payload: currencyRate[1]?.factor });
+        }
+    }
+    const getCurrentCurrency = async () => {
+        let data = {}
+        data["token"] = userToken;
+        dispatch(_getCurrencyRate('get_currencies', data, userToken))
+    }
+    const getMarketList = async () => {
+        let data1 = {}
+        dispatch(_getMarketList('get_buy_sell_order_for_list', data1))
+    }
+    const setMarkets = async () => {
+        setOrderFor(marketList?.markets)
+    }
     const Fcm = async () => {
         const enabled = await firebase.messaging().hasPermission();
         if (enabled) {
@@ -133,7 +132,6 @@ const HomeScreen = (props) => {
             console.warn('no token');
         }
     }
-
     const getMarketData = async () => {
 
         let data = {}
@@ -142,24 +140,21 @@ const HomeScreen = (props) => {
         data1["filtering"] = false;
         data["token"] = userToken;
         data["search"] = data1;
-        data["limit"] = 30;
-        data["page"] = 1;
-        await dispatch(_getMarketData('get_markets', data))
+        data["filters"] = [];
+
+        dispatch(_getMarketData('get_markets', data))
         setActiveButton('all')
         // alert(JSON.stringify(marketData.more_available))
     }
-
     const setWatchListData = async () => {
         setMarketDataa(WatchListMarkets)
         setActiveButton('eye')
     }
-
     const getWatchlistMarkets = async () => {
         let data = {}
         data["token"] = userToken;
         dispatch(_getAllWatchList('get_watchlist', data))
     }
-
     const getFilteredData = async (filter, filter_Value) => {
         let data = {}
         let data1 = {}
@@ -173,17 +168,13 @@ const HomeScreen = (props) => {
         data["search"] = data1;
         data["filters"] = [];
         data["selling"] = 0;
-        data["limit"] = 30;
-        data["page"] = 1;
-        // console.log(data)
-         dispatch(_getMarketData('get_markets', data))
+        console.log(data)
+        dispatch(_getMarketData('get_markets', data))
         setCommodityValue('')
     }
-
     const getFilteredDataGrade = async (filter, filter_Value) => {
         let data = {}
         let data1 = {}
-
 
         data1["searching"] = false;
         data1["filtering"] = true;
@@ -192,14 +183,11 @@ const HomeScreen = (props) => {
         data["token"] = userToken;
         data["search"] = data1;
         data["filters"] = [];
-        data["limit"] = 30;
-        data["page"] = 1;
         data["selling"] = 0;
         // console.log(data)
-         dispatch(_getMarketData('get_markets', data))
+        dispatch(_getMarketData('get_markets', data))
         setCommodityValue('')
     }
-
     const getFilteredDataFilter = async (filter) => {
         let data = {}
         let data1 = {}
@@ -208,32 +196,26 @@ const HomeScreen = (props) => {
         data["token"] = userToken;
         data["search"] = data1;
         data["filters"] = [filter];
-        data["limit"] = 30;
-        data["page"] = 1;
-        await dispatch(_getMarketData('get_markets', data))
-
+        dispatch(_getMarketData('get_markets', data))
         // alert(JSON.stringify(data))
     }
-
     const applyFilter = async (item) => {
-         setFilterApply(item.title)
+        setFilterApply(item.title)
         // if (item.title !== "Commodity") {
         //     setFilterModal(false)
         //     getFilteredDataFilter(item.title)
         // }
-        
-        
-        if (item?.title === "Grade") {
-            
-        } else if(item?.title === "Commodity"){
-            
-        }else{
-            setFilterModal(false)
-            getFilteredData(item.title)
 
-        }
+        // if (item?.title === "Grade") {
+
+        // } else if (item?.title === "Commodity") {
+
+        // } else {
+        //     setFilterModal(false)
+        //     getFilteredData(item.title)
+
+        // }
     }
-
     const applyFilterCom = () => {
         setCommodityValueError(false)
         if (CommodityValue === '') {
@@ -250,15 +232,37 @@ const HomeScreen = (props) => {
             setFilterApply('')
         }
 
-    }
+        else if (filterApply === "Warehouse") {
+            getFilteredDataGrade("Warehouse", WarehouseDropDownValue)
+            setFilterModal(false)
+            setFilterApply('')
+        }
 
+    }
     const addIndexExpand = (index) => {
         var selectedIdss = [...expandedIndexes]
         selectedIdss.push(index)
         setExpandedIndexes(selectedIdss)
-        // alert(selectedIdss)
     }
-
+    const renderButtonText = (rowData) => {
+        const { id, title, pair } = rowData;
+        return <View><Text style={styles.dropDown_textStyle}>{title}</Text></View>;
+    }
+    const renderDropDownList = (rowData) => {
+        const { id, title, pair } = rowData;
+        return (
+            <View style={{ backgroundColor: "#fff" }}>
+                <TouchableOpacity
+                    // activeOpacity={.1}
+                    activeOpacity={0.4}
+                    underlayColor="#ffffff00"
+                    //  underlayColor="gray" 
+                    style={{ marginVertical: 10, }}>
+                    <Text style={[{ fontSize: 15, color: "#000", fontFamily: fonts.Poppins }]}>{title}</Text>
+                </TouchableOpacity>
+            </View>
+        )
+    }
 
     return (
         <View style={styles.container}>
@@ -282,15 +286,15 @@ const HomeScreen = (props) => {
                                 <ResponsiveText size="h8" color={Colors.white} >{"Commodity"}</ResponsiveText>
                             </Pressable>
                             : */}
-                            <Pressable onPress={() => getMarketData()}
-                                style={{ backgroundColor: activeButton === 'all'? Colors.greenColor : "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, height: wp(7), justifyContent: "center" }}>
-                                <ResponsiveText size="h8" color={Colors.white} >{"All"}</ResponsiveText>
-                            </Pressable>
+                        <Pressable onPress={() => { getMarketData(), dispatch({ type: MARKET_DATA_LOADING, payload: true }) }}
+                            style={{ backgroundColor: activeButton === 'all' ? Colors.greenColor : "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, height: wp(7), justifyContent: "center" }}>
+                            <ResponsiveText size="h8" color={Colors.white} >{"All"}</ResponsiveText>
+                        </Pressable>
                         {/* } */}
 
                         <Pressable onPress={() => { getWatchlistMarkets(), setWatchListData() }}
-                            style={{ backgroundColor: activeButton === 'eye'? Colors.greenColor: "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, marginLeft: 8, height: wp(7), justifyContent: "center" }}>
-                            <Image source={activeButton === 'eye'? iconPath.whiteEye : iconPath.greenEye} style={{ width: wp(4.5), height: wp(4.5), resizeMode: "contain" }} />
+                            style={{ backgroundColor: activeButton === 'eye' ? Colors.greenColor : "#CCCCCC", paddingHorizontal: wp(5), borderRadius: 20, marginLeft: 8, height: wp(7), justifyContent: "center" }}>
+                            <Image source={activeButton === 'eye' ? iconPath.whiteEye : iconPath.greenEye} style={{ width: wp(4.5), height: wp(4.5), resizeMode: "contain" }} />
                         </Pressable>
                     </View>
                     <Pressable onPress={() => setFilterModal(true)}>
@@ -301,6 +305,7 @@ const HomeScreen = (props) => {
 
             <FlatList
                 data={marketDataa}
+                extraData={marketDataa}
                 keyExtractor={(item, index) => index.toString()}
                 style={{ marginTop: wp(3.5) }}
                 showsVerticalScrollIndicator={false}
@@ -317,11 +322,11 @@ const HomeScreen = (props) => {
                                 <Image source={{ uri: item.image_url }} style={{ width: wp(7), height: wp(7), resizeMode: "contain" }} />
                                 <ResponsiveText size="h6" margin={[0, 0, 0, 5]} fontFamily={fonts.Poppins_SemiBold}>{item.title}</ResponsiveText>
                             </View>
-                            <ResponsiveText size="h9" margin={[0, 0, 0, 5]} fontFamily={fonts.Poppins_SemiBold}>{item.pair}</ResponsiveText>
+                            <ResponsiveText size="h9" margin={[0, 0, 0, 5]} fontFamily={fonts.Poppins_SemiBold}>{userInfo?.currency_iso + "/MT"}</ResponsiveText>
                         </View>
 
                         {item?.tickers?.slice(0, expandedIndexes.includes(index) ? item?.tickers?.length : 2).map((cardData, indx) =>
-                            <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData.id, marketID: item.id })}
+                            <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: cardData?.id, marketID: item?.id })}
                                 style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7, }}>
                                 <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{cardData?.ticker}</ResponsiveText>
 
@@ -333,7 +338,7 @@ const HomeScreen = (props) => {
                                                     {
                                                         data: cardData?.chartData?.map((itemm) => {
                                                             return (
-                                                                parseInt(itemm.price)
+                                                                parseInt(itemm?.price)
                                                             )
                                                         })
                                                     }
@@ -346,7 +351,7 @@ const HomeScreen = (props) => {
                                             chartConfig={{
                                                 backgroundGradientFromOpacity: 0,
                                                 backgroundGradientToOpacity: 0,
-                                                color: (opacity = 1) => cardData.trend >= 0 ? Colors.greenColor : Colors.redColor,
+                                                color: (opacity = 1) => cardData?.trend >= 0 ? Colors.greenColor : Colors.redColor,
                                                 propsForDots: { r: "0" },
                                                 propsForBackgroundLines: { stroke: "#CCCCCC33" }
                                             }}
@@ -356,8 +361,8 @@ const HomeScreen = (props) => {
                                     }
 
                                     <View style={{ alignItems: "flex-end" }}>
-                                        <ResponsiveText size="h8" color={cardData.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(cardData.price).toFixed(1)}</ResponsiveText>
-                                        <ResponsiveText size="h10" color={cardData.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + cardData.trend + " %"}</ResponsiveText>
+                                        <ResponsiveText size="h8" color={cardData?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(cardData?.price * current_currency_rate).toFixed(1)}</ResponsiveText>
+                                        <ResponsiveText size="h10" color={cardData?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + cardData.trend + " %"}</ResponsiveText>
                                     </View>
                                 </View>
                             </Pressable>
@@ -379,7 +384,6 @@ const HomeScreen = (props) => {
                             </View>}
                     </Pressable>
                 )} />
-
 
             <Modal
                 transparent={true}
@@ -428,16 +432,55 @@ const HomeScreen = (props) => {
                                 </>
                             }
 
+                            {filterApply === "Warehouse" &&
+                                <>
+                                    <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
+                                        <ModalDropdown options={['W9', 'W10']}
+                                            defaultValue={WarehouseDropDownValue}
+                                            style={[styles.dropDown, {}]}
+                                            dropdownStyle={styles.dropDown_dropDownStyle}
+                                            dropdownTextStyle={styles.dropDown_textStyle}
+                                            textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(75), fontFamily: fonts.Poppins, }}
+                                            onSelect={(idx, DropDownItem) => setWarehouseDropDownValue(DropDownItem)}
+                                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} />)}
+                                        />
 
-
-
-
-
-
+                                    </View>
+                                    <Pressable
+                                        onPress={() => applyFilterCom()}
+                                        style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
+                                        <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
+                                    </Pressable>
+                                </>
+                            }
 
 
                             {filterApply === "Commodity" &&
+
+
                                 <>
+                                    <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
+                                        <ModalDropdown options={orderFor}
+                                            defaultValue={""}
+                                            style={[styles.dropDown, {}]}
+                                            dropdownStyle={styles.dropDown_dropDownStyle}
+                                            dropdownTextStyle={styles.dropDown_textStyle}
+                                            renderRow={(rowData, rowID) => renderDropDownList(rowData, rowID)}
+                                            renderButtonText={(rowData) => renderButtonText(rowData)}
+                                            textStyle={{ color: "#6F7074", marginLeft: 10, fontSize: wp(4), width: wp(75), fontFamily: fonts.Poppins, }}
+                                            onSelect={(idx, DropDownItem) => setCommodityValue(DropDownItem?.title)}
+                                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} />)}
+                                        />
+
+                                    </View>
+                                    <Pressable
+                                        onPress={() => applyFilterCom()}
+                                        style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
+                                        <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
+                                    </Pressable>
+
+
+                                    {/* <>
                                     <View style={{ paddingHorizontal: wp(2), paddingTop: wp(5), paddingBottom: wp(10) }}>
                                         <InputField
                                             placeholder={" + add commoditiy"}
@@ -457,6 +500,11 @@ const HomeScreen = (props) => {
                                         style={{ backgroundColor: Colors.greenColor, paddingHorizontal: wp(7), paddingVertical: wp(2.5), borderRadius: 11, alignSelf: "flex-end", marginRight: wp(2) }}>
                                         <ResponsiveText size="h9" padding={[0, 0, 0, 0]} color={"#fff"}>{"Apply"}</ResponsiveText>
                                     </Pressable>
+                                </> */}
+
+
+
+
                                 </>
                             }
 
@@ -464,6 +512,7 @@ const HomeScreen = (props) => {
                     </Pressable>
                 </Pressable>
             </Modal>
+
             <Loader loading={Market_Loading} />
 
         </View>

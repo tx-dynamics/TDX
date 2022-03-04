@@ -7,9 +7,7 @@ import { StatusBar } from 'react-native';
 import Splash from '../Screens/Splash'
 import AuthStack from './Stack/AuthStack'
 import DrawerStack from './Stack/DrawerStack';
-// // import BottomNav from './BottomNav/BottomNav'
-import Drawer from './Drawer'
-// import { connect } from 'react-redux'
+import Drawer from './Drawer';
 import { Colors, AppTheme } from '../Constants/Colors';
 import { useSelector } from 'react-redux';
 

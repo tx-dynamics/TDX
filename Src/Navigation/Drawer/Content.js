@@ -101,7 +101,6 @@ class Content extends Component {
       // this.props.navigation.navigate('DrawerStack', { screen: 'Orders' });
     }
     else {
-      // alert("elseeee")
     }
   }
 

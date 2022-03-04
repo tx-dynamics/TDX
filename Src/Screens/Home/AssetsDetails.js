@@ -23,15 +23,11 @@ import SeeMore from 'react-native-see-more-inline';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     _getTickerData, _getNewsData, _addToWishList,
-    _getAllWatchList, _addAlert
+    _getAllWatchList, _addAlert, _getGraphData
 } from '../../Redux/Actions/Actions';
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
+import { ADD_ALERT_ORDER } from '../../Redux/Constants';
 
-
-const NewsDATA = [
-    { id: "1", Heading: "News Headings", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Non, mauris egestas a..." },
-    { id: "2", Heading: "News Headings", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Non, mauris egestas a..." }
-]
 const DayDATA = [
     { id: "1", title: "1 D" },
     { id: "2", title: "1 w" },
@@ -41,16 +37,6 @@ const DayDATA = [
     { id: "6", title: "1 Y" },
     { id: "7", title: "All" },
 ]
-const DayDATA1 = [
-    { id: "1", title: "1/10" },
-    { id: "2", title: "2/10" },
-    { id: "3", title: "3/10" },
-    { id: "4", title: "4/10" },
-    { id: "5", title: "5/10" },
-    { id: "6", title: "6/10" },
-    { id: "7", title: "7/10" },
-]
-
 import {
     LineChart,
     BarChart,
@@ -61,24 +47,6 @@ import {
 } from "react-native-chart-kit";
 import Toast, { DURATION } from 'react-native-easy-toast'
 
-
-const Greendata = {
-    datasets: [
-        {
-            data: [
-                10,
-                8,
-                10,
-                8,
-                15,
-                10,
-                15,
-                10,
-                15
-            ]
-        }
-    ]
-}
 
 const AssetsDetails = (props) => {
 
@@ -94,13 +62,17 @@ const AssetsDetails = (props) => {
     const [blogsPosts, setBlogsPosts] = useState([])
     const [isThisWatchList, setIsThisWatchList] = useState(false)
     const [alertPrice, setAlertPrice] = useState('')
-    const [seeMore, setSeeMore] = useState(false)
-    const [isLargeNumberLines, setIsLargeNumberLines] = useState(true)
+    const [dataSetArray, setDataSetArray] = useState([])
+    const [selectedId, setselectedId] = useState("2")
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const tickerData = useSelector(state => state.HomeReducer.tickerData);
     const newsData = useSelector(state => state.HomeReducer.newsData);
     const WatchListMarkets = useSelector(state => state.HomeReducer.WatchListMarkets);
+    const add_Alert_Created = useSelector(state => state.HomeReducer.add_Alert_Created);
+    const graphDataSet = useSelector(state => state.HomeReducer.graphDataSet);
+    const current_currency_rate = useSelector(state => state.HomeReducer.current_currency_rate);
+    const userInfo = useSelector(state => state.AuthReducer.userInfo);
 
     useEffect(() => {
         getTickerData()
@@ -108,7 +80,6 @@ const AssetsDetails = (props) => {
     }, [])
 
     useEffect(() => {
-
         let payload = newsData.blogs?.map((item) => {
             return {
                 ...item,
@@ -117,8 +88,6 @@ const AssetsDetails = (props) => {
             }
         })
         setBlogsPosts(payload)
-        // alert(JSON.stringify(newsData.blogs[0].created_at))
-
     }, [newsData])
 
     useEffect(() => {
@@ -128,10 +97,14 @@ const AssetsDetails = (props) => {
         }
     }, [WatchListMarkets])
 
+    useEffect(() => {
+        setDataSetArray(graphDataSet)
+    }, [graphDataSet])
+
     const CheckIsWatchList = () => {
         if (WatchListMarkets?.length > 0) {
             WatchListMarkets.map((item) => {
-                if (item?.id === props.route.params.marketID) {
+                if (item?.id === props?.route?.params?.marketID) {
                     setIsThisWatchList(true)
                 } else {
                     setIsThisWatchList(false)
@@ -146,20 +119,23 @@ const AssetsDetails = (props) => {
     const getTickerData = async () => {
         let data = {}
         data["token"] = userToken;
-        data["id"] = props.route.params.tickerId;
+        data["id"] = props?.route?.params?.tickerId;
         dispatch(_getTickerData('get_ticker', data))
         let data1 = {}
         data1["token"] = userToken;
         data1["tickers"] = [props.route.params.tickerId];
         dispatch(_getNewsData('get_blogs', data1))
-        // alert(JSON.stringify(tickerData))
+        let data2 = {}
+        data2["token"] = userToken;
+        data2["id"] = props?.route?.params?.tickerId;
+        data2["days"] = 1;
+        dispatch(_getGraphData('get_chart', data))
     }
 
     const getWatchlistMarkets = async () => {
         let data = {}
         data["token"] = userToken;
-        await dispatch(_getAllWatchList('get_watchlist', data))
-        // alert(JSON.stringify(tickerData))
+        dispatch(_getAllWatchList('get_watchlist', data))
     }
 
     const openAlertModal = () => {
@@ -194,9 +170,7 @@ const AssetsDetails = (props) => {
         }
     }
 
-
     const showMoreClick = (indx, isShowMore) => {
-        // alert(JSON.stringify(isShowMore))
         let payload = newsData.blogs?.map((item, index) => {
             if (indx === index) {
                 return {
@@ -214,8 +188,18 @@ const AssetsDetails = (props) => {
             }
         })
         setBlogsPosts(payload)
-    };
+    }
 
+    const changeDataset = (item) => {
+        if (item?.id !== "1") {
+            setselectedId(item?.id)
+        } 
+            let data = {}
+            data["token"] = userToken;
+            data["id"] = props?.route?.params?.tickerId;
+            data["days"] = item?.id === "2" ? 1 :item?.id === "3"?  5 : item?.id === "4"? 15 : item?.id === "5"? 30 : item?.id === "6"? 61 : item?.id === "7 "? 365 : 1;
+            dispatch(_getGraphData('get_chart', data))       
+    }
 
 
     return (
@@ -225,7 +209,6 @@ const AssetsDetails = (props) => {
                 leftPress={() => props.navigation.goBack()} />
 
             <ScrollView>
-
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(3), alignItems: "center" }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <Image source={{ uri: tickerData?.ticker?.market?.image_url }} style={{ width: wp(13), height: wp(13), resizeMode: "contain" }} />
@@ -243,40 +226,43 @@ const AssetsDetails = (props) => {
                     <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4) }}>
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 5]}>{tickerData?.ticker?.ticker}</ResponsiveText>
                         <View style={{ alignItems: "flex-end" }}>
-                            <ResponsiveText size="h8" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(tickerData?.ticker?.price).toFixed(1)}</ResponsiveText>
+                            <View style={{ flexDirection: "row" }}>
+                                <ResponsiveText size="h8" color={"#000"}>{userInfo?.currency_iso+"  "}</ResponsiveText>
+                                <ResponsiveText size="h8" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(tickerData?.ticker?.price * current_currency_rate).toFixed(1)}</ResponsiveText>
+                            </View>
                             <ResponsiveText size="h9" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{tickerData?.ticker?.trend + " %"}</ResponsiveText>
                         </View>
                     </View>
 
                     <View style={{ width: "100%", alignItems: "center", marginTop: wp(5) }}>
 
-                        {tickerData?.ticker?.chartData !== undefined &&
+                        {dataSetArray?.length > 0 &&
                             <LineChart
                                 data={{
-                                    labels: tickerData?.ticker?.chartData.map((itemm) => {
+                                    labels: dataSetArray?.map((itemm) => {
                                         return (
                                             itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
                                         )
                                     }),
                                     datasets: [
                                         {
-                                            data: tickerData?.ticker?.chartData?.map((itemm) => {
+                                            data: dataSetArray?.map((itemm) => {
                                                 return (
-                                                    parseInt(itemm.price)
+                                                    parseInt(itemm?.price)
                                                 )
                                             })
                                         }
                                     ]
                                 }}
-                                width={Dimensions.get("window").width} // from react-native
+                                width={Dimensions.get("window").width } // from react-native
                                 height={160}
-                                yAxisLabel="$"
+                                yAxisLabel={userInfo?.currency_iso}
                                 // yAxisSuffix="k"
                                 // yAxisInterval={1} // optional, defaults to 1
                                 chartConfig={{
                                     backgroundGradientFromOpacity: 0,
                                     backgroundGradientToOpacity: 0,
-                                    decimalPlaces: 2,
+                                    decimalPlaces: 1,
                                     color: (opacity = 1) => tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor,
                                     labelColor: (opacity = 1) => Colors.black,
                                     propsForDots: { r: "0" },
@@ -296,8 +282,9 @@ const AssetsDetails = (props) => {
                     <View style={{ paddingHorizontal: wp(4) }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {DayDATA.map((item, index) =>
-                                <Pressable style={{ marginLeft: index === 0 ? 0 : wp(4), backgroundColor: "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
-                                    <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{item?.title}</ResponsiveText>
+                                <Pressable onPress={() => changeDataset(item)}
+                                    style={{ marginLeft: index === 0 ? 0 : wp(4), backgroundColor: selectedId === item?.id ? Colors.greenColor : "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
+                                    <ResponsiveText color={selectedId === item?.id ? "#fff": "#000"} size="h8" margin={[0, 0, 0, 0]}>{item?.title}</ResponsiveText>
                                 </Pressable>
                             )}
                         </ScrollView>
@@ -309,7 +296,7 @@ const AssetsDetails = (props) => {
                     backgroundColor: Colors.TextInputBackgroundColor, paddingHorizontal: wp(4), justifyContent: "space-between",
                     marginVertical: wp(6), paddingVertical: wp(4), flexDirection: "row", alignItems: "center"
                 }}>
-                    <Pressable onPress={() => alert(JSON.stringify(newsData))}>
+                    <Pressable >
                         <ResponsiveText size="h7" fontFamily={fonts.Poppins_Medium}>{"Your stock"}</ResponsiveText>
                     </Pressable>
 
@@ -421,7 +408,7 @@ const AssetsDetails = (props) => {
             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(4), marginTop: wp(2), marginBottom: wp(3) }}>
                 <View style={{ width: "49%", }}>
                     <Button
-                        onPress={() => props.navigation.navigate('TradeScreenTicker')}
+                        onPress={() => props.navigation.navigate('TradeScreenTicker', { tickerId: props?.route?.params?.tickerId, marketID: props?.route?.params?.marketID, btnType: "Buy" })}
                         Text={'BUY'}
                         height={45}
                         backgroundColor={"#019146"}
@@ -429,7 +416,7 @@ const AssetsDetails = (props) => {
                 </View>
                 <View style={{ width: "49%" }}>
                     <Button
-                        onPress={() => props.navigation.navigate('TradeScreenTicker')}
+                        onPress={() => props.navigation.navigate('TradeScreenTicker', { tickerId: props?.route?.params?.tickerId, marketID: props?.route?.params?.marketID, btnType: "Sell" })}
                         Text={'SELL'}
                         height={45}
                         backgroundColor={"#DB1222"}
@@ -505,6 +492,40 @@ const AssetsDetails = (props) => {
                 </Pressable>
             </Modal>
 
+            <Modal
+                style={{ flex: 1 }}
+                animationType="slide"
+                transparent={true}
+                // visible={true}
+                visible={add_Alert_Created}
+                onRequestClose={() => { dispatch({ type: ADD_ALERT_ORDER, payload: false }) }}>
+                <Pressable onPress={() => dispatch({ type: ADD_ALERT_ORDER, payload: false })}
+                    style={{ width: '100%', height: '100%', justifyContent: 'center', alignSelf: 'center', borderRadius: 15, backgroundColor: "rgba(240, 244, 244, 0.4)", }}>
+                    <View style={[styles.boxWithShadow, styles.inputContainer]}>
+                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderRadius: 20, width: wp(80) }}>
+                            <Fonticon type={"Entypo"} name={"cross"} size={wp(4)} color={Colors.black} style={{ alignSelf: "flex-end", margin: 5 }}
+                                onPress={() => dispatch({ type: ADD_ALERT_ORDER, payload: false })}
+                            />
+                            <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
+                            <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your request has been successfully submitted</Text>
+                            <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
+                                <Button
+                                    onPress={() => dispatch({ type: ADD_ALERT_ORDER, payload: false })}
+                                    Text={'Okay'}
+                                    fontFamily={fonts.Poppins_Medium}
+                                    fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
+                                />
+                            </View>
+                        </View>
+
+                    </View>
+                </Pressable>
+
+            </Modal>
+
             <Toast
                 ref={toastRef}
                 style={{ backgroundColor: 'white', paddingVertical: 15, paddingHorizontal: 30, borderRadius: 30 }}
@@ -567,6 +588,18 @@ const styles = StyleSheet.create({
         marginTop: wp(19),
         padding: 5,
         paddingVertical: wp(5)
-    }
+    },
+    inputContainer: {
+        alignSelf: 'center',
+        borderRadius: 18,
+    },
+    boxWithShadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: "#fff"
+    },
 
 })

@@ -1,7 +1,7 @@
 
 import axios from 'axios';
-// export const BASE_URL = "https://ur-groffer-backend.herokuapp.com/api/";
-export const BASE_URL = "https://aqueous-journey-97697.herokuapp.com/";
+export const BASE_URL = "https://tdx-cg85s.ondigitalocean.app/";
+// export const BASE_URL = "https://aqueous-journey-97697.herokuapp.com/";
 
 export const _axiosPostAPI = (url, params) => {
     return new Promise((resolve, reject) => {

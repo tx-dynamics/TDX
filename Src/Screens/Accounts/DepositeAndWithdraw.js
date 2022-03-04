@@ -8,6 +8,7 @@ import { wp } from '../../Helpers/Responsiveness';
 import ResponsiveText from '../../Components/RnText';
 import { fonts } from '../../Constants/Fonts';
 import moment from 'moment';
+import Loader from '../../Components/Loader';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { _getDepositeWithdraw } from '../../Redux/Actions/Actions';
@@ -17,12 +18,13 @@ export default function DepositeAndWithdraw(props) {
 
     const dispatch = useDispatch();
 
-    const [selectedBtn, setSelectedBtn] = useState("Open")
+    const [selectedBtn, setSelectedBtn] = useState("Deposit")
     const [depositHistory, setDepositHistory] = useState([])
     const [withdrawHistory, setWithdrawHistory] = useState([])
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const TransationHistory = useSelector(state => state.HomeReducer.TransationHistory);
+    const Transaction_Loading = useSelector(state => state.HomeReducer.Transaction_Loading);
 
     useEffect(() => {
         GetHistory()
@@ -51,7 +53,9 @@ export default function DepositeAndWithdraw(props) {
     const GetHistory = async () => {
         let data = {}
         data["token"] = userToken;
-        await dispatch(_getDepositeWithdraw('get_transactions', data))
+        // data["page"] = 1;
+        // data["limit"] = 10;
+        dispatch(_getDepositeWithdraw('get_transactions', data))
     }
 
     return (
@@ -95,12 +99,12 @@ export default function DepositeAndWithdraw(props) {
                         {/* 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : */}
                         <View style={styles.notification}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{selectedBtn === "Deposit" ? item?.type : item.type+" "+item.withdraw_type + " " + item.ticker}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{selectedBtn === "Deposit" ? item?.type : item.type + " " + item.withdraw_type + " " + item.ticker}</ResponsiveText>
                                 <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#F4BB32" : item?.status === 1 ? "#019146" : item?.status === 2 && "#DB1222"} textAlign={"center"}>{item?.status_text}</ResponsiveText>
                             </View>
-                            <View style={{ flexDirection: "row", marginTop:wp(2) }}>
-                                <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{item?.withdraw_type ==="Commodity" ? "Quantity (MT):" :"Amount (GH¢):" }</ResponsiveText>
-                                <ResponsiveText size="h8" margin={[10, 0, 0, 8]}>{item?.amount}</ResponsiveText>
+                            <View style={{ flexDirection: "row", marginTop: wp(2) }}>
+                                <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{item?.withdraw_type === "Commodity" ? "Quantity (MT):" : "Amount (GH¢):"}</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[10, 0, 0, 8]}>{item?.amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</ResponsiveText>
                             </View>
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>
@@ -117,6 +121,8 @@ export default function DepositeAndWithdraw(props) {
                         </View>
                     </>
                 )} />
+
+            <Loader loading={Transaction_Loading} />
 
         </View>
     )

@@ -11,7 +11,6 @@ import AssetsStack from '../Stack/AssetsStack';
 
 import { iconPath } from '../../Constants/icon';
 import { Colors } from '../../Constants/Colors';
-import Fonticon from '../../Constants/FontIcon';
 import ResponsiveText from '../../Components/RnText';
 import { fonts } from '../../Constants/Fonts';
 

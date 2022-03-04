@@ -29,8 +29,6 @@ const SettingScreen = (props) => {
     const userToken = useSelector(state => state.AuthReducer.userToken);
 
     useEffect(() => {
-        // alert(JSON.stringify(userInfo.currency))
-        // alert(JSON.stringify(userInfo.currency_iso))
         setDropDownItem(userInfo?.currency_iso)
         setCurrencySign(userInfo?.currency)
     }, [])
@@ -48,11 +46,9 @@ const SettingScreen = (props) => {
         let data = {}
         data["token"] = userToken;
         data["currency"] = currencyS;
-        data["currency_iso"] = value;
+        data["currency_iso"] = value === 'GHS'? "GH₵": "USD";
         // alert(JSON.stringify(data))
-        await dispatch(_updateCurrency('set_currency', data, userToken))
-
-
+         dispatch(_updateCurrency('set_currency', data, userToken))
     }
 
     return (

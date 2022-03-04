@@ -15,9 +15,7 @@ import Loader from '../../Components/Loader';
 
 import TradeHeading from './TradeHeading'
 import ModalDropdown from 'react-native-modal-dropdown';
-import {
-    CREATE_ORDER,
-} from '../../Redux/Constants'
+import { CREATE_ORDER } from '../../Redux/Constants';
 import { Calendar, CalendarList, Agenda, LocaleConfig } from 'react-native-calendars';
 
 import { useFocusEffect } from '@react-navigation/native';
@@ -27,6 +25,7 @@ import {
     _getMarketList, _getSingleMarketData, _createOrder,
     _getOrdersHistory
 } from '../../Redux/Actions/Actions';
+import Toast from 'react-native-toast-message';
 
 const OrderType = [
     { id: "1", value: "Market" },
@@ -108,7 +107,6 @@ const TradeScreen = (props) => {
         getMarketData()
         setMinDate(tomorrow.toISOString().split('T')[0])
         getSellOrderList()
-        // alert(JSON.stringify(Order_List_History))
     }, [])
 
     const getSellOrderList = async () => {
@@ -172,24 +170,21 @@ const TradeScreen = (props) => {
         data["limit"] = 50;
         data["page"] = 1;
         data["selling"] = isSelling;
-        await dispatch(_getSingleMarketData('get_markets', data))
+        dispatch(_getSingleMarketData('get_markets', data))
 
-        // alert(JSON.stringify(marketData.more_available))
     }
     const getMarketData = async () => {
         let data1 = {}
-        await dispatch(_getMarketList('get_buy_sell_order_for_list', data1))
-        // alert(JSON.stringify(marketList.markets))
+        dispatch(_getMarketList('get_buy_sell_order_for_list', data1))
         setOrderFor(marketList?.markets)
-        // alert(JSON.stringify(tickerData))
-    }
-    const setTickers = async () => {
-        // alert(JSON.stringify(singleMarketData?.markets[0]))
-        setSymbolData(singleMarketData?.markets[0]?.tickers)
     }
     const setMarkets = async () => {
-        setOrderFor(marketList.markets)
+        setOrderFor(marketList?.markets)
     }
+    const setTickers = async () => {
+        setSymbolData(singleMarketData?.markets[0]?.tickers)
+    }
+    
     const renderButtonText = (rowData) => {
         const { id, title, pair } = rowData;
         return <View><Text style={styles.dropDown_textStyle}>{title}</Text></View>;
@@ -230,11 +225,9 @@ const TradeScreen = (props) => {
         setSeason('')
         setBags("0")
         symbolDropDownRef.current.select(-1)
-        // alert("hello2")
     }
     const onSymbolSelect = (item) => {
         setQuantity('')
-        // alert(JSON.stringify(item))
         setWareHouseName(item?.warehouse?.title)
         setWareHouseId(item?.warehouse?.id)
         setDropDownItem1(DropDownItem)
@@ -248,10 +241,6 @@ const TradeScreen = (props) => {
         } else {
             setMaxSellQuantity(parseFloat(item?.my_stocks?.qty))
         }
-        // alert(JSON.stringify(item.harvest.symbol))
-        // alert(JSON.stringify(item.season.symbol))
-        // alert(JSON.stringify(item.my_stocks.qty))
-        // alert("hello2")
     }
     const renderButtonText1 = (rowData) => {
         // const { symbol } = rowData;
@@ -276,22 +265,22 @@ const TradeScreen = (props) => {
     const CreateOrderApi = async () => {
 
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Symbol")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Symbol" } })
         }
         else if (HarvestYear === '') {
-            alert("Please Select Harvest Year")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Harvest Year" } })
         }
         else if (Season === '') {
-            alert("Please Select Season")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Season" } })
         }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
         else if ((orderTypeValue === 'Limit' && price === '')) {
-            alert("Please Enter Price")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Enter Price" } })
         }
         else {
 
@@ -311,19 +300,17 @@ const TradeScreen = (props) => {
             data["warehouse_id"] = wareHouseId;
             data["gtd_date"] = callDate;
             data["advanced"] = 1;
-            // alert(JSON.stringify(data))
-            await dispatch(_createOrder('create_order', data))
+            dispatch(_createOrder('create_order', data))
         }
     }
     const CreateOrderApiBasic = async () => {
-        // alert(selectedBtn.toLowerCase())
         setIsQuantityError(false)
 
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Commodity type")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Commodity type" } })
         }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
@@ -345,9 +332,7 @@ const TradeScreen = (props) => {
             data["warehouse_id"] = wareHouseId;
             data["gtd_date"] = callDate;
             data["advanced"] = 0;
-
-            // alert(JSON.stringify(data))
-            await dispatch(_createOrder('create_order', data))
+            dispatch(_createOrder('create_order', data))
 
         }
 
@@ -355,14 +340,11 @@ const TradeScreen = (props) => {
     const SellOrderApi = async () => {
 
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Symbol")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Symbol" } })
         }
-        // else if (!sellOrdersList?.includes(tickerTitle)) {
-        //     alert("You Can't Place Order for '" + tickerSymbol + "'")
-        // }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
@@ -370,7 +352,7 @@ const TradeScreen = (props) => {
             setIsQuantityError(true)
         }
         else if ((orderTypeValue === 'Limit' && price === '')) {
-            alert("Please Enter Price")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Enter Price" } })
         }
         else {
 
@@ -390,13 +372,10 @@ const TradeScreen = (props) => {
             data["warehouse_id"] = wareHouseId;
             data["gtd_date"] = callDate;
             data["advanced"] = 1;
-            // alert(JSON.stringify(orderTypeValue))
-            // alert(JSON.stringify(data))
-            await dispatch(_createOrder('create_order', data))
+            dispatch(_createOrder('create_order', data))
         }
     }
     const SellOrderApiBasic = async () => {
-        // alert(selectedBtn.toLowerCase())
         setIsQuantityError(false)
 
         if (tickerTitle !== '') {
@@ -423,15 +402,11 @@ const TradeScreen = (props) => {
         }
 
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Commodity type")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Commodity type" } })
         }
-        // else if (!sellOrdersList?.includes(tickerTitle)) {
-        //     alert("You Can't Place Order for '" + tickerSymbol + "'")
-        //     return
-        // }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
@@ -493,16 +468,14 @@ const TradeScreen = (props) => {
         if (bag < 20) {
             setIsQuantityError(true)
         }
-        // alert(text+"  "+MaxSellQuantity)
         if (text > MaxSellQuantity) {
             setIsQuantityError(true)
         }
     }
     const dateSelect = async (day) => {
-        // alert(JSON.stringify(day.dateString))
         setSelectedDate({ [day.dateString]: { selected: true, selectedColor: "#000" } })
         setDateModal(false)
-        await setCallDate(day.dateString)
+        setCallDate(day.dateString)
 
     }
     const selectOrderValidity = async (mode) => {
@@ -704,8 +677,8 @@ const TradeScreen = (props) => {
 
                 {IsQuantityError ?
                     <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{'Quantity must not exceed 2 decimal places.\n Second decimal place digit must be either "5" or "0"'}</Text>
-                    : 
-                    selectedBtn === "Buy" ? <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{""}</Text>: null
+                    :
+                    selectedBtn === "Buy" ? <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{""}</Text> : null
                 }
 
 

@@ -2,57 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
-import Fonticon from '../../Constants/FontIcon';
 import { iconPath } from '../../Constants/icon';
 import { wp } from '../../Helpers/Responsiveness';
-import ResponsiveText from '../../Components/RnText';
-import Header from '../../Components/Header';
 import { fonts } from '../../Constants/Fonts';
-
 import { useSelector, useDispatch } from 'react-redux';
-
 import { _getAssets, _removeNotification } from '../../Redux/Actions/Actions';
 import { _axiosPostAPI } from '../../Apis/Apis';
-import groupBy from 'lodash/groupBy';
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
-} from "react-native-chart-kit";
+import { CURRENT_CURRENCY_FACTOR, MARKET_DATA_LOADING } from '../../Redux/Constants';
 
-const Greendata = {
-    datasets: [
-        {
-            data: [
-                10,
-                8,
-                15,
-                10,
-                15,
-                10,
-                15
-            ]
-        }
-    ]
-}
-const Reddata = {
-    datasets: [
-        {
-            data: [
-                15,
-                10,
-                13,
-                10,
-                12,
-                8,
-                10
-            ]
-        }
-    ]
-}
+import ResponsiveText from '../../Components/RnText';
+import Header from '../../Components/Header';
+import Loader from '../../Components/Loader';
 
 const AssetsScreen = (props) => {
 
@@ -72,18 +32,17 @@ const AssetsScreen = (props) => {
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const AssetsDetails = useSelector(state => state.HomeReducer.AssetsDetails);
     const Alertss = useSelector(state => state.HomeReducer.Alertss);
+    const current_currency_rate = useSelector(state => state.HomeReducer.current_currency_rate);
+    const userInfo = useSelector(state => state.AuthReducer.userInfo);
+    const Assets_Loading = useSelector(state => state.HomeReducer.Assets_Loading);
 
     useEffect(() => {
         setAlertsState(Alertss)
     }, [Alertss])
 
     useEffect(() => {
-        // console.log(userToken)
         getUserAssets()
         setTickerDetails()
-        setTimeout(() => {
-            // console.log(JSON.stringify(AssetsDetails?.stocks[0].groupBy))
-        }, 2500);
     }, [])
     useEffect(() => {
         setTickerDetails()
@@ -162,7 +121,7 @@ const AssetsScreen = (props) => {
             let PriceCount = 0
             let QtyCount = 0
             item.map((itemm) => {
-                PriceCount = PriceCount + (parseFloat(itemm?.price)* parseFloat(itemm?.my_stocks?.qty))
+                PriceCount = PriceCount + (parseFloat(itemm?.price) * parseFloat(itemm?.my_stocks?.qty))
                 totalPriceAll = totalPriceAll + PriceCount
                 QtyCount = QtyCount + parseFloat(itemm?.my_stocks?.qty)
             })
@@ -202,12 +161,12 @@ const AssetsScreen = (props) => {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} color={"#FDBD20"}>{"Cash Balance"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[0, 0, 0, 8]} color={"#000"}>{currency_iso}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[0, 0, 0, 8]} color={"#000"}>{userInfo?.currency_iso}</ResponsiveText>
                     </View>
                     {/* <Fonticon type={"MaterialIcons"} name={"info"} size={wp(6)} color={"#000"} /> */}
                 </View>
 
-                <ResponsiveText size="h6" fontFamily={fonts.Poppins_Bold} color={"#000"}>{cash_balance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</ResponsiveText>
+                <ResponsiveText size="h6" fontFamily={fonts.Poppins_Bold} color={"#000"}>{(cash_balance * current_currency_rate)?.toFixed(2)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</ResponsiveText>
 
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: wp(5) }}>
 
@@ -239,8 +198,8 @@ const AssetsScreen = (props) => {
                         <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{totalStock}</ResponsiveText>
                     </View>
                     <View style={{ alignItems: "center", marginLeft: wp(5) }}>
-                        <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{"GH₵ Value"}</ResponsiveText>
-                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{totalValue}</ResponsiveText>
+                        <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{userInfo?.currency_iso+" Value"}</ResponsiveText>
+                        <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{parseFloat(totalValue * current_currency_rate).toFixed(2)}</ResponsiveText>
                     </View>
                 </View>
             </View>
@@ -275,16 +234,16 @@ const AssetsScreen = (props) => {
                                     <ResponsiveText size="h9">{"Quantity (MT)"}</ResponsiveText>
                                 </View>
                                 <View style={{ flex: .25, alignItems: "flex-end" }}>
-                                    <ResponsiveText size="h9">{"GH₵/MT"}</ResponsiveText>
+                                    <ResponsiveText size="h9">{userInfo?.currency_iso+"/MT"}</ResponsiveText>
                                 </View>
                                 <View style={{ flex: .25, alignItems: "flex-end" }}>
-                                    <ResponsiveText size="h9">{"GH₵/MT"}</ResponsiveText>
+                                    <ResponsiveText size="h9">{userInfo?.currency_iso+" Value"}</ResponsiveText>
                                 </View>
                             </View>
 
                             {/* <Text>{JSON.stringify(item?.length)}</Text> */}
 
-                            {item.map((itemm) =>
+                            {item?.map((itemm) =>
 
                                 <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: itemm.id, marketID: item.id })}
                                     style={{ flexDirection: "row", marginTop: wp(5), }}>
@@ -296,12 +255,12 @@ const AssetsScreen = (props) => {
                                     </View>
                                     <View style={{ flex: .25, alignItems: "flex-end" }}>
                                         <View style={{ alignItems: "flex-end" }}>
-                                            <ResponsiveText size="h8" color={itemm?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(itemm?.price).toFixed(1)}</ResponsiveText>
+                                            <ResponsiveText size="h8" color={itemm?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(itemm?.price * current_currency_rate).toFixed(1)}</ResponsiveText>
                                             <ResponsiveText size="h10" color={itemm?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + itemm?.trend + " %"}</ResponsiveText>
                                         </View>
                                     </View>
                                     <View style={{ flex: .25, alignItems: "flex-end" }}>
-                                        <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{parseFloat(itemm?.price) * parseFloat(itemm?.my_stocks?.qty)}</ResponsiveText>
+                                        <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{parseFloat(itemm?.price * current_currency_rate) * parseFloat(itemm?.my_stocks?.qty)}</ResponsiveText>
                                     </View>
                                 </Pressable>
                             )}
@@ -318,7 +277,7 @@ const AssetsScreen = (props) => {
                                 <View style={{ flex: .25 }}>
                                 </View>
                                 <View style={{ flex: .25, alignItems: "flex-end" }}>
-                                    <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalPrice[index]).toFixed(1)}</ResponsiveText>
+                                    <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalPrice[index] * current_currency_rate).toFixed(1)}</ResponsiveText>
                                 </View>
                             </View>
                         </Pressable>
@@ -329,105 +288,7 @@ const AssetsScreen = (props) => {
                 </View>
             }
 
-
-            {/* <Pressable onPress={() => props.navigation.navigate("AssetsDetailss")}
-                style={{ backgroundColor: "#CCCCCC33", paddingVertical: wp(4), paddingHorizontal: wp(3), paddingBottom: wp(2) }}>
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row" }}>
-                        <Image source={iconPath.coin1} style={{ width: wp(8), height: wp(8), resizeMode: "contain" }} />
-                        <ResponsiveText size="h6" margin={[0, 0, 0, 5]} fontFamily={fonts.Poppins_SemiBold}>{"Soya Bean"}</ResponsiveText>
-                    </View>
-                </View>
-
-
-                <View style={{ flexDirection: "row", marginTop: wp(6),  }}>
-
-                    <View style={{ flex: .19, alignItems: "flex-start" }}>
-                        <ResponsiveText size="h9">{"Ticker"}</ResponsiveText>
-                    </View>
-                    <View style={{ flex: .26, alignItems: "center" }}>
-                        <ResponsiveText size="h9">{"Quantity (MT)"}</ResponsiveText>
-                    </View>
-                    <View style={{ flex: .3 }}>
-                    </View>
-                    <View style={{ flex: .25, alignItems: "flex-end" }}>
-                        <ResponsiveText size="h9">{"GH₵/MT"}</ResponsiveText>
-                    </View>
-
-                </View>
-
-
-                <FlatList
-                    data={TickersState}
-                    keyExtractor={(item, index) => index.toString()}
-                    style={{ marginTop: wp(0), }}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={({ item, index }) => (
-
-                        <View style={{ paddingBottom: wp(2) }}>
-                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{item?.ticker}</ResponsiveText>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, wp(-12)]}>{item?.my_stocks?.qty}</ResponsiveText>
-
-                                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                    {item?.chartData[0]?.price !== undefined &&
-                                        <LineChart
-                                            data={{
-                                                datasets: [
-                                                    {
-                                                        data: item?.chartData?.map((itemm) => {
-                                                            return (
-                                                                parseInt(itemm.price)
-                                                            )
-                                                        })
-                                                    }
-                                                ]
-                                            }}
-                                            width={wp(30)} // from react-native
-                                            height={wp(11)}
-                                            withHorizontalLabels={false}
-                                            flatColor={true}
-                                            chartConfig={{
-                                                backgroundGradientFromOpacity: 0,
-                                                backgroundGradientToOpacity: 0,
-                                                color: (opacity = 1) => item.trend >= 0 ? Colors.greenColor : Colors.redColor,
-                                                propsForDots: { r: "0" },
-                                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
-                                            }}
-                                            bezier
-                                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
-                                        />
-                                    }
-
-                                    <View style={{ alignItems: "flex-end" }}>
-                                        <ResponsiveText size="h8" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(item?.price).toFixed(1)}</ResponsiveText>
-                                        <ResponsiveText size="h10" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + item?.trend + " %"}</ResponsiveText>
-                                    </View>
-                                </View>
-
-                            </View>
-                        </View>
-                    )} />
-
-                <View style={{ backgroundColor: "#D8D8D8", height: 1.5, width: "60%", alignSelf: "center", marginVertical: 18 }} />
-                <View style={{ flexDirection: "row" }}>
-                    <View style={{ flex: .19, alignItems: "flex-start" }}>
-                        <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} margin={[0, 0, wp(6), 0]}>{"Total"}</ResponsiveText>
-                    </View>
-                    <View style={{ flex: .26, alignItems: "center" }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalQuantity).toFixed(2)}</ResponsiveText>
-                    </View>
-                    <View style={{ flex: .3 }}>
-                    </View>
-                    <View style={{ flex: .25, alignItems: "flex-end" }}>
-                        <ResponsiveText size="h9" margin={[0, 0, wp(5), 0]}>{parseFloat(totalPrice).toFixed(1)}</ResponsiveText>
-                    </View>
-                </View>
-            </Pressable> */}
-
-
-
-
+            <Loader loading={Assets_Loading} />
 
         </View>
     )

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, Modal, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
@@ -18,6 +18,7 @@ import { _axiosPostAPI } from '../../Apis/Apis';
 import { useSelector, useDispatch } from 'react-redux';
 import Loader from '../../Components/Loader';
 import Toast, { DURATION } from 'react-native-easy-toast'
+import { DEPOSITE_WITHDRAW_ORDER } from '../../Redux/Constants';
 
 import { _postTransaction } from '../../Redux/Actions/Actions';
 
@@ -37,12 +38,11 @@ const Deposite = (props) => {
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const Deposite_Msg = useSelector(state => state.HomeReducer.Deposite_Msg);
     const ChangePasswordLoading = useSelector(state => state.HomeReducer.ChangePasswordLoading);
+    const Deposite_Withdraw_Created = useSelector(state => state.HomeReducer.Deposite_Withdraw_Created);
 
 
     // useEffect(() => {
-    //     if (Deposite_Msg) {
-    //         toastRef.current.show(Deposite_Msg, 2500);
-    //     }
+    //     // console.log(JSON.stringify(Deposite_Msg))
     // }, [Deposite_Msg]);
 
 
@@ -115,7 +115,7 @@ const Deposite = (props) => {
             data["withdraw_date"] = ''
             data["ticker"] = ''
             data["ticker_id"] = ''
-            await dispatch(_postTransaction('new_transaction', data))
+            dispatch(_postTransaction('new_transaction', data))
             setDepositeAmount('')
             setTransactionId('')
             setImageFile('')
@@ -141,7 +141,7 @@ const Deposite = (props) => {
             data["withdraw_date"] = ''
             data["ticker"] = ''
             data["ticker_id"] = ''
-            await dispatch(_postTransaction('new_transaction', data))
+            dispatch(_postTransaction('new_transaction', data))
             // alert(JSON.stringify(data))
             setDepositeAmount('')
             setTransactionId('')
@@ -252,6 +252,40 @@ const Deposite = (props) => {
             />
             <Loader loading={loading} />
 
+            <Modal
+                style={{ flex: 1 }}
+                animationType="slide"
+                transparent={true}
+                // visible={true}
+                visible={Deposite_Withdraw_Created}
+                onRequestClose={() => { dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false }) }}>
+                <Pressable onPress={() => dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false })}
+                    style={{ width: '100%', height: '100%', justifyContent: 'center', alignSelf: 'center', borderRadius: 15, backgroundColor: "rgba(240, 244, 244, 0.4)", }}>
+                    <View style={[styles.boxWithShadow, styles.inputContainer]}>
+                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderRadius: 20, width: wp(80) }}>
+                            <Fonticon type={"Entypo"} name={"cross"} size={wp(4)} color={Colors.black} style={{ alignSelf: "flex-end", margin: 5 }}
+                                onPress={() => dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false })}
+                            />
+                            <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
+                            <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your request has been successfully submitted</Text>
+                            <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
+                                <Button
+                                    onPress={() => dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false })}
+                                    Text={'Okay'}
+                                    fontFamily={fonts.Poppins_Medium}
+                                    fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
+                                />
+                            </View>
+                        </View>
+
+                    </View>
+                </Pressable>
+
+            </Modal>
+
         </View>
     )
 }
@@ -259,9 +293,6 @@ export default Deposite;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: Colors.white,
-        // justifyContent: "center",
-        // alignItems: "center"
     },
     containerStyle: {
         backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", marginVertical: wp(4),
@@ -299,6 +330,26 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
         marginRight: 10,
         marginTop: wp(-8)
-    }
+    },
+    inputContainer: {
+        alignSelf: 'center',
+        borderRadius: 18,
+    },
+    boxWithShadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: "#fff"
+    },
+    modalBackground: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        backgroundColor: '#00000040',
+        paddingHorizontal: wp(4)
+    },
 
 })

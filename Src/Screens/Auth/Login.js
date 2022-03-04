@@ -48,11 +48,11 @@ const Login = (props) => {
                     setLoading(false)
                     if (response.action === "success") {
                         // ResponseHandle(response.data)
-                        if (response.data.is_password_set) {
+                        if (response.data?.is_password_set) {
                             ResponseHandle(response.data)
                         } else {
-                            // SendOtp(response.data.token)
-                            ResponseHandle(response.data)
+                            SendOtp(response.data.token)
+                            // ResponseHandle(response.data)
 
                         }
                     } else {

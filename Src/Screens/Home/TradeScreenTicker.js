@@ -1,32 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable, Modal } from 'react-native'
+import { View, Text, StyleSheet, Image, Pressable, Modal } from 'react-native'
 
-import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
-import { iconPath } from '../../Constants/icon';
-import { wp } from '../../Helpers/Responsiveness';
 import ResponsiveText from '../../Components/RnText';
 import Header from '../../Components/Header';
-import { fonts } from '../../Constants/Fonts';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
 import InputField from '../../Components/InputField';
 import Loader from '../../Components/Loader';
-
 import TradeHeading from './TradeHeading'
 import ModalDropdown from 'react-native-modal-dropdown';
-import {
-    CREATE_ORDER,
-} from '../../Redux/Constants'
-import { Calendar, CalendarList, Agenda, LocaleConfig } from 'react-native-calendars';
+import Toast from 'react-native-toast-message';
 
+import { Colors } from '../../Constants/Colors';
+import { iconPath } from '../../Constants/icon';
+import { wp } from '../../Helpers/Responsiveness';
+import { fonts } from '../../Constants/Fonts';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { CREATE_ORDER } from '../../Redux/Constants'
+import { Calendar } from 'react-native-calendars';
 import { useFocusEffect } from '@react-navigation/native';
-
 import { useSelector, useDispatch } from 'react-redux';
-import {
-    _getMarketList, _getSingleMarketData, _createOrder,
-    _getOrdersHistory
-} from '../../Redux/Actions/Actions';
+import { _getMarketList, _getSingleMarketData, _createOrder, _getOrdersHistory } from '../../Redux/Actions/Actions';
+
 
 const OrderType = [
     { id: "1", value: "Market" },
@@ -52,12 +47,10 @@ const TradeScreenTicker = (props) => {
     const harvestDropDownRef = React.createRef(ModalDropdown);
     const seasonDropDownRef = React.createRef(ModalDropdown);
 
-
     const [DateModal, setDateModal] = useState(false)
     const [selectedDate, setSelectedDate] = useState('')
     const [minDate, setMinDate] = useState('')
     const [callDate, setCallDate] = useState('')
-
     const [HarvestYear, setHarvestYear] = useState('')
     const [price, setPrice] = useState('')
     const [Season, setSeason] = useState('')
@@ -70,13 +63,10 @@ const TradeScreenTicker = (props) => {
     const [OrderValidityValue, setOrderValidityValue] = useState("Day")
     const [FullTypeValue, setFullTypeValue] = useState("Partial")
     const [AdvanceOptions, setAdvanceOptions] = useState(false)
-
     const [assetsDropdownShow, setAssetsDropdownShow] = useState(false)
     const [DropDownItemm, setDropDownItemm] = useState('')
     const [DropDownItemOrder, setDropDownItemOrder] = useState('')
-
     const [withdrawDropdownShow, setwithdrawDropdownShow] = useState(false)
-
     const [SuccessfulModal, setSuccessfulModal] = useState(false);
     const [wareHouseName, setWareHouseName] = useState('');
     const [wareHouseId, setWareHouseId] = useState('');
@@ -84,32 +74,41 @@ const TradeScreenTicker = (props) => {
     const [tickerId, setTickerId] = useState('');
     const [tickerSymbol, setTickerSymbol] = useState('');
     const [tickerTitle, setTickerTitle] = useState('');
-
     const [MaxSellQuantity, setMaxSellQuantity] = useState(0);
-
     const [Quantity, setQuantity] = useState('');
     const [Bags, setBags] = useState("0");
-
     const [IsQuantityError, setIsQuantityError] = useState(false);
     const [sellOrdersList, setSellOrdersList] = useState([]);
     const [sellOrdersQtyList, setSellOrdersQtyList] = useState([]);
 
+    const userToken = useSelector(state => state.AuthReducer.userToken);
     const marketList = useSelector(state => state.HomeReducer.marketList);
     const singleMarketData = useSelector(state => state.HomeReducer.singleMarketData);
-    const userToken = useSelector(state => state.AuthReducer.userToken);
     const orderCreated = useSelector(state => state.HomeReducer.orderCreated);
     const OrderLoading = useSelector(state => state.HomeReducer.OrderLoading);
     const Order_List_History = useSelector(state => state.HomeReducer.Order_List_History);
 
-
     useEffect(() => {
         var tomorrow = new Date();
-
-        getMarketData()
+        OnOrderSelect({ id: props?.route?.params?.marketID }, 0)
+        setSelectedBtn(props?.route?.params?.btnType)
         setMinDate(tomorrow.toISOString().split('T')[0])
         getSellOrderList()
-        // alert(JSON.stringify(Order_List_History))
     }, [])
+    useFocusEffect(
+        React.useCallback(() => {
+            getTickerDataHistory("history")
+        }, [])
+    )
+    useEffect(() => {
+        marketDropDownRef?.current?.select(0)
+    }, [orderFor])
+    useEffect(() => {
+        symbolDropDownRef?.current?.select(0)
+    }, [symbolData, AdvanceOptions])
+    useEffect(() => {
+        setTickers()
+    }, [singleMarketData])
 
     const getSellOrderList = async () => {
         if (Order_List_History?.length > 0) {
@@ -125,21 +124,6 @@ const TradeScreenTicker = (props) => {
             setSellOrdersQtyList(Arr1)
         }
     }
-    useFocusEffect(
-        React.useCallback(() => {
-            getTickerDataHistory("history")
-        }, [])
-    );
-    useEffect(() => {
-        setMarkets()
-    }, [marketList])
-    useEffect(() => {
-        setTickers()
-    }, [singleMarketData])
-    useEffect(() => {
-        clearData()
-    }, [OrderLoading])
-
     const clearData = async () => {
         setOrderTypeValue('Market')
         setMarketId('')
@@ -169,26 +153,25 @@ const TradeScreenTicker = (props) => {
         data["token"] = userToken;
         data["search"] = data1;
         data["id"] = id;
-        data["limit"] = 50;
-        data["page"] = 1;
         data["selling"] = isSelling;
-        await dispatch(_getSingleMarketData('get_markets', data))
+        dispatch(_getSingleMarketData('get_markets', data))
 
-        // alert(JSON.stringify(marketData.more_available))
     }
     const getMarketData = async () => {
         let data1 = {}
-        await dispatch(_getMarketList('get_buy_sell_order_for_list', data1))
-        // alert(JSON.stringify(marketList.markets))
-        setOrderFor(marketList?.markets)
-        // alert(JSON.stringify(tickerData))
+        dispatch(_getMarketList('get_buy_sell_order_for_list', data1))
     }
     const setTickers = async () => {
-        // alert(JSON.stringify(singleMarketData?.markets[0]))
-        setSymbolData(singleMarketData?.markets[0]?.tickers)
+        setOrderFor([{ id: singleMarketData?.markets[0].id, title: singleMarketData?.markets[0].title, pair: singleMarketData?.markets[0].pair }])
+        singleMarketData?.markets[0].tickers.map((item) => {
+            if (item.id === props?.route?.params?.tickerId) {
+                onSymbolSelect(item)
+                setSymbolData([item])
+            }
+        })
     }
     const setMarkets = async () => {
-        setOrderFor(marketList.markets)
+        setOrderFor(marketList?.markets)
     }
     const renderButtonText = (rowData) => {
         const { id, title, pair } = rowData;
@@ -212,13 +195,13 @@ const TradeScreenTicker = (props) => {
     const OnOrderSelect = (item, isSell) => {
         getSingleMarketData(item.id, isSell)
         setMarketId(item.id)
-        setDropDownItemOrder(DropDownItem)
-        ClearSymbolSelect()
-        let data = {}
-        data["symbol"] = "";
-        renderButtonText1(data)
-        setSymbolData([""])
-        symbolDropDownRef.current.select(-1)
+        // setDropDownItemOrder(DropDownItem)
+        // ClearSymbolSelect()
+        // let data = {}
+        // data["symbol"] = "";
+        // renderButtonText1(data)
+        // setSymbolData([""])
+        // symbolDropDownRef.current.select(-1)
     }
     const ClearSymbolSelect = () => {
         setWareHouseName('')
@@ -230,7 +213,6 @@ const TradeScreenTicker = (props) => {
         setSeason('')
         setBags("0")
         symbolDropDownRef.current.select(-1)
-        // alert("hello2")
     }
     const onSymbolSelect = (item) => {
         setQuantity('')
@@ -241,16 +223,12 @@ const TradeScreenTicker = (props) => {
         setTickerSymbol(item?.symbol)
         setTickerTitle(item?.ticker)
         setHarvestYear(item?.harvest?.symbol)
-        setSeason(item?.season?.symbol)
+        setSeason("1")
         if (item?.my_stocks?.qty === null) {
             setMaxSellQuantity(0)
         } else {
             setMaxSellQuantity(parseFloat(item?.my_stocks?.qty))
         }
-        // alert(JSON.stringify(item.harvest.symbol))
-        // alert(JSON.stringify(item.season.symbol))
-        // alert(JSON.stringify(item.my_stocks.qty))
-        // alert("hello2")
     }
     const renderButtonText1 = (rowData) => {
         // const { symbol } = rowData;
@@ -273,27 +251,25 @@ const TradeScreenTicker = (props) => {
         )
     }
     const CreateOrderApi = async () => {
-
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Symbol")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Symbol" } })
         }
         else if (HarvestYear === '') {
-            alert("Please Select Harvest Year")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Harvest Year" } })
         }
         else if (Season === '') {
-            alert("Please Select Season")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Season" } })
         }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
         else if ((orderTypeValue === 'Limit' && price === '')) {
-            alert("Please Enter Price")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Enter Price" } })
         }
         else {
-
             let data = {}
             data["token"] = userToken;
             data["type"] = selectedBtn.toLowerCase();
@@ -310,26 +286,23 @@ const TradeScreenTicker = (props) => {
             data["warehouse_id"] = wareHouseId;
             data["gtd_date"] = callDate;
             data["advanced"] = 1;
-            // alert(JSON.stringify(data))
-            await dispatch(_createOrder('create_order', data))
+            dispatch(_createOrder('create_order', data))
         }
     }
     const CreateOrderApiBasic = async () => {
-        // alert(selectedBtn.toLowerCase())
         setIsQuantityError(false)
 
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Commodity type")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Commodity type" } })
         }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
         else {
             let data = {}
-
             data["token"] = userToken;
             data["type"] = selectedBtn.toLowerCase();
             data["order_type"] = "market";
@@ -344,24 +317,16 @@ const TradeScreenTicker = (props) => {
             data["warehouse_id"] = wareHouseId;
             data["gtd_date"] = callDate;
             data["advanced"] = 0;
-
-            // alert(JSON.stringify(data))
-            await dispatch(_createOrder('create_order', data))
-
+            dispatch(_createOrder('create_order', data))
         }
-
     }
     const SellOrderApi = async () => {
-
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Symbol")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Symbol" } })
         }
-        // else if (!sellOrdersList?.includes(tickerTitle)) {
-        //     alert("You Can't Place Order for '" + tickerSymbol + "'")
-        // }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
@@ -369,7 +334,7 @@ const TradeScreenTicker = (props) => {
             setIsQuantityError(true)
         }
         else if ((orderTypeValue === 'Limit' && price === '')) {
-            alert("Please Enter Price")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Enter Price" } })
         }
         else {
 
@@ -389,15 +354,11 @@ const TradeScreenTicker = (props) => {
             data["warehouse_id"] = wareHouseId;
             data["gtd_date"] = callDate;
             data["advanced"] = 1;
-            // alert(JSON.stringify(orderTypeValue))
-            // alert(JSON.stringify(data))
-            await dispatch(_createOrder('create_order', data))
+            dispatch(_createOrder('create_order', data))
         }
     }
     const SellOrderApiBasic = async () => {
-        // alert(selectedBtn.toLowerCase())
         setIsQuantityError(false)
-
         if (tickerTitle !== '') {
             var holder = {};
             Order_List_History?.forEach(function (d) {
@@ -422,15 +383,11 @@ const TradeScreenTicker = (props) => {
         }
 
         if (marketId === '') {
-            alert("Please Select Order")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Order" } })
         }
         else if (tickerId === '') {
-            alert("Please Select Commodity type")
+            Toast.show({ type: "message", position: "bottom", props: { body: "Please Select Commodity type" } })
         }
-        // else if (!sellOrdersList?.includes(tickerTitle)) {
-        //     alert("You Can't Place Order for '" + tickerSymbol + "'")
-        //     return
-        // }
         else if ((Quantity === '' || IsQuantityError === true)) {
             setIsQuantityError(true)
         }
@@ -439,7 +396,6 @@ const TradeScreenTicker = (props) => {
         }
         else {
             let data = {}
-
             data["token"] = userToken;
             data["type"] = selectedBtn.toLowerCase();
             data["order_type"] = "market";
@@ -454,10 +410,8 @@ const TradeScreenTicker = (props) => {
             data["warehouse_id"] = wareHouseId;
             data["gtd_date"] = callDate;
             data["advanced"] = 0;
-
-            await dispatch(_createOrder('create_order', data))
+            dispatch(_createOrder('create_order', data))
         }
-
     }
     const setQuantityFun = (text) => {
         setIsQuantityError(false)
@@ -492,16 +446,14 @@ const TradeScreenTicker = (props) => {
         if (bag < 20) {
             setIsQuantityError(true)
         }
-        // alert(text+"  "+MaxSellQuantity)
         if (text > MaxSellQuantity) {
             setIsQuantityError(true)
         }
     }
     const dateSelect = async (day) => {
-        // alert(JSON.stringify(day.dateString))
         setSelectedDate({ [day.dateString]: { selected: true, selectedColor: "#000" } })
         setDateModal(false)
-        await setCallDate(day.dateString)
+        setCallDate(day.dateString)
 
     }
     const selectOrderValidity = async (mode) => {
@@ -537,7 +489,7 @@ const TradeScreenTicker = (props) => {
                 </View>
                 <View style={{ width: "47%" }}>
                     <Button
-                        onPress={() => { setSelectedBtn("Sell"), clearData() }}
+                        onPress={() => { setSelectedBtn("Sell") }}
                         Text={'Sell'}
                         TextColor={selectedBtn === "Sell" ? "#fff" : "rgba(255, 255, 255, 0.5)"}
                         backgroundColor={selectedBtn === "Sell" ? "#DB1222" : "#E6727F"}
@@ -552,6 +504,7 @@ const TradeScreenTicker = (props) => {
                 <ModalDropdown options={orderFor}
                     // defaultValue={DropDownItemOrder}
                     ref={marketDropDownRef}
+                    disabled
                     style={[styles.dropDown, { backgroundColor: assetsDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: assetsDropdownShow ? 1 : 0 }]}
                     dropdownStyle={styles.dropDown_dropDownStyle1}
                     dropdownTextStyle={styles.dropDown_textStyle}
@@ -561,48 +514,30 @@ const TradeScreenTicker = (props) => {
                     renderButtonText={(rowData) => renderButtonText(rowData)}
                     textStyle={{ color: assetsDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(78), fontFamily: fonts.Poppins, borderRadius: 11 }}
                     onSelect={(idx, DropDownItem) => OnOrderSelect(DropDownItem, selectedBtn === "Buy" ? 0 : 1)}
-                    renderRightComponent={() => (<Fonticon type={"AntDesign"} name={assetsDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
+                // renderRightComponent={() => (<Fonticon type={"AntDesign"} name={assetsDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
                 />
 
 
-                
-                        <TradeHeading title={AdvanceOptions? "Symbol :": "Commodity type :"} top={15} />
-                        <ModalDropdown options={symbolData}
-                            ref={symbolDropDownRef}
-                            style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: withdrawDropdownShow ? 1 : 0 }]}
-                            dropdownStyle={[styles.dropDown_dropDownStyle1, { height: wp(40) }]}
-                            dropdownTextStyle={styles.dropDown_textStyle}
-                            onDropdownWillShow={() => setwithdrawDropdownShow(true)}
-                            onDropdownWillHide={() => setwithdrawDropdownShow(false)}
-                            renderRow={(rowData, rowID) => renderDropDownList1(rowData, rowID)}
-                            renderButtonText={(rowData) => renderButtonText1(rowData)}
-                            textStyle={{ color: withdrawDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(78), fontFamily: fonts.Poppins }}
-                            onSelect={(idx, DropDownItem) => onSymbolSelect(DropDownItem)}
-                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={withdrawDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
-                        />
-                    
+
+                <TradeHeading title={AdvanceOptions ? "Symbol :" : "Commodity type :"} top={15} />
+                <ModalDropdown options={symbolData}
+                    ref={symbolDropDownRef}
+                    disabled
+                    style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: withdrawDropdownShow ? 1 : 0 }]}
+                    dropdownStyle={[styles.dropDown_dropDownStyle1, { height: wp(40) }]}
+                    dropdownTextStyle={styles.dropDown_textStyle}
+                    onDropdownWillShow={() => setwithdrawDropdownShow(true)}
+                    onDropdownWillHide={() => setwithdrawDropdownShow(false)}
+                    // renderRow={(rowData, rowID) => renderDropDownList1(rowData, rowID)}
+                    renderButtonText={(rowData) => renderButtonText1(rowData)}
+                    textStyle={{ color: withdrawDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(78), fontFamily: fonts.Poppins }}
+                    onSelect={(idx, DropDownItem) => onSymbolSelect(DropDownItem)}
+                // renderRightComponent={() => (<Fonticon type={"AntDesign"} name={withdrawDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
+                />
+
 
                 {AdvanceOptions &&
                     <>
-
-                        {/* <TradeHeading title={"Symbol :"} top={15} />
-
-                        <ModalDropdown options={symbolData}
-                            ref={symbolDropDownRef}
-                            style={[styles.dropDown, { backgroundColor: withdrawDropdownShow ? "#fff" : Colors.TextInputBackgroundColor, elevation: withdrawDropdownShow ? 1 : 0 }]}
-                            dropdownStyle={[styles.dropDown_dropDownStyle1, { height: wp(40) }]}
-                            dropdownTextStyle={styles.dropDown_textStyle}
-                            onDropdownWillShow={() => setwithdrawDropdownShow(true)}
-                            onDropdownWillHide={() => setwithdrawDropdownShow(false)}
-                            renderRow={(rowData, rowID) => renderDropDownList1(rowData, rowID)}
-                            renderButtonText={(rowData) => renderButtonText1(rowData)}
-                            textStyle={{ color: withdrawDropdownShow ? "#fff" : "#000", marginLeft: 10, fontSize: wp(4), width: wp(78), fontFamily: fonts.Poppins }}
-                            onSelect={(idx, DropDownItem) => onSymbolSelect(DropDownItem)}
-                            renderRightComponent={() => (<Fonticon type={"AntDesign"} name={withdrawDropdownShow ? "caretup" : "caretdown"} size={wp(4)} color={Colors.black} />)}
-                        /> */}
-
-
-
                         <TradeHeading title={"Warehouse :"} top={15} />
                         <InputField value={wareHouseName} editable={false} height={60} />
 
@@ -610,42 +545,42 @@ const TradeScreenTicker = (props) => {
                             <View style={{ flex: 1 }}>
                                 <TradeHeading title={"Harvest Year :"} top={15} />
 
-                                <InputField height={60}
+                                {/* <InputField height={60}
                                     value={HarvestYear}
                                     editable={false}
                                     keyboardType="number-pad"
-                                />
+                                /> */}
 
-                                {/* <ModalDropdown options={['2022', '2021', '2020', '2019', '2018']}
+                                <ModalDropdown options={['2022', '2021', '2020', '2019', '2018']}
                                     ref={harvestDropDownRef}
                                     style={styles.dropDown}
-                                    defaultValue={'Any'}
+                                    defaultValue={'2022'}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
                                     dropdownTextStyle={styles.dropDown_textStyle}
                                     textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
                                     onSelect={(idx, DropDownItem) => setHarvestYear(DropDownItem)}
                                     renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} style={styles.dropDownIcon} />)}
-                                /> */}
+                                />
                             </View>
 
                             <View style={{ marginLeft: 10, flex: 1 }}>
                                 <TradeHeading title={"Season :"} top={15} />
 
-                                <InputField height={60}
+                                {/* <InputField height={60}
                                     value={Season}
                                     keyboardType="number-pad"
-                                />
+                                /> */}
 
-                                {/* <ModalDropdown options={['1', '2', '3', '4']}
+                                <ModalDropdown options={['1', '2', '3', '4']}
                                     ref={seasonDropDownRef}
                                     style={styles.dropDown}
-                                    defaultValue={''}
+                                    defaultValue={'1'}
                                     dropdownStyle={styles.dropDown_dropDownStyle}
                                     dropdownTextStyle={styles.dropDown_textStyle}
                                     textStyle={{ color: "#000", marginLeft: 10, fontSize: wp(4), width: wp(33), fontFamily: fonts.Poppins }}
                                     onSelect={(idx, DropDownItem) => setSeason(DropDownItem)}
                                     renderRightComponent={() => (<Fonticon type={"AntDesign"} name={"caretdown"} size={wp(4)} color={Colors.black} style={styles.dropDownIcon} />)}
-                                /> */}
+                                />
 
                             </View>
 
@@ -698,13 +633,16 @@ const TradeScreenTicker = (props) => {
                     // onChangeText={text => setQuantity(text)}
                     />
                 }
+                {selectedBtn === "Buy" ? null :
+                    <View style={{ alignItems: "flex-end" }}>
+                        <TradeHeading title={"Available Quantity: " + MaxSellQuantity} />
+                    </View>}
 
                 {IsQuantityError ?
-                    <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{"Please Enter Valid Quantity"}</Text>
+                    <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{'Quantity must not exceed 2 decimal places.\n Second decimal place digit must be either "5" or "0"'}</Text>
                     :
-                    <Text style={{ color: 'red', fontSize: 13, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}> {""}</Text>
+                    selectedBtn === "Buy" ? <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{""}</Text> : null
                 }
-
 
 
                 {AdvanceOptions &&
@@ -746,11 +684,11 @@ const TradeScreenTicker = (props) => {
                     </>
                 }
                 {!AdvanceOptions ?
-                    <Pressable onPress={() => {setAdvanceOptions(true), ClearSymbolSelect()}}>
+                    <Pressable onPress={() => { setAdvanceOptions(true) }}>
                         <ResponsiveText size="h8" fontFamily={fonts.Poppins_Light} textAlign={"center"} margin={[wp(10), 0, wp(10), 0]}>{"Advance Options"}</ResponsiveText>
                     </Pressable>
                     :
-                    <Pressable onPress={() => {setAdvanceOptions(false), ClearSymbolSelect()}}>
+                    <Pressable onPress={() => { setAdvanceOptions(false) }}>
                         <ResponsiveText size="h8" fontFamily={fonts.Poppins_Light} textAlign={"center"} margin={[wp(10), 0, wp(10), 0]}>{"Basic Options"}</ResponsiveText>
                     </Pressable>
                 }
@@ -760,7 +698,7 @@ const TradeScreenTicker = (props) => {
                     <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: wp(2), marginVertical: 20 }}>
                         <View style={{ width: "45%", }}>
                             <Button
-                                onPress={() => { clearData() }}
+                                // onPress={() => { clearData() }}
                                 Text={'Clear'}
                                 fontFamily={fonts.Poppins_Medium}
                                 fontSize={16}
@@ -785,7 +723,7 @@ const TradeScreenTicker = (props) => {
                     <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(10), marginTop: wp(2), marginVertical: 20 }}>
                         <View style={{ width: "45%", }}>
                             <Button
-                                onPress={() => clearData()}
+                                // onPress={() => clearData()}
                                 Text={'Clear'}
                                 fontFamily={fonts.Poppins_Medium}
                                 fontSize={16}
@@ -873,23 +811,27 @@ const TradeScreenTicker = (props) => {
                 style={{ flex: 1, }}
                 animationType="slide"
                 transparent={true}
-                // visible={false}
+                // visible={true}
                 visible={orderCreated}
                 onRequestClose={() => { dispatch({ type: CREATE_ORDER, payload: false }) }}>
                 <Pressable onPress={() => dispatch({ type: CREATE_ORDER, payload: false })}
                     style={{ width: '100%', height: '100%', justifyContent: 'center', alignSelf: 'center', borderRadius: 15, backgroundColor: "rgba(240, 244, 244, 0.4)", }}>
                     <View style={[styles.boxWithShadow, styles.inputContainer]}>
-                        <Image source={iconPath.WithdrawSuccess} style={{ width: wp(87), height: wp(40), borderTopRightRadius: 20, borderTopLeftRadius: 20 }}></Image>
-
-                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, width: wp(87), paddingBottom: 15 }}>
-                            <ResponsiveText size="h5" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(5), 0, 0, 0]}>{"Sucessfully order submitted"}</ResponsiveText>
-                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(4), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your order request has been successfully submitted</Text>
-                            <View style={{ paddingHorizontal: wp(5), marginTop: wp(8) }}>
+                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderRadius: 20, width: wp(80) }}>
+                            <Fonticon type={"Entypo"} name={"cross"} size={wp(4)} color={Colors.black} style={{ alignSelf: "flex-end", margin: 5 }}
+                                onPress={() => dispatch({ type: CREATE_ORDER, payload: false })}
+                            />
+                            <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
+                            <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your order request has been successfully submitted</Text>
+                            <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
                                 <Button
                                     onPress={() => dispatch({ type: CREATE_ORDER, payload: false })}
-                                    Text={'Done'}
+                                    Text={'Okay'}
                                     fontFamily={fonts.Poppins_Medium}
                                     fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
                                 />
                             </View>
                         </View>
@@ -903,12 +845,10 @@ const TradeScreenTicker = (props) => {
     )
 }
 export default TradeScreenTicker;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: Colors.white,
-        // justifyContent: "center",
-        // alignItems: "center"
     },
     containerStyle: {
         backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", marginVertical: wp(4),

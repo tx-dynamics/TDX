@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, Modal, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import Fonticon from '../../Constants/FontIcon';
@@ -11,10 +11,11 @@ import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
 import { useFocusEffect } from '@react-navigation/native';
+import Loader from '../../Components/Loader';
 
 
 import { useSelector, useDispatch } from 'react-redux';
-import { _getOrders, _getOrdersHistory } from '../../Redux/Actions/Actions';
+import { _getOrders, _getOrdersHistory, _cancelOrder } from '../../Redux/Actions/Actions';
 
 
 const Orders = (props) => {
@@ -23,9 +24,12 @@ const Orders = (props) => {
 
     const [DropDownItem, setDropDownItem] = useState('')
     const [selectedBtn, setSelectedBtn] = useState("Open")
+    const [cancelOrderModal, setCancelOrderModal] = useState(false)
+    const [cancelOrderId, setCancelOrderId] = useState("")
 
     const Order_List = useSelector(state => state.HomeReducer.Order_List);
     const Order_List_History = useSelector(state => state.HomeReducer.Order_List_History);
+    const Order_Loading = useSelector(state => state.HomeReducer.Order_Loading);
     const userToken = useSelector(state => state.AuthReducer.userToken);
 
     useEffect(() => {
@@ -46,13 +50,11 @@ const Orders = (props) => {
         let data = {}
         data["token"] = userToken;
         data["type"] = type.toLowerCase();
-        data["page"] = 1;
-        data["limit"] = 50;
-        await dispatch(_getOrders('get_orders', data))
-
-        // alert(JSON.stringify(Order_List))
+        // data["page"] = 1;
+        // data["limit"] = 10;
+        // alert(JSON.stringify(data))
+        dispatch(_getOrders('get_orders', data))
     }
-
     const getTickerDataHistory = async (type) => {
         let data = {}
         data["token"] = userToken;
@@ -70,6 +72,25 @@ const Orders = (props) => {
         getTickerDataHistory(type)
         setSelectedBtn(type)
     }
+    const cancelOrder = (item) => {
+        if (item?.status === 0) {
+            setCancelOrderId(item?.id)
+            setTimeout(() => {
+                setCancelOrderModal(true)
+            }, 300);
+        }
+    }
+
+    const cancelOrderApi = () => {
+        setCancelOrderModal(false)
+        let data = {}
+        data["token"] = userToken;
+        data["order_id"] = cancelOrderId;
+
+        // alert(JSON.stringify(cancelOrderId))
+        dispatch(_cancelOrder('cancel_pending_order', data, userToken))
+    }
+
 
     return (
         <View style={styles.container}>
@@ -128,7 +149,8 @@ const Orders = (props) => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
                     <>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, height: 50, paddingHorizontal: wp(2) }}>
+                        <Pressable onLongPress={() => cancelOrder(item)}
+                            style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, height: 50, paddingHorizontal: wp(2) }}>
                             <View style={{ flex: 1, justifyContent: "center" }}>
                                 <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.date?.split('T')[0]}</ResponsiveText>
                             </View>
@@ -144,21 +166,69 @@ const Orders = (props) => {
                             <View style={{ flex: 1, justifyContent: "center" }}>
                                 <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.qty}</ResponsiveText>
                             </View>
-                            <View style={{ flex: 1, justifyContent: "center", }}>
+                            <View style={{ flex: 1, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
 
-                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} color={ item?.status === 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : item?.status === 3 && "red"  } textAlign={"center"}>{item?.status === 0 ? "Pending" : item?.status === 1 ? "Partial" : item?.status === 2 ? "Completed" : item?.status === 3 && "Rejected" }</ResponsiveText>
-                                {/* {selectedBtn === "Open" ?
-                                    <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={item?.status === 0 ? "#DB1222" : "#F4BB32"} textAlign={"center"}>{item?.status === 0 ? "Pending" : "Partial"}</ResponsiveText>
-                                    :
-                                    <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} color={"#019146"} textAlign={"center"}>{"Completed"}</ResponsiveText>
-                                } */}
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : item?.status === 3 && "red"} textAlign={"center"}>{item?.status === 0 ? "Pending" : item?.status === 1 ? "Partial" : item?.status === 2 ? "Completed" : item?.status === 3 && "Rejected"}</ResponsiveText>
+                                {selectedBtn === "Open" ?
+                                    item?.status === 0 ?
+                                        <Fonticon type={"Entypo"} name={"circle-with-cross"} size={18} color={Colors.black}
+                                            style={{ marginLeft: 5 }}
+                                            onPress={() => cancelOrder(item)}
+                                        /> : null
+                                    : null
+                                }
                             </View>
-                        </View>
+                        </Pressable>
                         <View style={{ backgroundColor: "#ECECEC", height: 2, width: wp(100), marginVertical: wp(2) }} />
                     </>
 
 
                 )} />
+
+
+            <Modal
+                style={{ flex: 1, }}
+                animationType="slide"
+                transparent={true}
+                // visible={true}
+                visible={cancelOrderModal}
+                onRequestClose={() => { setCancelOrderModal(false) }}>
+                <Pressable
+                    style={{ width: '100%', height: '100%', justifyContent: 'center', alignSelf: 'center', borderRadius: 15, backgroundColor: "rgba(240, 244, 244, 0.4)", }}>
+                    <View style={[styles.boxWithShadow, styles.inputContainer]}>
+                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderRadius: 20, width: wp(80) }}>
+                            <Fonticon type={"Entypo"} name={"cross"} size={wp(4)} color={Colors.black} style={{ alignSelf: "flex-end", margin: 5 }}
+                                onPress={() => setCancelOrderModal(false)}
+                            />
+                            <Fonticon type={"Entypo"} name={"circle-with-cross"} size={wp(22)} color={"red"} style={{ alignSelf: "center" }} />
+                            {/* <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Order Cancel!"}</ResponsiveText> */}
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 16 }}>Do you want to cancel Order</Text>
+                            <View style={{ width: wp(20), marginTop: wp(5), flexDirection: "row", justifyContent: "space-around", width: "100%" }}>
+                                <Button
+                                    onPress={() => setCancelOrderModal(false)}
+                                    Text={'No'}
+                                    fontFamily={fonts.Poppins_Medium}
+                                    fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
+                                />
+                                <Button
+                                    onPress={() => cancelOrderApi()}
+                                    Text={'Yes'}
+                                    fontFamily={fonts.Poppins_Medium}
+                                    fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
+                                />
+                            </View>
+                        </View>
+
+                    </View>
+                </Pressable>
+
+            </Modal>
+
+            <Loader loading={Order_Loading} />
 
         </View>
     )
@@ -201,6 +271,18 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
         marginRight: 10,
         marginTop: wp(-8)
-    }
+    },
+    inputContainer: {
+        alignSelf: 'center',
+        borderRadius: 18,
+    },
+    boxWithShadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: "#fff"
+    },
 
 })

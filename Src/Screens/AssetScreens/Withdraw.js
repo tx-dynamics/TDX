@@ -18,8 +18,8 @@ import { Calendar, CalendarList, Agenda, LocaleConfig } from 'react-native-calen
 import { useSelector, useDispatch } from 'react-redux';
 import Loader from '../../Components/Loader';
 import Toast, { DURATION } from 'react-native-easy-toast'
-
 import { _postTransaction, _getSingleMarketData } from '../../Redux/Actions/Actions';
+import { DEPOSITE_WITHDRAW_ORDER } from '../../Redux/Constants';
 
 const Withdraw = (props) => {
 
@@ -33,6 +33,7 @@ const Withdraw = (props) => {
     const ChangePasswordLoading = useSelector(state => state.HomeReducer.ChangePasswordLoading);
     const AssetsDetails = useSelector(state => state.HomeReducer.AssetsDetails);
     const singleMarketData = useSelector(state => state.HomeReducer.singleMarketData);
+    const Deposite_Withdraw_Created = useSelector(state => state.HomeReducer.Deposite_Withdraw_Created);
 
     const [DropDownItem, setDropDownItem] = useState('Cash')
     const [DropDownItemm, setDropDownItemm] = useState('Bank Account')
@@ -88,7 +89,7 @@ const Withdraw = (props) => {
         data["token"] = userToken;
         data["search"] = data1;
         data["selling"] = 1;
-        await dispatch(_getSingleMarketData('get_markets', data))
+        dispatch(_getSingleMarketData('get_markets', data))
         // alert(JSON.stringify(marketData.more_available))
     }
 
@@ -109,7 +110,7 @@ const Withdraw = (props) => {
     }
 
     const renderDropDownList1 = (rowData) => {
-        const { id, symbol } = rowData;
+        const { id, symbol, title, ticker } = rowData;
         return (
             <View style={{ backgroundColor: "#fff" }}>
                 <View
@@ -118,15 +119,15 @@ const Withdraw = (props) => {
                     underlayColor="#ffffff00"
                     //  underlayColor="gray" 
                     style={{ marginVertical: 10, }}>
-                    <Text style={[{ fontSize: 15, color: "#000", fontFamily: fonts.Poppins }]}>{symbol}</Text>
+                    <Text style={[{ fontSize: 15, color: "#000", fontFamily: fonts.Poppins }]}>{ticker}</Text>
                 </View>
             </View>
         )
     }
 
     const renderButtonText1 = (rowData) => {
-        const { symbol } = rowData;
-        return <View><Text style={styles.dropDown_textStyle}>{symbol}</Text></View>;
+        const { symbol, ticker } = rowData;
+        return <View><Text style={styles.dropDown_textStyle}>{ticker}</Text></View>;
     }
 
     const setTickerValue = async () => {
@@ -370,8 +371,6 @@ const Withdraw = (props) => {
             </View>
 
 
-
-
             <Modal
                 transparent={true}
                 animationType={'none'}
@@ -399,8 +398,6 @@ const Withdraw = (props) => {
                 </Pressable>
             </Modal>
 
-
-
             <Toast
                 ref={toastRef}
                 style={{ backgroundColor: 'white', paddingVertical: 15, paddingHorizontal: 30, borderRadius: 30 }}
@@ -411,7 +408,39 @@ const Withdraw = (props) => {
             />
             <Loader loading={loading} />
 
+            <Modal
+                style={{ flex: 1 }}
+                animationType="slide"
+                transparent={true}
+                // visible={true}
+                visible={Deposite_Withdraw_Created}
+                onRequestClose={() => { dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false }) }}>
+                <Pressable onPress={() => dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false })}
+                    style={{ width: '100%', height: '100%', justifyContent: 'center', alignSelf: 'center', borderRadius: 15, backgroundColor: "rgba(240, 244, 244, 0.4)", }}>
+                    <View style={[styles.boxWithShadow1, styles.inputContainer1]}>
+                        <View style={{ backgroundColor: "#fff", marginTop: -2, borderRadius: 20, width: wp(80) }}>
+                            <Fonticon type={"Entypo"} name={"cross"} size={wp(4)} color={Colors.black} style={{ alignSelf: "flex-end", margin: 5 }}
+                                onPress={() => dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false })}
+                            />
+                            <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
+                            <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your request has been successfully submitted</Text>
+                            <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
+                                <Button
+                                    onPress={() => dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false })}
+                                    Text={'Okay'}
+                                    fontFamily={fonts.Poppins_Medium}
+                                    fontSize={16}
+                                    TextColor={"rgb(180,180,180)"}
+                                    backgroundColor={"transparent"}
+                                />
+                            </View>
+                        </View>
 
+                    </View>
+                </Pressable>
+
+            </Modal>
 
         </View>
     )
@@ -420,9 +449,6 @@ export default Withdraw;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: Colors.white,
-        // justifyContent: "center",
-        // alignItems: "center"
     },
     containerStyle: {
         backgroundColor: Colors.TextInputBackgroundColor, flexDirection: "row", marginVertical: wp(4),
@@ -493,6 +519,18 @@ const styles = StyleSheet.create({
             fontSize: 14,
             fontFamily: fonts.Poppins,
         },
-    }
+    },
+    inputContainer1: {
+        alignSelf: 'center',
+        borderRadius: 18,
+    },
+    boxWithShadow1: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: "#fff"
+    },
 
 })

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -24,6 +24,9 @@ const SearchNextScreen = (props) => {
 
     const [DropDownItem, setDropDownItem] = useState('White Maize')
     const [DropDownItemm, setDropDownItemm] = useState('Warehouse W9')
+
+   
+    
 
     return (
         <View style={styles.container}>

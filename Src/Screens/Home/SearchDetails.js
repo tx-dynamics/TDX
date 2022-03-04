@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
@@ -11,6 +11,7 @@ import { fonts } from '../../Constants/Fonts';
 import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
 
+import { useSelector, useDispatch } from 'react-redux';
 
 import {
     LineChart,
@@ -64,8 +65,19 @@ const DATA = [
 
 const SearchDetails = (props) => {
 
+    const dispatch = useDispatch();
+
     const [DropDownItem, setDropDownItem] = useState('')
     const [selectedBtn, setSelectedBtn] = useState("Open")
+    const [searchedData, setSearchedData] = useState("Open")
+
+    const current_currency_rate = useSelector(state => state.HomeReducer.current_currency_rate);
+
+
+    useEffect(() => {
+        // alert(JSON.stringify(props.route?.params?.allData[0].tickers))
+        setSearchedData(props.route?.params?.allData[0])
+    }, [])
 
     return (
         <View style={styles.container}>
@@ -76,20 +88,20 @@ const SearchDetails = (props) => {
 
 
             <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: wp(4), marginTop: wp(4) }}>
-                <Image source={iconPath.coin1} style={{ width: wp(13), height: wp(13), resizeMode: "contain" }} />
+                <Image source={{ uri: props.route?.params?.allData[0]?.image_url }} style={{ width: wp(13), height: wp(13), resizeMode: "contain" }} />
                 <View style={{ marginLeft: 5 }}>
-                    <ResponsiveText size="h5" margin={[0, 0, 0, 0]} >{"Maize"}</ResponsiveText>
-                    <ResponsiveText size="h7" margin={[-6, 0, 0, 0]}>{"Warehouse - W9"}</ResponsiveText>
+                    <ResponsiveText size="h5" margin={[0, 0, 0, 0]} >{props.route?.params?.allData[0]?.title}</ResponsiveText>
+                    {/* <ResponsiveText size="h7" margin={[-6, 0, 0, 0]}>{"Warehouse - W9"}</ResponsiveText> */}
                 </View>
             </View>
-            <View style={{ flex: 1, backgroundColor: Colors.TextInputBackgroundColor, marginTop:wp(6) }}>
+            <View style={{ flex: 1, backgroundColor: Colors.TextInputBackgroundColor, marginTop: wp(6) }}>
 
-                <View style={{width:"100%", alignItems:"flex-end", marginTop:wp(3), paddingRight:wp(4)}}>
+                <View style={{ width: "100%", alignItems: "flex-end", marginTop: wp(3), paddingRight: wp(4) }}>
                     <ResponsiveText size="h8" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 0]}>{"Price/MT"}</ResponsiveText>
                 </View>
 
                 <FlatList
-                    data={DATA}
+                    data={props.route?.params?.allData[0].tickers}
                     keyExtractor={(item, index) => index.toString()}
                     style={{ marginTop: wp(0), backgroundColor: Colors.TextInputBackgroundColor }}
                     showsVerticalScrollIndicator={false}
@@ -97,10 +109,49 @@ const SearchDetails = (props) => {
 
                         <View style={{ padding: wp(4), paddingBottom: wp(2), backgroundColor: Colors.TextInputBackgroundColor, }}>
 
-                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
-                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item.coinName}</ResponsiveText>
-
+                            <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: item?.id, marketID: props.route?.params?.allData[0]?.id })}
+                                style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 7 }}>
+                                <ResponsiveText size="h8" margin={[0, 0, 0, 5]}>{item?.ticker}</ResponsiveText>
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    {item?.chartData[0]?.price !== undefined &&
+                                        <LineChart
+                                            data={{
+                                                datasets: [
+                                                    {
+                                                        data: item?.chartData?.map((itemm) => {
+                                                            return (
+                                                                parseInt(itemm?.price)
+                                                            )
+                                                        })
+                                                    }
+                                                ]
+                                            }}
+                                            width={wp(30)} // from react-native
+                                            height={wp(11)}
+                                            withHorizontalLabels={false}
+                                            flatColor={true}
+                                            chartConfig={{
+                                                backgroundGradientFromOpacity: 0,
+                                                backgroundGradientToOpacity: 0,
+                                                color: (opacity = 1) => item?.trend >= 0 ? Colors.greenColor : Colors.redColor,
+                                                propsForDots: { r: "0" },
+                                                propsForBackgroundLines: { stroke: "#CCCCCC33" }
+                                            }}
+                                            bezier
+                                            style={{ paddingRight: 0, paddingTop: 3, transform: [{ translateX: -15 }] }}
+                                        />
+                                    }
+
+                                    <View style={{ alignItems: "flex-end" }}>
+                                        <ResponsiveText size="h8" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(item?.price * current_currency_rate).toFixed(1)}</ResponsiveText>
+                                        <ResponsiveText size="h10" color={item?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{"" + item.trend + " %"}</ResponsiveText>
+                                    </View>
+                                </View>
+
+
+
+
+                                {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
                                     <LineChart
                                         data={item.type === "green" ? Greendata : Reddata}
                                         width={wp(30)} // from react-native
@@ -122,9 +173,9 @@ const SearchDetails = (props) => {
                                         <ResponsiveText size="h8" color={item.type === "green" ? Colors.greenColor : "#DB1222"}>{item.value}</ResponsiveText>
                                         <ResponsiveText size="h10" color={item.type === "green" ? Colors.greenColor : "#DB1222"} margin={[-4, 0, 0, 0]}>{item.percent}</ResponsiveText>
                                     </View>
-                                </View>
+                                </View> */}
 
-                            </View>
+                            </Pressable>
 
 
 
