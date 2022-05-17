@@ -54,6 +54,7 @@ const Withdraw = (props) => {
     const [amount, setAmount] = useState('')
     const [quantity, setQuantity] = useState('')
     const [tickerData, setTickerData] = useState([])
+    const [selectedCashWithdrawType, setSelectedCashWithdrawType] = useState(false)
 
     const [IsQuantityError, setIsQuantityError] = useState(false);
 
@@ -167,6 +168,7 @@ const Withdraw = (props) => {
             setIsQuantityError(true)
         }
         else {
+            setSelectedCashWithdrawType(false)
             let data = {}
             data["token"] = userToken
             data["amount"] = quantity
@@ -174,11 +176,13 @@ const Withdraw = (props) => {
             data["type"] = ''
             data["proof_id"] = ''
             data["image"] = ''
-            data["withdraw_type"] = DropDownItem
+            data["withdraw_type"] = "commodity"
             data["withdraw_date"] = callDate
             data["ticker"] = tickerTitle
             data["ticker_id"] = tickerId
-            await dispatch(_postTransaction('new_transaction', data))
+            data["notes"] = ""
+            // alert(JSON.stringify(data))
+            dispatch(_postTransaction('new_transaction', data))
             setAmount('')
             setQuantity('')
             symbolDropDownRef.current.select(-1)
@@ -191,6 +195,7 @@ const Withdraw = (props) => {
         if (amount === '') {
             toastRef.current.show('Please Enter Amount', 2500);
         } else {
+            setSelectedCashWithdrawType(true)
             let data = {}
             data["token"] = userToken
             data["amount"] = amount
@@ -202,7 +207,7 @@ const Withdraw = (props) => {
             data["withdraw_date"] = ''
             data["ticker"] = ''
             data["ticker_id"] = ''
-            await dispatch(_postTransaction('new_transaction', data))
+            dispatch(_postTransaction('new_transaction', data))
             setAmount('')
             // alert(JSON.stringify(data))
         }
@@ -245,7 +250,7 @@ const Withdraw = (props) => {
             <Header left LeftImage ImageName={iconPath.backArrow}
                 midtitle title={"Withdrawal"}
                 leftPress={() => props.navigation.goBack()} />
-
+                <ScrollView>
             <View style={{ paddingHorizontal: wp(4), marginTop: wp(5), flex: 1 }}>
                 <ResponsiveText size="h8" color={"#616161"} margin={[0, 0, 5, 0]}>{"Choose Asset :"}</ResponsiveText>
                 <ModalDropdown options={['Cash', 'Commodity']}
@@ -369,7 +374,7 @@ const Withdraw = (props) => {
                     </View>
                 </View>
             </View>
-
+            </ScrollView>
 
             <Modal
                 transparent={true}
@@ -424,7 +429,7 @@ const Withdraw = (props) => {
                             />
                             <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
                             <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
-                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your request has been successfully submitted</Text>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>{selectedCashWithdrawType === true ? "Withdrawals may be subject to bank charges.":"Your request has been successfully submitted"  }</Text>
                             <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
                                 <Button
                                     onPress={() => dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: false })}

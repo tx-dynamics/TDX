@@ -31,6 +31,7 @@ import {
     ORDER_DATA_LOADING,
     TRANSACTION_DATA_LOADING
 } from '../Constants'
+import Toast from 'react-native-toast-message';
 
 import { _axiosPostAPI } from '../../Apis/Apis';
 
@@ -141,6 +142,7 @@ export const _getGraphData = (url, params) => {
         return async dispatch => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
+                    // alert(JSON.stringify(response))
                     if (response.action === "success") {
                         dispatch({ type: TICKER_GRAPH_DATA, payload: response?.data?.chartData })
                     } else {
@@ -148,10 +150,12 @@ export const _getGraphData = (url, params) => {
                     }
                 })
                 .catch((err) => {
+                    alert("err")
                     console.log(JSON.stringify(err))
                 })
         };
     } catch (error) {
+        alert("err")
         console.log(JSON.stringify(error))
     }
 }
@@ -248,7 +252,7 @@ export const _removeNotification = (url, params, token) => {
 export const _getAssets = (url, params) => {
     try {
         return async dispatch => {
-            dispatch({ type: ASSETS_DATA_LOADING, payload: true });
+            // dispatch({ type: ASSETS_DATA_LOADING, payload: true });
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     dispatch({ type: ASSETS_DATA_LOADING, payload: false });
@@ -279,11 +283,12 @@ export const _postTransaction = (url, params) => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     dispatch({ type: CHANGEPASSWORD_LOADING, payload: false });
-                    alert(JSON.stringify(response))
+                    // alert(JSON.stringify(response))
                     if (response.action === "success") {
                         // dispatch({ type: DEPOSITE_MSG, payload: response.action });
                         dispatch({ type: DEPOSITE_WITHDRAW_ORDER, payload: true })
                     } else {
+                        Toast.show({ type: "message", position: "bottom", props: { body: response?.error } })
                         // dispatch({ type: DEPOSITE_MSG, payload: response.error });
                         // alert(JSON.stringify(response.error))
                     }
@@ -631,7 +636,9 @@ export const _createOrder = (url, params) => {
                     if (response.action === "success") {
                         dispatch({ type: CREATE_ORDER, payload: true })
                     } else {
-                        console.log(JSON.stringify(response.error))
+                        Toast.show({ type: "message", position: "bottom", props: { body: response?.error } })
+
+                        // console.log(JSON.stringify(response.error))
                     }
                 })
                 .catch((err) => {
@@ -719,7 +726,7 @@ export const _getMarketNews = (url, params) => {
             await _axiosPostAPI(url, params)
                 .then(async (response) => {
                     if (response.action === "success") {
-                        dispatch({ type: MARKET_NEWS, payload: response.data.infos })
+                        dispatch({ type: MARKET_NEWS, payload: response.data.blogs })
                     } else {
                         console.log(JSON.stringify(response.error))
                     }

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Linking, Pressable } from 'react-native'
 
-import { Colors } from '../../Constants/Colors';
-import Fonticon from '../../Constants/FontIcon';
+
 import { iconPath } from '../../Constants/icon';
 import { wp } from '../../Helpers/Responsiveness';
 import ResponsiveText from '../../Components/RnText';
@@ -12,11 +11,8 @@ import moment from 'moment';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { _getMarketNews } from '../../Redux/Actions/Actions';
+import Toast from 'react-native-toast-message';
 
-const DATA = [
-    { id: "1", imageName: iconPath.marketInfo1, desc: "Oprah's Weight Watchers Stake Shrinks by $580M", link: "investopedia.com" },
-    { id: "2", imageName: iconPath.marketInfo2, desc: "Wayfair Retests 52-Week Highs After Strong Q4", link: "investopedia.com" },
-]
 
 const MarketInfoScreen = (props) => {
 
@@ -31,16 +27,29 @@ const MarketInfoScreen = (props) => {
         getNews()
     }, [])
 
-    useEffect(() => {
-        // alert(JSON.stringify(Market_News[1].created_at))
-    }, [Market_News])
-
     const getNews = async () => {
         let data = {}
         data["token"] = userToken;
-        data["page"] = 1;
-        data["limit"] = 20;
-        dispatch(_getMarketNews('get_infos', data))
+        dispatch(_getMarketNews('get_blogs', data))
+    }
+
+    function validURL(str) {
+        var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+            '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+        return !!pattern.test(str);
+    }
+
+    const openLink = (link) => {
+        let check = validURL(link)
+        if (check) {
+            Linking.openURL(link.includes("http")? link : "https://"+link)
+        } else {
+            Toast.show({ type: "message", position: "bottom", props: { body: "Link is not Valid" } })  
+        }
     }
 
     return (
@@ -57,13 +66,13 @@ const MarketInfoScreen = (props) => {
                 contentContainerStyle={{ paddingHorizontal: wp(4) }}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
-                    <Pressable onPress={() => Linking.openURL('http://' + item.link)}
+                    <Pressable onPress={() => openLink(item.link)}
                         style={styles.itemContainer}>
                         <Image source={{ uri: item.image_url }} style={{ width: wp(28), height: wp(20), borderRadius: 10 }} />
                         <View style={{ marginLeft: 10, width: "65%" }}>
                             <ResponsiveText size="h8" padding={[0, 0, 0, 0]} >{item.title}</ResponsiveText>
-                            <View style={{flexDirection:"row", justifyContent:"space-between", alignItems:"flex-end", flex:1}}>
-                                <ResponsiveText size="h9" padding={[0, 0, 0, 0]} >{"Category"}</ResponsiveText>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", flex: 1 }}>
+                                <ResponsiveText size="h9" padding={[0, 0, 0, 0]} >{item.ticker_title}</ResponsiveText>
                                 <ResponsiveText size="h9" padding={[0, 0, 0, 0]} >{moment(item?.created_at).format('DD MMM YYYY')}</ResponsiveText>
                             </View>
                         </View>

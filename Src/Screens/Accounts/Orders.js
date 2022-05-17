@@ -132,6 +132,9 @@ const Orders = (props) => {
                 <View style={{ flex: 1, justifyContent: "center" }}>
                     <ResponsiveText size="h8" margin={[0, 0, 0, 0]} textAlign={"center"} color={"#fff"}>{"Qty\n(MT)"}</ResponsiveText>
                 </View>
+                <View style={{ flex: 0.8, justifyContent: "center" }}>
+                    <ResponsiveText size="h8" margin={[0, 0, 0, 0]} textAlign={"center"} color={"#fff"}>{"Fee"}</ResponsiveText>
+                </View>
                 <View style={{ flex: 1, justifyContent: "center" }}>
                     <ResponsiveText size="h8" margin={[0, 0, 0, 0]} textAlign={"center"} color={"#fff"}>{"Status"}</ResponsiveText>
                 </View>
@@ -147,7 +150,9 @@ const Orders = (props) => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
                     <>
-                        <Pressable onLongPress={() => cancelOrder(item)}
+                        <Pressable 
+                        // onPress={()=> alert(JSON.stringify(item))}
+                        onLongPress={() => cancelOrder(item)}
                             style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, height: 50, paddingHorizontal: wp(2) }}>
                             <View style={{ flex: 1, justifyContent: "center" }}>
                                 <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.date?.split('T')[0]}</ResponsiveText>
@@ -164,9 +169,14 @@ const Orders = (props) => {
                             <View style={{ flex: 1, justifyContent: "center" }}>
                                 <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{item?.qty}</ResponsiveText>
                             </View>
-                            <View style={{ flex: 1, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
+                            <View style={{ flex: 0.8, justifyContent: "center" }}>
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[0, 0, 0, 0]} textAlign={"center"}>{Number(item?.fee).toFixed(2)}</ResponsiveText>
+                            </View>
+                            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
 
-                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : item?.status === 3 && "red"} textAlign={"center"}>{item?.status === 0 ? "Pending" : item?.status === 1 ? "Partial" : item?.status === 2 ? "Completed" : item?.status === 3 && "Rejected"}</ResponsiveText>
+                            {/* c_by_user */}
+                                <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} margin={[10,0,0,0]} color={item?.status === 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : item?.status === 3 && "red"} textAlign={"center"}>{item?.status === 0 ? "Pending" : item?.status === 1 ? "Partial" : item?.status === 2 ? "Completed" : item?.status === 3 && item.c_by_user == 1 ? "Cancelled"  : "Rejected" }</ResponsiveText>
+                                {/* <ResponsiveText size="h10" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#DB1222" : item?.status === 1 ? "#F4BB32" : item?.status === 2 ? "#019146" : item?.status === 3 && "red"} textAlign={"center"}>{item?.status === 0 ? "Pending" : item?.status === 1 ? "Partial" : item?.status === 2 ? "Completed" : item?.status === 3  && "Cancelled"}</ResponsiveText> */}
                                 {selectedBtn === "Open" ?
                                     item?.status === 0 ?
                                         <Fonticon type={"Entypo"} name={"circle-with-cross"} size={18} color={Colors.black}

@@ -15,17 +15,13 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../../Components/Button';
 import InputField from '../../Components/InputField';
 import moment from 'moment';
-import HTMLView from 'react-native-htmlview';
-import ViewMoreText from 'react-native-view-more-text';
-import HTML from 'react-native-render-html';
-import SeeMore from 'react-native-see-more-inline';
+// import Toast from 'react-native-toast-message';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { _getTickerData, _getNewsData, _addToWishList, _getAllWatchList, _addAlert, _getGraphData } from '../../Redux/Actions/Actions';
 import { ADD_ALERT_ORDER } from '../../Redux/Constants';
 
 const DayDATA = [
-    { id: "1", title: "1 D" },
     { id: "2", title: "1 w" },
     { id: "3", title: "1 M" },
     { id: "4", title: "3 M" },
@@ -35,7 +31,19 @@ const DayDATA = [
 ]
 import { LineChart } from "react-native-chart-kit";
 import Toast, { DURATION } from 'react-native-easy-toast'
+// import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
+const data11 = [];
+
+const rand = 300;
+for (let i = 0; i < 7; i++) {
+    let d = {
+        year: 2000 + i,
+        value: Math.random() * (rand + 50) + 100
+    };
+
+    data11.push(d);
+}
 
 const AssetsDetails = (props) => {
 
@@ -53,7 +61,8 @@ const AssetsDetails = (props) => {
     const [alertPrice, setAlertPrice] = useState('')
     const [dataSetArray, setDataSetArray] = useState([])
     const [selectedId, setselectedId] = useState("2")
-
+    const [datesLabel, setDatesLabel] = useState([])
+   
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const tickerData = useSelector(state => state.HomeReducer.tickerData);
     const newsData = useSelector(state => state.HomeReducer.newsData);
@@ -64,6 +73,7 @@ const AssetsDetails = (props) => {
     const userInfo = useSelector(state => state.AuthReducer.userInfo);
 
     useEffect(() => {
+        // alert( props?.route?.params?.tickerId)
         getTickerData()
         getWatchlistMarkets()
     }, [])
@@ -87,8 +97,80 @@ const AssetsDetails = (props) => {
     }, [WatchListMarkets])
 
     useEffect(() => {
-        setDataSetArray(graphDataSet)
+        setGraphData()
     }, [graphDataSet])
+
+    const setGraphData = () => {
+        setDataSetArray(graphDataSet)
+
+        if (selectedId == "2") {
+
+           let labels = graphDataSet?.map((itemm) => {
+                return (
+                    itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
+                )
+            })
+            setDatesLabel(labels)
+            // alert(JSON.stringify(labels))
+        }
+        else if (selectedId == "3") {
+            let labels = graphDataSet?.map((itemm) => {
+                return (
+                    itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
+                )
+            })
+            let labels1 = [labels[0], labels[5], labels[10], labels[15], labels[20], labels[25], labels[labels.length -1] ]
+            setDatesLabel(labels1)
+            // alert(JSON.stringify(labels1))
+        }
+        else if (selectedId == "4") {
+            let labels = graphDataSet?.map((itemm) => {
+                return (
+                    itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
+                )
+            })
+            let labels1 = [labels[0], labels[15], labels[30], labels[45], labels[60], labels[75], labels[labels.length -1] ]
+            setDatesLabel(labels1)
+            // alert(JSON.stringify(labels1))
+
+        }
+        else if (selectedId == "5") {
+
+            let labels = graphDataSet?.map((itemm) => {
+                return (
+                    itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
+                )
+            })
+            let labels1 = [labels[0], labels[30], labels[60], labels[90], labels[120], labels[150], labels[labels.length -1] ]
+            setDatesLabel(labels1)
+            // alert(JSON.stringify(labels1))
+        }
+        else if (selectedId == "6") {
+
+            let labels = graphDataSet?.map((itemm) => {
+                return (
+                    itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
+                )
+            })
+            let labels1 = [labels[0], labels[60], labels[120], labels[180], labels[240], labels[300], labels[labels.length -1] ]
+            setDatesLabel(labels1)
+            // alert(JSON.stringify(labels1))
+
+        }
+        else if (selectedId == "7") {
+
+            let labels = graphDataSet?.map((itemm) => {
+                return (
+                    itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
+                )
+            })
+            let labels1 = [labels[0], labels[120], labels[240], labels[360], labels[480], labels[600], labels[labels.length -1] ]
+            setDatesLabel(labels1)
+            // alert(JSON.stringify(labels1))
+
+        }
+
+    }
 
     const CheckIsWatchList = () => {
         if (WatchListMarkets?.length > 0) {
@@ -106,6 +188,7 @@ const AssetsDetails = (props) => {
     }
 
     const getTickerData = async () => {
+        // alert(props.route.params.tickerId)
         let data = {}
         data["token"] = userToken;
         data["id"] = props?.route?.params?.tickerId;
@@ -114,11 +197,15 @@ const AssetsDetails = (props) => {
         data1["token"] = userToken;
         data1["tickers"] = [props.route.params.tickerId];
         dispatch(_getNewsData('get_blogs', data1))
+
+        let fromDate = createDate(7, 0, 0)
+        // let fromDate = createDate(0, 3, 0)
         let data2 = {}
         data2["token"] = userToken;
         data2["id"] = props?.route?.params?.tickerId;
-        data2["days"] = 1;
-        dispatch(_getGraphData('get_chart', data))
+        data2["from_date"] = moment(fromDate).format("yyyy-MM-DD");
+        data2["to_date"] = moment(new Date()).format("yyyy-MM-DD");
+        dispatch(_getGraphData('get_chart_v3', data2))
     }
 
     const getWatchlistMarkets = async () => {
@@ -180,16 +267,45 @@ const AssetsDetails = (props) => {
     }
 
     const changeDataset = (item) => {
-        if (item?.id !== "1") {
             setselectedId(item?.id)
-        }
+        let fromDate = item?.id === "2" ? createDate(7, 0, 0) : item?.id === "3" ? createDate(0, 1, 0) : item?.id === "4" ? createDate(0, 3, 0) : item?.id === "5" ? createDate(0, 6, 0) : item?.id === "6" ? createDate(0, 0, 1) : item?.id == "7" ? createDate(0, 0, 2) : createDate(7, 0, 0)
+
         let data = {}
         data["token"] = userToken;
         data["id"] = props?.route?.params?.tickerId;
-        data["days"] = item?.id === "2" ? 1 : item?.id === "3" ? 5 : item?.id === "4" ? 15 : item?.id === "5" ? 30 : item?.id === "6" ? 61 : item?.id === "7 " ? 365 : 1;
-        dispatch(_getGraphData('get_chart', data))
+        data["from_date"] = moment(fromDate).format("yyyy-MM-DD");
+        data["to_date"] = moment(new Date()).format("yyyy-MM-DD");
+        dispatch(_getGraphData('get_chart_v3', data))
+        //    alert(JSON.stringify(data))
     }
 
+    function createDate(days, months, years) {
+        var date = new Date();
+        date.setDate(date.getDate() - days);
+        date.setMonth(date.getMonth() - months);
+        date.setFullYear(date.getFullYear() - years);
+        return date;
+    }
+
+    function validURL(str) {
+        var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+            '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+        return !!pattern.test(str);
+    }
+
+    const openLink = (link) => {
+        let check = validURL(link)
+        if (check) {
+            Linking.openURL(link.includes("http")? link : "https://"+link)
+        } else {
+            toastReff.current.show('Please Enter Price', 2500);
+            // Toast.show({ type: "message", position: "bottom", props: { body: "Link is not Valid" } })  
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -216,7 +332,7 @@ const AssetsDetails = (props) => {
                         <ResponsiveText size="h6" fontFamily={fonts.Poppins_SemiBold} margin={[0, 0, 0, 5]}>{tickerData?.ticker?.ticker}</ResponsiveText>
                         <View style={{ alignItems: "flex-end" }}>
                             <View style={{ flexDirection: "row" }}>
-                                <ResponsiveText size="h8" color={"#000"}>{userInfo?.currency_iso + "  "}</ResponsiveText>
+                                <ResponsiveText size="h8" color={"#000"}>{userInfo?.currency + "  "}</ResponsiveText>
                                 <ResponsiveText size="h8" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor}>{parseFloat(tickerData?.ticker?.price * current_currency_rate).toFixed(1)}</ResponsiveText>
                             </View>
                             <ResponsiveText size="h9" color={tickerData?.ticker?.trend >= 0 ? Colors.greenColor : Colors.redColor} margin={[-4, 0, 0, 0]}>{tickerData?.ticker?.trend + " %"}</ResponsiveText>
@@ -228,16 +344,12 @@ const AssetsDetails = (props) => {
                         {dataSetArray?.length > 0 &&
                             <LineChart
                                 data={{
-                                    labels: dataSetArray?.map((itemm) => {
-                                        return (
-                                            itemm.date.split('T')[0].split('-')[2] + "/" + itemm.date.split('-')[1]
-                                        )
-                                    }),
+                                    labels: datesLabel,
                                     datasets: [
                                         {
                                             data: dataSetArray?.map((itemm) => {
                                                 return (
-                                                    parseInt(itemm?.price)
+                                                    parseInt(itemm?.price * current_currency_rate)
                                                 )
                                             })
                                         }
@@ -245,7 +357,8 @@ const AssetsDetails = (props) => {
                                 }}
                                 width={Dimensions.get("window").width - 7} // from react-native
                                 height={160}
-                                yAxisLabel={userInfo?.currency}
+                                // yAxisLabel={userInfo?.currency}
+                                xAxisLabel={""}
                                 // yAxisSuffix="k"
                                 // yAxisInterval={1} // optional, defaults to 1
                                 chartConfig={{
@@ -261,19 +374,16 @@ const AssetsDetails = (props) => {
                                 bezier
                                 style={{
                                     marginVertical: 8,
-                                    // backgroundColor:"green",
-                                    transform: [{ translateX: 3 }]
+                                    transform: [{ translateX: 3 }],
                                 }}
                             />
                         }
                     </View>
-
-
-                    <View style={{ paddingHorizontal: wp(4) }}>
+                    <View style={{ paddingHorizontal: wp(4), alignItems: "center" }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {DayDATA.map((item, index) =>
                                 <Pressable onPress={() => changeDataset(item)}
-                                    style={{ marginLeft: index === 0 ? 0 : wp(4), backgroundColor: selectedId === item?.id ? Colors.greenColor : "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
+                                    style={{ marginLeft: index === 0 ? 0 : wp(6), backgroundColor: selectedId === item?.id ? Colors.greenColor : "#00000033", width: 41, alignItems: "center", height: 31, justifyContent: "center", borderRadius: 15 }}>
                                     <ResponsiveText color={selectedId === item?.id ? "#fff" : "#000"} size="h8" margin={[0, 0, 0, 0]}>{item?.title}</ResponsiveText>
                                 </Pressable>
                             )}
@@ -362,7 +472,8 @@ const AssetsDetails = (props) => {
                 {/* seeMore: true, */}
                 {/* isLinesLarger: true */}
                 {blogsPosts?.map((item, index) =>
-                    <View style={{
+                    <Pressable onPress={() => openLink(item.link)}
+                    style={{
                         backgroundColor: Colors.TextInputBackgroundColor, marginTop: wp(2), marginHorizontal: wp(4), paddingHorizontal: wp(4),
                         paddingVertical: wp(2), borderRadius: 16,
                     }}>
@@ -383,13 +494,8 @@ const AssetsDetails = (props) => {
                                 <Text onPress={() => showMoreClick(index, item?.seeMore)} style={{ color: "blue" }}>{item?.isLinesLarger ? item?.seeMore ? " See less" : " See more..." : ""} </Text>
                                 {/* {isLargeNumberLines ? " Yes Show more" : ""} */}
                             </Text>
-
-
                         </View>
-
-
-
-                    </View>
+                    </Pressable>
                 )}
 
             </ScrollView>
@@ -498,7 +604,7 @@ const AssetsDetails = (props) => {
                             />
                             <Fonticon type={"Feather"} name={"check-circle"} size={wp(22)} color={Colors.greenColor} style={{ alignSelf: "center" }} />
                             <ResponsiveText size="h3" fontFamily={fonts.Poppins_Bold} textAlign={"center"} margin={[wp(1), 0, 0, 0]}>{"Success!"}</ResponsiveText>
-                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your request has been successfully submitted</Text>
+                            <Text style={{ color: "#000", textAlign: "center", marginTop: wp(1), width: wp(80), alignSelf: "center", fontFamily: fonts.Poppins, fontSize: 13 }}>Your alert has been successfully created</Text>
                             <View style={{ width: wp(20), marginTop: wp(5), alignSelf: "center" }}>
                                 <Button
                                     onPress={() => dispatch({ type: ADD_ALERT_ORDER, payload: false })}

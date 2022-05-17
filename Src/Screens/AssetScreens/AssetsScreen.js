@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, Dimensions, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, StatusBar, RefreshControl, FlatList, Pressable } from 'react-native'
 
 import { Colors } from '../../Constants/Colors';
 import { iconPath } from '../../Constants/icon';
@@ -8,17 +8,17 @@ import { fonts } from '../../Constants/Fonts';
 import { useSelector, useDispatch } from 'react-redux';
 import { _getAssets, _removeNotification } from '../../Redux/Actions/Actions';
 import { _axiosPostAPI } from '../../Apis/Apis';
-import { CURRENT_CURRENCY_FACTOR, MARKET_DATA_LOADING } from '../../Redux/Constants';
+import { ASSETS_DATA_LOADING } from '../../Redux/Constants';
 
 import ResponsiveText from '../../Components/RnText';
 import Header from '../../Components/Header';
 import Loader from '../../Components/Loader';
+import { useFocusEffect } from '@react-navigation/native';
 
 const AssetsScreen = (props) => {
 
     const dispatch = useDispatch();
 
-    const [Notificationss, setNotificationss] = useState([])
     const [cash_balance, setCash_balance] = useState('')
     const [currency_iso, setCurrency_iso] = useState('')
     const [totalStock, setTotalStock] = useState('')
@@ -29,6 +29,7 @@ const AssetsScreen = (props) => {
     const [AlertsState, setAlertsState] = useState([])
     const [TickersState, setTickersState] = useState([])
     const [StockMarkets, setStockMarkets] = useState([])
+    const [refreshLoading, setRefreshLoading] = useState(false)
 
     const userToken = useSelector(state => state.AuthReducer.userToken);
     const AssetsDetails = useSelector(state => state.HomeReducer.AssetsDetails);
@@ -42,12 +43,27 @@ const AssetsScreen = (props) => {
     }, [Alertss])
 
     useEffect(() => {
-        getUserAssets()
-        setTickerDetails()
+        dispatch({ type: ASSETS_DATA_LOADING, payload: true });
     }, [])
     useEffect(() => {
         setTickerDetails()
     }, [AssetsDetails])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            getUserAssets()
+            setTickerDetails()
+        }, [])
+    );
+
+    const refreshScreen = () => {
+        setRefreshLoading(true)
+        getUserAssets()
+        setTickerDetails()
+        setTimeout(() => {
+            setRefreshLoading(false)
+        }, 600);
+    }
 
     useEffect(() => {
         if ((AssetsDetails !== "" || AssetsDetails !== undefined)) {
@@ -161,7 +177,6 @@ const AssetsScreen = (props) => {
             <Header left LeftImage ImageName={iconPath.drawerIcon}
                 midtitle title={"Assets"}
                 leftPress={() => props.navigation.openDrawer()} />
-
             <View style={styles.cashBalance}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -202,7 +217,7 @@ const AssetsScreen = (props) => {
                         <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{totalAllQuantity}</ResponsiveText>
                     </View>
                     <View style={{ alignItems: "center", marginLeft: wp(5) }}>
-                        <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{userInfo?.currency_iso+" Value"}</ResponsiveText>
+                        <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={"#000"}>{userInfo?.currency_iso + " Value"}</ResponsiveText>
                         <ResponsiveText size="h9" margin={[3, 0, 0, 0]} color={"#000"}>{parseFloat(totalValue * current_currency_rate).toFixed(2)}</ResponsiveText>
                     </View>
                 </View>
@@ -213,6 +228,8 @@ const AssetsScreen = (props) => {
                 <FlatList
                     data={StockMarkets}
                     extraData={StockMarkets}
+                    onRefresh={() => refreshScreen()}
+                    refreshing={refreshLoading}
                     keyExtractor={(item, index) => index.toString()}
                     style={{ marginTop: wp(3.5) }}
                     showsVerticalScrollIndicator={false}
@@ -238,10 +255,10 @@ const AssetsScreen = (props) => {
                                     <ResponsiveText size="h9">{"Quantity (MT)"}</ResponsiveText>
                                 </View>
                                 <View style={{ flex: .25, alignItems: "flex-end" }}>
-                                    <ResponsiveText size="h9">{userInfo?.currency_iso+"/MT"}</ResponsiveText>
+                                    <ResponsiveText size="h9">{userInfo?.currency_iso + "/MT"}</ResponsiveText>
                                 </View>
                                 <View style={{ flex: .25, alignItems: "flex-end" }}>
-                                    <ResponsiveText size="h9">{userInfo?.currency_iso+" Value"}</ResponsiveText>
+                                    <ResponsiveText size="h9">{userInfo?.currency_iso + " Value"}</ResponsiveText>
                                 </View>
                             </View>
 
@@ -249,7 +266,9 @@ const AssetsScreen = (props) => {
 
                             {item?.map((itemm) =>
 
-                                <Pressable onPress={() => props.navigation.navigate("AssetsDetails", { tickerId: itemm.id, marketID: item.id })}
+                                <Pressable 
+                                // onPress={() => alert(JSON.stringify(itemm.market.id))}
+                                onPress={() => props.navigation.navigate("AssetsDetailsss", { tickerId: itemm.id, marketID: itemm?.market?.id })}
                                     style={{ flexDirection: "row", marginTop: wp(5), }}>
                                     <View style={{ flex: .25, alignItems: "flex-start" }}>
                                         <ResponsiveText size="h8" margin={[0, 0, 0, 0]}>{itemm?.ticker}</ResponsiveText>

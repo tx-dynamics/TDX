@@ -241,8 +241,21 @@ const HomeScreen = (props) => {
     }
     const addIndexExpand = (index) => {
         var selectedIdss = [...expandedIndexes]
-        selectedIdss.push(index)
+
+        // selectedIdss.push(index)
+        // setExpandedIndexes(selectedIdss)
+
+
+        if (selectedIdss.includes(index)) {
+            selectedIdss = selectedIdss.filter(id => id !== index)
+        }
+        else {
+            selectedIdss.push(index)
+        }
         setExpandedIndexes(selectedIdss)
+
+
+
     }
     const renderButtonText = (rowData) => {
         const { id, title, pair } = rowData;
@@ -368,11 +381,9 @@ const HomeScreen = (props) => {
                             </Pressable>
 
                         )}
-                        {!expandedIndexes.includes(index) &&
-                            item?.tickers?.length > 2 &&
-                            <Pressable
-                                onPress={() => addIndexExpand(index)}
-                            >
+                        {/* {!expandedIndexes?.includes(index) && */}
+                        {item?.tickers?.length > 2 &&
+                            <Pressable onPress={() => addIndexExpand(index)}>
                                 <Image source={iconPath.threeHorizontalDots} style={{ width: wp(10), height: wp(8), resizeMode: "contain" }} />
                             </Pressable>
                         }

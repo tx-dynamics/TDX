@@ -639,7 +639,7 @@ const TradeScreenTicker = (props) => {
                     </View>}
 
                 {IsQuantityError ?
-                    <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{'Quantity must not exceed 2 decimal places.\n Second decimal place digit must be either "5" or "0"'}</Text>
+                    <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{'Quantity must not exceed 2 decima places. Second decimal place digit must be either "5" or " O". If Sell order, quantity must not exceed your stock quantity'}</Text>
                     :
                     selectedBtn === "Buy" ? <Text style={{ color: 'red', fontSize: 10.5, marginLeft: 12, textAlign: 'center', marginTop: 1, fontFamily: fonts.Poppins }}>{""}</Text> : null
                 }

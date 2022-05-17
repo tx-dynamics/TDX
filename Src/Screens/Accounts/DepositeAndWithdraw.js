@@ -104,8 +104,8 @@ export default function DepositeAndWithdraw(props) {
                                 <ResponsiveText size="h9" fontFamily={fonts.Poppins_Medium} color={item?.status === 0 ? "#F4BB32" : item?.status === 1 ? "#019146" : item?.status === 2 && "#DB1222"} textAlign={"center"}>{item?.status_text}</ResponsiveText>
                             </View>
                             <View style={{ flexDirection: "row", marginTop: wp(2) }}>
-                                <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{item?.withdraw_type === "Commodity" ? "Quantity (MT):" : `${"Amount ("}${userInfo?.currency_iso}${"):"}`}</ResponsiveText>
-                                <ResponsiveText size="h8" margin={[10, 0, 0, 8]}>{(item?.amount * current_currency_rate).toFixed(1)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</ResponsiveText>
+                                <ResponsiveText size="h8" fontFamily={fonts.Poppins_Medium} margin={[10, 0, 0, 5]}>{item?.withdraw_type.toLowerCase() === "commodity" ? "Quantity (MT):" : `${"Amount (GH₵)"}` }</ResponsiveText>
+                                <ResponsiveText size="h8" margin={[10, 0, 0, 8]}>{item?.amount?.toFixed(1)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</ResponsiveText>
                             </View>
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>

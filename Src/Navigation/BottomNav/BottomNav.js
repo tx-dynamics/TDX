@@ -17,35 +17,6 @@ import { fonts } from '../../Constants/Fonts';
 // import HotDog from '../Stack/HotDog';
 const Tab = createBottomTabNavigator();
 
-function Screen1() {
-  return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 20 }}> </Text>
-    </View>
-  );
-}
-function Screen2() {
-  return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 20 }}> </Text>
-    </View>
-  );
-}
-function Screen3() {
-  return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 20 }}></Text>
-    </View>
-  );
-}
-function Screen4() {
-  return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 20 }}> </Text>
-    </View>
-  );
-}
-
 export default function BottomNav() {
   return (
     <Tab.Navigator
